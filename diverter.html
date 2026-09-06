@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Python If/Elif/Else Visualizer | Automated Water Diverter</title>
+  <meta name="description" content="Interactive Python control flow visualizer demonstrating if, elif, and else statements through an automated industrial water diverter analogy. Zero dependencies, 100% offline capable.">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    /* Reset & Fullscreen Non-Scrollable Layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --bg-base: #0a0d14;
+      --bg-panel: #111724;
+      --bg-card: rgba(22, 30, 46, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.15);
+      
+      --steam-color: #ff5722;
+      --steam-glow: rgba(255, 87, 34, 0.4);
+      --steam-bg: rgba(255, 87, 34, 0.12);
+      
+      --ice-color: #38bdf8;
+      --ice-glow: rgba(56, 189, 248, 0.45);
+      --ice-bg: rgba(56, 189, 248, 0.12);
+      
+      --water-color: #3b82f6;
+      --water-glow: rgba(59, 130, 246, 0.4);
+      --water-bg: rgba(59, 130, 246, 0.12);
+
+      --success-green: #22c55e;
+      --danger-red: #ef4444;
+      --code-bg: #090d16;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      color: #f1f5f9;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fixed App Header */
+    header {
+      height: 48px;
+      background: rgba(13, 17, 26, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back-hub {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-back-hub:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .app-icon-badge svg {
+      width: 16px;
+      height: 16px;
+      color: #fff;
+    }
+
+    .app-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #f1f5f9;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .preset-pill.active {
+      background: rgba(59, 130, 246, 0.25);
+      border-color: #3b82f6;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tool-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .status-offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    .pulse-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Main Fullscreen Stage (3 Columns + Code Overlay) */
+    main {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 48px);
+      position: relative;
+      display: grid;
+      grid-template-columns: 290px 1fr 340px;
+      gap: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 50%, #111726 0%, #080b12 100%);
+    }
+
+    /* Fullscreen Background Canvas for flowing fluid & particles */
+    #fluidCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* LEFT COLUMN: Water Intake & Temperature Controls */
+    .col-intake {
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      border-right: 1px solid var(--border-subtle);
+      background: rgba(14, 19, 31, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 2px 7px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    .intake-pipe-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .intake-pipe-visual {
+      height: 48px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+      border: 2px solid #475569;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    .intake-pipe-stream {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 24px;
+      transition: background 0.3s ease;
+    }
+
+    .pipe-flow-label {
+      position: relative;
+      z-index: 2;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Interactive Thermometer & Slider Container */
+    .slider-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      justify-content: space-between;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .temp-readout-box {
+      background: #080c14;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .temp-readout-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .temp-readout-value {
+      font-size: 32px;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      line-height: 1.1;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .temp-readout-state {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Vertical / Custom Slider Area */
+    .slider-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slider-scale-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+      font-family: var(--font-mono);
+      color: #64748b;
+      padding: 0 4px;
+    }
+
+    .custom-range-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(to right, #38bdf8 0%, #38bdf8 25%, #3b82f6 26%, #3b82f6 74%, #ff5722 75%, #ff5722 100%);
+      outline: none;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+    }
+
+    .custom-range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 2px 6px rgba(0,0,0,0.5);
+      cursor: grab;
+      transition: transform 0.1s ease;
+    }
+
+    .custom-range-slider::-webkit-slider-thumb:active {
+      cursor: grabbing;
+      transform: scale(1.15);
+    }
+
+    .custom-range-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 2px 6px rgba(0,0,0,0.5);
+      cursor: grab;
+    }
+
+    .step-btn-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .step-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 6px 0;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .step-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .step-btn:active {
+      transform: scale(0.96);
+    }
+
+    .threshold-guide {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .guide-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .guide-item.active-guide {
+      background: rgba(255, 255, 255, 0.08);
+      font-weight: 700;
+    }
+
+    .guide-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* CENTER COLUMN: The Mechanical Sorting Junction */
+    .col-center {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 10px;
+      z-index: 20;
+    }
+
+    /* Top Mutual Exclusivity Banner */
+    .exclusivity-banner {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      padding: 5px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+    }
+
+    .exclusivity-banner strong {
+      color: #f8fafc;
+    }
+
+    .banner-badge {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Central Mechanical Junction Chamber */
+    .junction-container {
+      width: 100%;
+      max-width: 320px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .junction-housing {
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 3px solid #475569;
+      border-radius: 28px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    /* Junction Intake Port & Three Outlet Ports */
+    .junction-port-in {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 48px;
+      background: #334155;
+      border: 2px solid #64748b;
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+    }
+
+    .junction-port-out {
+      position: absolute;
+      right: -20px;
+      width: 24px;
+      height: 36px;
+      background: #334155;
+      border: 2px solid #64748b;
+      border-left: none;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .junction-port-out.top { top: 22px; }
+    .junction-port-out.mid { top: 50%; transform: translateY(-50%); }
+    .junction-port-out.bot { bottom: 22px; }
+
+    /* Flashing Digital Sensor Housing */
+    .sensor-box {
+      width: 170px;
+      background: #070a10;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 0, 0, 0.4);
+      position: relative;
+      z-index: 5;
+    }
+
+    .sensor-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sensor-title {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+
+    .sensor-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+      animation: sensorBlink 0.6s infinite alternate ease-in-out;
+    }
+
+    @keyframes sensorBlink {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; filter: brightness(1.4); }
+    }
+
+    .sensor-digits {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+    }
+
+    .sensor-unit {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    /* Mechanical Diverter Arm in Center */
+    .diverter-diverter-arm {
+      width: 110px;
+      height: 10px;
+      background: linear-gradient(90deg, #64748b 0%, #cbd5e1 50%, #64748b 100%);
+      border: 1px solid #1e293b;
+      border-radius: 5px;
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform-origin: 10px 50%;
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      z-index: 2;
+    }
+
+    .diverter-pivot-point {
+      width: 22px;
+      height: 22px;
+      background: radial-gradient(circle, #f8fafc 0%, #64748b 70%, #1e293b 100%);
+      border: 2px solid #0f172a;
+      border-radius: 50%;
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Visual Gate Status Indicators */
+    .junction-gate-badges {
+      position: absolute;
+      right: -130px;
+      display: flex;
+      flex-direction: column;
+      gap: 34px;
+      width: 115px;
+    }
+
+    .gate-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.25s ease;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #64748b;
+    }
+
+    .gate-badge.gate-open {
+      color: #ffffff;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    /* Bottom Evaluation Stepper & Explanation */
+    .eval-stepper-box {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    .stepper-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .eval-flow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      flex-wrap: wrap;
+    }
+
+    .eval-step {
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .eval-step.true-step {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: #22c55e;
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    .eval-step.false-step {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      text-decoration: line-through;
+    }
+
+    .eval-step.skipped-step {
+      opacity: 0.4;
+      border-style: dashed;
+    }
+
+    /* RIGHT COLUMN: Three Destination Tanks / Machines */
+    .col-destinations {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-left: 1px solid var(--border-subtle);
+      background: rgba(14, 19, 31, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      gap: 10px;
+      height: 100%;
+    }
+
+    .dest-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dest-card.active-dest {
+      transform: scale(1.02);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Destination 1: Steam Turbine */
+    .dest-turbine.active-dest {
+      border-color: var(--steam-color);
+      background: linear-gradient(135deg, rgba(255, 87, 34, 0.15) 0%, rgba(20, 10, 8, 0.9) 100%);
+      box-shadow: 0 0 24px var(--steam-glow);
+    }
+
+    /* Destination 2: Ice Crusher */
+    .dest-ice.active-dest {
+      border-color: var(--ice-color);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(8, 20, 32, 0.9) 100%);
+      box-shadow: 0 0 24px var(--ice-glow);
+    }
+
+    /* Destination 3: Municipal Tank */
+    .dest-water.active-dest {
+      border-color: var(--water-color);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(8, 16, 32, 0.9) 100%);
+      box-shadow: 0 0 24px var(--water-glow);
+    }
+
+    .dest-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dest-name-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dest-icon-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .dest-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .dest-condition-chip {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Machine Visual Animations */
+    .dest-machine-viewport {
+      height: 48px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Turbine Blades Animation */
+    .turbine-fan {
+      width: 36px;
+      height: 36px;
+      position: relative;
+      animation: spinTurbine 3s linear infinite paused;
+    }
+
+    .dest-turbine.active-dest .turbine-fan {
+      animation-play-state: running;
+      animation-duration: 0.4s;
+    }
+
+    @keyframes spinTurbine {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fan-blade {
+      position: absolute;
+      width: 6px;
+      height: 18px;
+      background: #ff7043;
+      border-radius: 3px;
+      left: 15px;
+      top: 0;
+      transform-origin: 3px 18px;
+      box-shadow: 0 0 6px rgba(255, 87, 34, 0.8);
+    }
+
+    .fan-blade:nth-child(1) { transform: rotate(0deg); }
+    .fan-blade:nth-child(2) { transform: rotate(60deg); }
+    .fan-blade:nth-child(3) { transform: rotate(120deg); }
+    .fan-blade:nth-child(4) { transform: rotate(180deg); }
+    .fan-blade:nth-child(5) { transform: rotate(240deg); }
+    .fan-blade:nth-child(6) { transform: rotate(300deg); }
+
+    /* Ice Crusher Gears Animation */
+    .crusher-gears {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .crusher-gear {
+      width: 30px;
+      height: 30px;
+      border: 3px dashed #38bdf8;
+      border-radius: 50%;
+      animation: spinGear 4s linear infinite paused;
+    }
+
+    .crusher-gear.reverse {
+      animation-direction: reverse;
+    }
+
+    .dest-ice.active-dest .crusher-gear {
+      animation-play-state: running;
+      animation-duration: 0.8s;
+      border-color: #bae6fd;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
+    }
+
+    @keyframes spinGear {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Municipal Tank Water Wave Animation */
+    .tank-water-stage {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tank-water-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 28px;
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.6) 0%, rgba(29, 78, 216, 0.8) 100%);
+      transition: height 0.5s ease;
+    }
+
+    .dest-water.active-dest .tank-water-fill {
+      height: 38px;
+      background: linear-gradient(180deg, rgba(96, 165, 250, 0.8) 0%, rgba(37, 99, 235, 0.95) 100%);
+    }
+
+    .dest-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10.5px;
+    }
+
+    .dest-gate-state {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    /* Floating Python Code Overlay Panel */
+    .code-overlay-card {
+      position: absolute;
+      bottom: 14px;
+      left: 304px;
+      width: 380px;
+      background: rgba(9, 13, 22, 0.95);
+      border: 2px solid var(--border-light);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .code-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 4px;
+    }
+
+    .code-card-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .code-exec-indicator {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Code Lines */
+    .code-snippet {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .code-line {
+      padding: 2px 6px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+      white-space: pre;
+    }
+
+    .code-line.active-line {
+      font-weight: 700;
+      position: relative;
+    }
+
+    .code-line.line-if.active-line {
+      background: rgba(255, 87, 34, 0.25);
+      border-left: 3px solid var(--steam-color);
+      color: #ffccbc;
+    }
+
+    .code-line.line-elif.active-line {
+      background: rgba(56, 189, 248, 0.25);
+      border-left: 3px solid var(--ice-color);
+      color: #e0f2fe;
+    }
+
+    .code-line.line-else.active-line {
+      background: rgba(59, 130, 246, 0.25);
+      border-left: 3px solid var(--water-color);
+      color: #dbeafe;
+    }
+
+    .code-line.dim-line {
+      opacity: 0.4;
+    }
+
+    .kw-python { color: #f472b6; font-weight: 700; }
+    .op-python { color: #38bdf8; }
+    .num-python { color: #facc15; }
+    .fn-python { color: #a78bfa; }
+
+    .code-pointer {
+      display: inline-block;
+      width: 14px;
+      font-size: 9px;
+      color: #4ade80;
+    }
+
+    .code-footer-tip {
+      font-size: 9.5px;
+      color: #94a3b8;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Modal / Info Dialog */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      width: 90%;
+      max-width: 520px;
+      background: #111827;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-body {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-body ul {
+      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-close-btn {
+      align-self: flex-end;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header>
+    <div class="header-left">
+      <a href="./index.html" class="btn-back-hub" id="backToHubBtn" title="Return to Visualizer Hub">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Hub</span>
+      </a>
+
+      <div class="app-title-group">
+        <div class="app-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8m-8 5h5m-5 5h8M4 4h16v16H4z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">Automated Water Diverter</h1>
+          <div class="app-subtitle">
+            <span>Python Control Flow: if / elif / else</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Presets in Center Header -->
+    <div class="header-center">
+      <span style="font-size: 10.5px; color: #64748b; font-weight: 600;">Presets:</span>
+      <button class="preset-pill" data-temp="-35" title="Freezing frost (-35°C)">-35°C (Ice)</button>
+      <button class="preset-pill" data-temp="0" title="Freezing boundary (0°C)">0°C (Boundary)</button>
+      <button class="preset-pill active" data-temp="25" title="Ambient drinking water (25°C)">25°C (Default)</button>
+      <button class="preset-pill" data-temp="100" title="Boiling boundary (100°C)">100°C (Boundary)</button>
+      <button class="preset-pill" data-temp="135" title="Superheated steam (135°C)">135°C (Steam)</button>
+    </div>
+
+    <!-- Right Utility Buttons -->
+    <div class="header-right">
+      <button class="tool-btn" id="btnAudioToggle" title="Toggle audio feedback">
+        <span id="audioIcon">🔊</span>
+        <span id="audioLabel">Sound ON</span>
+      </button>
+
+      <button class="tool-btn" id="btnHelpModal" title="Explain control flow rules">
+        <span>❓ Concept Guide</span>
+      </button>
+
+      <div class="status-offline-badge">
+        <span class="pulse-indicator"></span>
+        <span>Offline Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Visualizer Canvas & Grid -->
+  <main>
+    <!-- Background Canvas for Real-Time Hydraulic Fluid Particles -->
+    <canvas id="fluidCanvas"></canvas>
+
+    <!-- COLUMN 1: Intake Pipe & Temperature Slider -->
+    <section class="col-intake">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="section-tag">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          Step 1: Input Variable
+        </span>
+
+        <!-- Pipe Visual -->
+        <div class="intake-pipe-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; font-weight: 700; color: #e2e8f0;">Main Water Supply</span>
+            <span style="font-size: 9.5px; font-family: var(--font-mono); color: #94a3b8;" id="flowRateLabel">Flow: Constant 100 L/s</span>
+          </div>
+
+          <div class="intake-pipe-visual">
+            <div class="intake-pipe-stream" id="intakeStream"></div>
+            <div class="pipe-flow-label">
+              <span>INFLOW</span>
+              <span id="intakeStateIcon">💧</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Temperature Controller Card -->
+      <div class="slider-card">
+        <div>
+          <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; display: block; margin-bottom: 8px;">
+            Interactive Temperature Control
+          </span>
+
+          <!-- Digital Readout Display -->
+          <div class="temp-readout-box">
+            <div class="temp-readout-label">Variable: <code style="color: #38bdf8;">temperature</code></div>
+            <div class="temp-readout-value" id="tempDisplay">25°C</div>
+            <div class="temp-readout-state" id="tempStateDisplay">Liquid Water</div>
+          </div>
+        </div>
+
+        <!-- Slider Range & Controls -->
+        <div class="slider-zone">
+          <div class="slider-scale-legend">
+            <span>-50°C</span>
+            <span style="color: #38bdf8; font-weight: 700;">0°C</span>
+            <span>50°C</span>
+            <span style="color: #ff5722; font-weight: 700;">100°C</span>
+            <span>150°C</span>
+          </div>
+
+          <input 
+            type="range" 
+            id="tempSlider" 
+            class="custom-range-slider" 
+            min="-50" 
+            max="150" 
+            value="25" 
+            step="1" 
+            aria-label="Water Temperature Slider"
+          />
+
+          <!-- Fine adjustment buttons -->
+          <div class="step-btn-group">
+            <button class="step-btn" id="btnMinus10">-10°</button>
+            <button class="step-btn" id="btnMinus1">-1°</button>
+            <button class="step-btn" id="btnPlus1">+1°</button>
+            <button class="step-btn" id="btnPlus10">+10°</button>
+          </div>
+        </div>
+
+        <!-- Educational Threshold Legend -->
+        <div class="threshold-guide">
+          <div class="guide-item" id="guideIf">
+            <div><span class="guide-dot" style="background: var(--steam-color);"></span><code>temperature &gt;= 100</code></div>
+            <span style="color: #ff8a65;">Steam Turbine</span>
+          </div>
+          <div class="guide-item" id="guideElif">
+            <div><span class="guide-dot" style="background: var(--ice-color);"></span><code>temperature &lt;= 0</code></div>
+            <span style="color: #7dd3fc;">Ice Crusher</span>
+          </div>
+          <div class="guide-item active-guide" id="guideElse">
+            <div><span class="guide-dot" style="background: var(--water-color);"></span><code>else</code> (1°C to 99°C)</div>
+            <span style="color: #93c5fd;">Municipal Tank</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 2: Mechanical Sorting Junction & Flashing Sensor -->
+    <section class="col-center">
+      <!-- Mutual Exclusivity Concept Banner -->
+      <div class="exclusivity-banner">
+        <span class="banner-badge">MUTUAL EXCLUSIVITY</span>
+        <span>Exactly <strong>ONE</strong> destination pipe can be open at any time.</span>
+      </div>
+
+      <!-- Center Sorting Junction Apparatus -->
+      <div class="junction-container">
+        <!-- Mechanical Housing -->
+        <div class="junction-housing">
+          <!-- Left Intake Port -->
+          <div class="junction-port-in"></div>
+
+          <!-- Right Outlet Ports -->
+          <div class="junction-port-out top"></div>
+          <div class="junction-port-out mid"></div>
+          <div class="junction-port-out bot"></div>
+
+          <!-- Pivot Point & Rotating Mechanical Diverter Arm -->
+          <div class="diverter-diverter-arm" id="diverterArm"></div>
+          <div class="diverter-pivot-point"></div>
+
+          <!-- Flashing Digital Sensor Readout -->
+          <div class="sensor-box">
+            <div class="sensor-header">
+              <span class="sensor-title">DIGITAL SENSOR T-400</span>
+              <div class="sensor-led" id="sensorLed"></div>
+            </div>
+            <div class="sensor-digits">
+              <span id="sensorValue">25</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div style="font-size: 8px; color: #64748b; font-family: var(--font-mono); text-transform: uppercase;">
+              Active Gate: <span id="activeGateText" style="color: #60a5fa; font-weight: 700;">ROUTE 3 (ELSE)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Three External Gate Status Badges -->
+        <div class="junction-gate-badges">
+          <div class="gate-badge" id="gateBadgeTurbine">
+            <span id="gateIconTurbine">🔒</span>
+            <span>STEAM GATE</span>
+          </div>
+          <div class="gate-badge" id="gateBadgeIce">
+            <span id="gateIconIce">🔒</span>
+            <span>ICE GATE</span>
+          </div>
+          <div class="gate-badge gate-open" id="gateBadgeMunicipal">
+            <span id="gateIconMunicipal">🔓</span>
+            <span>WATER GATE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Evaluation Stepper -->
+      <div class="eval-stepper-box">
+        <div class="stepper-title">
+          <span>Python Execution Trace</span>
+          <span style="color: #60a5fa;">Top-to-Bottom Order</span>
+        </div>
+        <div class="eval-flow" id="evalFlow">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 3: Three Destination Machines / Tanks -->
+    <section class="col-destinations">
+      <!-- DESTINATION 1: Steam Turbine (Red/Orange) -->
+      <article class="dest-card dest-turbine" id="cardTurbine">
+        <div class="dest-header">
+          <div class="dest-name-group">
+            <div class="dest-icon-box" style="background: rgba(255, 87, 34, 0.2); color: #ff5722;">
+              ♨️
+            </div>
+            <div>
+              <h2 class="dest-title" style="color: #ff7043;">Steam Turbine</h2>
+              <span style="font-size: 10px; color: #94a3b8;">High-pressure thermal generation</span>
+            </div>
+          </div>
+          <span class="dest-condition-chip" style="color: #ffab91;">if temp &gt;= 100:</span>
+        </div>
+
+        <div class="dest-machine-viewport">
+          <div class="turbine-fan">
+            <div class="fan-blade"></div>
+            <div class="fan-blade"></div>
+            <div class="fan-blade"></div>
+            <div class="fan-blade"></div>
+            <div class="fan-blade"></div>
+            <div class="fan-blade"></div>
+          </div>
+        </div>
+
+        <div class="dest-status-row">
+          <div class="dest-gate-state">
+            <span id="turbineStatusIcon">⛔</span>
+            <span id="turbineStatusText" style="color: #94a3b8;">BLOCKED: Valve Closed</span>
+          </div>
+          <span style="font-size: 9.5px; font-family: var(--font-mono); color: #ff8a65;" id="turbineOutput">0 kW</span>
+        </div>
+      </article>
+
+      <!-- DESTINATION 2: Ice Crusher (Icy Blue/White) -->
+      <article class="dest-card dest-ice" id="cardIce">
+        <div class="dest-header">
+          <div class="dest-name-group">
+            <div class="dest-icon-box" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">
+              ❄️
+            </div>
+            <div>
+              <h2 class="dest-title" style="color: #38bdf8;">Ice Crusher</h2>
+              <span style="font-size: 10px; color: #94a3b8;">Sub-zero solid cryo-crushing</span>
+            </div>
+          </div>
+          <span class="dest-condition-chip" style="color: #bae6fd;">elif temp &lt;= 0:</span>
+        </div>
+
+        <div class="dest-machine-viewport">
+          <div class="crusher-gears">
+            <div class="crusher-gear"></div>
+            <div class="crusher-gear reverse"></div>
+          </div>
+        </div>
+
+        <div class="dest-status-row">
+          <div class="dest-gate-state">
+            <span id="iceStatusIcon">⛔</span>
+            <span id="iceStatusText" style="color: #94a3b8;">BLOCKED: Chute Sealed</span>
+          </div>
+          <span style="font-size: 9.5px; font-family: var(--font-mono); color: #7dd3fc;" id="iceOutput">0 kg/s</span>
+        </div>
+      </article>
+
+      <!-- DESTINATION 3: Municipal Drinking Tank (Standard Blue) -->
+      <article class="dest-card dest-water active-dest" id="cardMunicipal">
+        <div class="dest-header">
+          <div class="dest-name-group">
+            <div class="dest-icon-box" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+              🚰
+            </div>
+            <div>
+              <h2 class="dest-title" style="color: #60a5fa;">Municipal Drinking Tank</h2>
+              <span style="font-size: 10px; color: #94a3b8;">Potable filtered community water</span>
+            </div>
+          </div>
+          <span class="dest-condition-chip" style="color: #bfdbfe;">else: (Default)</span>
+        </div>
+
+        <div class="dest-machine-viewport">
+          <div class="tank-water-stage">
+            <div class="tank-water-fill"></div>
+          </div>
+        </div>
+
+        <div class="dest-status-row">
+          <div class="dest-gate-state">
+            <span id="waterStatusIcon">✅</span>
+            <span id="waterStatusText" style="color: #60a5fa;">OPEN: Diverting Flow</span>
+          </div>
+          <span style="font-size: 9.5px; font-family: var(--font-mono); color: #93c5fd;" id="waterOutput">100 L/s Flowing</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- FLOATING SCREEN OVERLAY: Dynamic Python Code Block -->
+    <aside class="code-overlay-card">
+      <div class="code-card-header">
+        <span class="code-card-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          Python Code: Live Evaluation
+        </span>
+        <span class="code-exec-indicator" id="codeBranchBadge">
+          <span>▶ Line 5 Running</span>
+        </span>
+      </div>
+
+      <div class="code-snippet">
+        <div class="code-line line-if" id="line1"><span class="code-pointer" id="ptr1">  </span><span class="kw-python">if</span> temperature <span class="op-python">&gt;=</span> <span class="num-python">100</span>:</div>
+        <div class="code-line line-if" id="line2"><span class="code-pointer" id="ptr2">  </span>    <span class="fn-python">divert_to_steam_turbine</span>()</div>
+        <div class="code-line line-elif" id="line3"><span class="code-pointer" id="ptr3">  </span><span class="kw-python">elif</span> temperature <span class="op-python">&lt;=</span> <span class="num-python">0</span>:</div>
+        <div class="code-line line-elif" id="line4"><span class="code-pointer" id="ptr4">  </span>    <span class="fn-python">divert_to_ice_crusher</span>()</div>
+        <div class="code-line line-else active-line" id="line5"><span class="code-pointer" id="ptr5">▶ </span><span class="kw-python">else</span>:</div>
+        <div class="code-line line-else active-line" id="line6"><span class="code-pointer" id="ptr6">  </span>    <span class="fn-python">divert_to_municipal_tank</span>()</div>
+      </div>
+
+      <div class="code-footer-tip" id="codeTip">
+        <span>💡</span>
+        <span id="codeTipText">When both 'if' and 'elif' evaluate to False, Python executes 'else' without testing any condition.</span>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Educational Concept Dialog -->
+  <div class="modal-backdrop" id="helpModal">
+    <div class="modal-dialog">
+      <h3 class="modal-title">Python Control Flow: if / elif / else</h3>
+      <div class="modal-body">
+        <p>In Python, conditional statements let programs make decisions based on runtime data.</p>
+        <ul>
+          <li><strong>Top-to-Bottom Execution:</strong> Python tests conditions in the exact order they are written.</li>
+          <li><strong>Mutual Exclusivity:</strong> As soon as <em>one</em> condition evaluates to <code>True</code>, Python runs that branch and <strong>immediately skips the rest</strong> of the conditional chain.</li>
+          <li><strong><code>elif</code> (Else If):</strong> Only tested if all previous conditions were <code>False</code>.</li>
+          <li><strong><code>else</code>:</strong> Has NO condition to evaluate. It serves as the guaranteed catch-all default whenever none of the preceding conditions matched.</li>
+        </ul>
+      </div>
+      <button class="modal-close-btn" id="btnCloseModal">Got it!</button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       Python Control Flow Logic & Visualizer Script
+       100% Vanilla JS, No external libraries, Offline-first
+       ========================================================= */
+
+    // State Variables
+    let currentTemp = 25;
+    let audioEnabled = true;
+    let currentBranch = 'else'; // 'if', 'elif', 'else'
+
+    // DOM Elements
+    const tempSlider = document.getElementById('tempSlider');
+    const tempDisplay = document.getElementById('tempDisplay');
+    const tempStateDisplay = document.getElementById('tempStateDisplay');
+    const sensorValue = document.getElementById('sensorValue');
+    const sensorLed = document.getElementById('sensorLed');
+    const activeGateText = document.getElementById('activeGateText');
+    const intakeStream = document.getElementById('intakeStream');
+    const intakeStateIcon = document.getElementById('intakeStateIcon');
+    const diverterArm = document.getElementById('diverterArm');
+
+    // Cards
+    const cardTurbine = document.getElementById('cardTurbine');
+    const cardIce = document.getElementById('cardIce');
+    const cardMunicipal = document.getElementById('cardMunicipal');
+
+    // Badges & Gate Icons
+    const gateBadgeTurbine = document.getElementById('gateBadgeTurbine');
+    const gateBadgeIce = document.getElementById('gateBadgeIce');
+    const gateBadgeMunicipal = document.getElementById('gateBadgeMunicipal');
+    const gateIconTurbine = document.getElementById('gateIconTurbine');
+    const gateIconIce = document.getElementById('gateIconIce');
+    const gateIconMunicipal = document.getElementById('gateIconMunicipal');
+
+    // Status Texts
+    const turbineStatusIcon = document.getElementById('turbineStatusIcon');
+    const turbineStatusText = document.getElementById('turbineStatusText');
+    const turbineOutput = document.getElementById('turbineOutput');
+
+    const iceStatusIcon = document.getElementById('iceStatusIcon');
+    const iceStatusText = document.getElementById('iceStatusText');
+    const iceOutput = document.getElementById('iceOutput');
+
+    const waterStatusIcon = document.getElementById('waterStatusIcon');
+    const waterStatusText = document.getElementById('waterStatusText');
+    const waterOutput = document.getElementById('waterOutput');
+
+    // Guide Items
+    const guideIf = document.getElementById('guideIf');
+    const guideElif = document.getElementById('guideElif');
+    const guideElse = document.getElementById('guideElse');
+
+    // Code lines
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    const line3 = document.getElementById('line3');
+    const line4 = document.getElementById('line4');
+    const line5 = document.getElementById('line5');
+    const line6 = document.getElementById('line6');
+    const ptr1 = document.getElementById('ptr1');
+    const ptr2 = document.getElementById('ptr2');
+    const ptr3 = document.getElementById('ptr3');
+    const ptr4 = document.getElementById('ptr4');
+    const ptr5 = document.getElementById('ptr5');
+    const ptr6 = document.getElementById('ptr6');
+    const codeBranchBadge = document.getElementById('codeBranchBadge');
+    const codeTipText = document.getElementById('codeTipText');
+    const evalFlow = document.getElementById('evalFlow');
+
+    // Preset Buttons
+    const presetButtons = document.querySelectorAll('.preset-pill');
+
+    /* =========================================================
+       Synthesized Web Audio Feedback (Zero Dependencies)
+       ========================================================= */
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playClankSound(type) {
+      if (!audioEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'if') {
+          // High-pressure steam release / hiss
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(1400, now);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'elif') {
+          // Sharp ice crunch
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(580, now);
+          osc.frequency.exponentialRampToValueAtTime(220, now + 0.2);
+          filter.type = 'highpass';
+          filter.frequency.setValueAtTime(800, now);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        } else {
+          // Deep metallic hydraulic valve clunk
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(60, now + 0.2);
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(600, now);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (err) {
+        // Audio errors fail silently
+      }
+    }
+
+    /* =========================================================
+       Core Control Flow Logic Evaluation
+       ========================================================= */
+    function updateVisualizer(temp, isInitial = false) {
+      currentTemp = parseInt(temp, 10);
+      sensorValue.textContent = currentTemp;
+      tempDisplay.textContent = `${currentTemp}°C`;
+
+      let newBranch = 'else';
+
+      // Evaluate Python logic step-by-step
+      if (currentTemp >= 100) {
+        newBranch = 'if';
+      } else if (currentTemp <= 0) {
+        newBranch = 'elif';
+      } else {
+        newBranch = 'else';
+      }
+
+      const branchChanged = (newBranch !== currentBranch);
+      if (branchChanged && !isInitial) {
+        playClankSound(newBranch);
+      }
+      currentBranch = newBranch;
+
+      // Update Slider active preset pill
+      presetButtons.forEach(btn => {
+        const btnVal = parseInt(btn.getAttribute('data-temp'), 10);
+        btn.classList.toggle('active', btnVal === currentTemp);
+      });
+
+      // Render States based on Branch
+      if (currentBranch === 'if') {
+        // 1. STEAM TURBINE ACTIVE
+        tempDisplay.style.color = '#ff5722';
+        tempDisplay.style.textShadow = '0 0 16px rgba(255, 87, 34, 0.6)';
+        tempStateDisplay.textContent = 'Superheated Steam (Vapor)';
+        tempStateDisplay.style.color = '#ff8a65';
+        sensorLed.style.background = '#ff5722';
+        sensorLed.style.boxShadow = '0 0 10px #ff5722';
+        activeGateText.textContent = 'ROUTE 1 (IF: STEAM)';
+        activeGateText.style.color = '#ff7043';
+
+        intakeStream.style.background = 'linear-gradient(90deg, #ff7043 0%, #ff5722 100%)';
+        intakeStateIcon.textContent = '♨️';
+
+        // Diverter arm points UP (-38 degrees)
+        diverterArm.style.transform = 'translateY(-50%) rotate(-36deg)';
+
+        // Dest Cards
+        cardTurbine.classList.add('active-dest');
+        cardIce.classList.remove('active-dest');
+        cardMunicipal.classList.remove('active-dest');
+
+        // Gates
+        gateBadgeTurbine.className = 'gate-badge gate-open';
+        gateBadgeTurbine.style.borderColor = '#ff5722';
+        gateIconTurbine.textContent = '🔓';
+
+        gateBadgeIce.className = 'gate-badge';
+        gateBadgeIce.style.borderColor = '';
+        gateIconIce.textContent = '🔒';
+
+        gateBadgeMunicipal.className = 'gate-badge';
+        gateBadgeMunicipal.style.borderColor = '';
+        gateIconMunicipal.textContent = '🔒';
+
+        // Status text
+        turbineStatusIcon.textContent = '✅';
+        turbineStatusText.textContent = 'OPEN: Diverting Steam';
+        turbineStatusText.style.color = '#ff7043';
+        turbineOutput.textContent = `${Math.min(2500, Math.round((currentTemp - 90) * 28))} kW Power`;
+
+        iceStatusIcon.textContent = '⛔';
+        iceStatusText.textContent = 'BLOCKED: Chute Sealed';
+        iceStatusText.style.color = '#94a3b8';
+        iceOutput.textContent = '0 kg/s';
+
+        waterStatusIcon.textContent = '⛔';
+        waterStatusText.textContent = 'BLOCKED: Valve Closed';
+        waterStatusText.style.color = '#94a3b8';
+        waterOutput.textContent = '0 L/s';
+
+        // Threshold Guide
+        guideIf.className = 'guide-item active-guide';
+        guideElif.className = 'guide-item';
+        guideElse.className = 'guide-item';
+
+        // Code Highlight
+        highlightCodeLines([1, 2], [3, 4, 5, 6]);
+        codeBranchBadge.innerHTML = '<span>▶ Running if branch (Line 1-2)</span>';
+        codeBranchBadge.style.background = 'rgba(255, 87, 34, 0.25)';
+        codeBranchBadge.style.color = '#ffab91';
+        codeTipText.textContent = `Condition '${currentTemp} >= 100' is True! Python executes line 2 and immediately skips all subsequent elif/else code.`;
+
+        // Execution Stepper Trace
+        evalFlow.innerHTML = `
+          <span class="eval-step true-step">1. [${currentTemp} &gt;= 100] = TRUE</span>
+          <span>➜</span>
+          <span class="eval-step true-step">2. divert_to_steam_turbine()</span>
+          <span>➜</span>
+          <span class="eval-step skipped-step">3. elif skipped</span>
+          <span class="eval-step skipped-step">4. else skipped</span>
+        `;
+
+      } else if (currentBranch === 'elif') {
+        // 2. ICE CRUSHER ACTIVE
+        tempDisplay.style.color = '#38bdf8';
+        tempDisplay.style.textShadow = '0 0 16px rgba(56, 189, 248, 0.6)';
+        tempStateDisplay.textContent = 'Sub-zero Slurry & Solid Ice';
+        tempStateDisplay.style.color = '#7dd3fc';
+        sensorLed.style.background = '#38bdf8';
+        sensorLed.style.boxShadow = '0 0 10px #38bdf8';
+        activeGateText.textContent = 'ROUTE 2 (ELIF: ICE)';
+        activeGateText.style.color = '#38bdf8';
+
+        intakeStream.style.background = 'linear-gradient(90deg, #7dd3fc 0%, #38bdf8 100%)';
+        intakeStateIcon.textContent = '❄️';
+
+        // Diverter arm points HORIZONTAL (0 degrees)
+        diverterArm.style.transform = 'translateY(-50%) rotate(0deg)';
+
+        // Dest Cards
+        cardTurbine.classList.remove('active-dest');
+        cardIce.classList.add('active-dest');
+        cardMunicipal.classList.remove('active-dest');
+
+        // Gates
+        gateBadgeTurbine.className = 'gate-badge';
+        gateBadgeTurbine.style.borderColor = '';
+        gateIconTurbine.textContent = '🔒';
+
+        gateBadgeIce.className = 'gate-badge gate-open';
+        gateBadgeIce.style.borderColor = '#38bdf8';
+        gateIconIce.textContent = '🔓';
+
+        gateBadgeMunicipal.className = 'gate-badge';
+        gateBadgeMunicipal.style.borderColor = '';
+        gateIconMunicipal.textContent = '🔒';
+
+        // Status text
+        turbineStatusIcon.textContent = '⛔';
+        turbineStatusText.textContent = 'BLOCKED: Valve Closed';
+        turbineStatusText.style.color = '#94a3b8';
+        turbineOutput.textContent = '0 kW';
+
+        iceStatusIcon.textContent = '✅';
+        iceStatusText.textContent = 'OPEN: Crushing Ice';
+        iceStatusText.style.color = '#38bdf8';
+        iceOutput.textContent = `${Math.round(40 + Math.abs(currentTemp) * 1.5)} kg/s Crushed`;
+
+        waterStatusIcon.textContent = '⛔';
+        waterStatusText.textContent = 'BLOCKED: Valve Closed';
+        waterStatusText.style.color = '#94a3b8';
+        waterOutput.textContent = '0 L/s';
+
+        // Threshold Guide
+        guideIf.className = 'guide-item';
+        guideElif.className = 'guide-item active-guide';
+        guideElse.className = 'guide-item';
+
+        // Code Highlight
+        highlightCodeLines([3, 4], [1, 2, 5, 6]);
+        codeBranchBadge.innerHTML = '<span>▶ Running elif branch (Line 3-4)</span>';
+        codeBranchBadge.style.background = 'rgba(56, 189, 248, 0.25)';
+        codeBranchBadge.style.color = '#bae6fd';
+        codeTipText.textContent = `Line 1 (${currentTemp} >= 100) was False, so Python tested Line 3 (${currentTemp} <= 0). It is True! Line 4 executes and else is skipped.`;
+
+        // Execution Stepper Trace
+        evalFlow.innerHTML = `
+          <span class="eval-step false-step">1. [${currentTemp} &gt;= 100] = FALSE</span>
+          <span>➜</span>
+          <span class="eval-step true-step">2. [${currentTemp} &lt;= 0] = TRUE</span>
+          <span>➜</span>
+          <span class="eval-step true-step">3. divert_to_ice_crusher()</span>
+          <span class="eval-step skipped-step">4. else skipped</span>
+        `;
+
+      } else {
+        // 3. MUNICIPAL DRINKING TANK ACTIVE (ELSE)
+        tempDisplay.style.color = '#60a5fa';
+        tempDisplay.style.textShadow = '0 0 16px rgba(59, 130, 246, 0.6)';
+        tempStateDisplay.textContent = 'Clean Liquid Water (Ambient)';
+        tempStateDisplay.style.color = '#93c5fd';
+        sensorLed.style.background = '#22c55e';
+        sensorLed.style.boxShadow = '0 0 10px #22c55e';
+        activeGateText.textContent = 'ROUTE 3 (ELSE: DRINKING)';
+        activeGateText.style.color = '#60a5fa';
+
+        intakeStream.style.background = 'linear-gradient(90deg, #60a5fa 0%, #2563eb 100%)';
+        intakeStateIcon.textContent = '💧';
+
+        // Diverter arm points DOWN (+36 degrees)
+        diverterArm.style.transform = 'translateY(-50%) rotate(36deg)';
+
+        // Dest Cards
+        cardTurbine.classList.remove('active-dest');
+        cardIce.classList.remove('active-dest');
+        cardMunicipal.classList.add('active-dest');
+
+        // Gates
+        gateBadgeTurbine.className = 'gate-badge';
+        gateBadgeTurbine.style.borderColor = '';
+        gateIconTurbine.textContent = '🔒';
+
+        gateBadgeIce.className = 'gate-badge';
+        gateBadgeIce.style.borderColor = '';
+        gateIconIce.textContent = '🔒';
+
+        gateBadgeMunicipal.className = 'gate-badge gate-open';
+        gateBadgeMunicipal.style.borderColor = '#3b82f6';
+        gateIconMunicipal.textContent = '🔓';
+
+        // Status text
+        turbineStatusIcon.textContent = '⛔';
+        turbineStatusText.textContent = 'BLOCKED: Valve Closed';
+        turbineStatusText.style.color = '#94a3b8';
+        turbineOutput.textContent = '0 kW';
+
+        iceStatusIcon.textContent = '⛔';
+        iceStatusText.textContent = 'BLOCKED: Chute Sealed';
+        iceStatusText.style.color = '#94a3b8';
+        iceOutput.textContent = '0 kg/s';
+
+        waterStatusIcon.textContent = '✅';
+        waterStatusText.textContent = 'OPEN: Diverting Flow';
+        waterStatusText.style.color = '#60a5fa';
+        waterOutput.textContent = '100 L/s Flowing';
+
+        // Threshold Guide
+        guideIf.className = 'guide-item';
+        guideElif.className = 'guide-item';
+        guideElse.className = 'guide-item active-guide';
+
+        // Code Highlight
+        highlightCodeLines([5, 6], [1, 2, 3, 4]);
+        codeBranchBadge.innerHTML = '<span>▶ Running else fallback (Line 5-6)</span>';
+        codeBranchBadge.style.background = 'rgba(59, 130, 246, 0.25)';
+        codeBranchBadge.style.color = '#bfdbfe';
+        codeTipText.textContent = `Both 'if' (${currentTemp} >= 100) and 'elif' (${currentTemp} <= 0) were False. Python defaults straight into 'else' without testing any condition!`;
+
+        // Execution Stepper Trace
+        evalFlow.innerHTML = `
+          <span class="eval-step false-step">1. [${currentTemp} &gt;= 100] = FALSE</span>
+          <span>➜</span>
+          <span class="eval-step false-step">2. [${currentTemp} &lt;= 0] = FALSE</span>
+          <span>➜</span>
+          <span class="eval-step true-step">3. else fallback</span>
+          <span>➜</span>
+          <span class="eval-step true-step">4. divert_to_municipal_tank()</span>
+        `;
+      }
+    }
+
+    function highlightCodeLines(activeLineNums, dimLineNums) {
+      const allLines = [
+        { num: 1, el: line1, ptr: ptr1 },
+        { num: 2, el: line2, ptr: ptr2 },
+        { num: 3, el: line3, ptr: ptr3 },
+        { num: 4, el: line4, ptr: ptr4 },
+        { num: 5, el: line5, ptr: ptr5 },
+        { num: 6, el: line6, ptr: ptr6 }
+      ];
+
+      allLines.forEach(item => {
+        if (activeLineNums.includes(item.num)) {
+          item.el.classList.add('active-line');
+          item.el.classList.remove('dim-line');
+          item.ptr.textContent = (item.num === activeLineNums[0]) ? '▶ ' : '  ';
+        } else if (dimLineNums.includes(item.num)) {
+          item.el.classList.remove('active-line');
+          item.el.classList.add('dim-line');
+          item.ptr.textContent = '  ';
+        } else {
+          item.el.classList.remove('active-line', 'dim-line');
+          item.ptr.textContent = '  ';
+        }
+      });
+    }
+
+    /* =========================================================
+       Canvas 60FPS Hydraulic Fluid Particle Simulator
+       ========================================================= */
+    const canvas = document.getElementById('fluidCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const NUM_PARTICLES = 65;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class FluidParticle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        // Start on left intake pipe
+        this.x = 20 + Math.random() * 260;
+        this.y = canvas.height * 0.12 + (Math.random() - 0.5) * 16;
+        this.vx = 2.5 + Math.random() * 2.0;
+        this.vy = 0;
+        this.stage = 'intake'; // intake -> junction -> destination
+        this.size = 3 + Math.random() * 3;
+        this.alpha = 0.5 + Math.random() * 0.4;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.08;
+      }
+
+      update() {
+        const junctionCenterX = canvas.width * 0.46;
+        const junctionCenterY = canvas.height * 0.48;
+
+        if (this.stage === 'intake') {
+          this.x += this.vx;
+          // Move towards junction center
+          const dy = junctionCenterY - this.y;
+          this.y += dy * 0.04;
+
+          if (this.x >= junctionCenterX - 60) {
+            this.stage = 'junction';
+          }
+        } else if (this.stage === 'junction') {
+          this.x += this.vx * 1.1;
+          this.y += (junctionCenterY - this.y) * 0.08;
+
+          if (this.x >= junctionCenterX + 30) {
+            this.stage = 'destination';
+          }
+        } else if (this.stage === 'destination') {
+          this.x += this.vx * 1.2;
+          this.rotation += this.rotSpeed;
+
+          // Branch trajectory towards active machine
+          let targetY;
+          if (currentBranch === 'if') {
+            targetY = canvas.height * 0.22; // Top Turbine
+          } else if (currentBranch === 'elif') {
+            targetY = canvas.height * 0.50; // Middle Ice Crusher
+          } else {
+            targetY = canvas.height * 0.80; // Bottom Municipal Tank
+          }
+
+          this.y += (targetY - this.y) * 0.05;
+
+          // Disperse/fade out as it enters destination
+          if (this.x > canvas.width - 40) {
+            this.reset();
+          }
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+
+        if (currentBranch === 'if') {
+          // Billowing Steam particles (Puffy circles / glowing embers)
+          ctx.beginPath();
+          const gradient = ctx.createRadialGradient(0, 0, 1, 0, 0, this.size * 2);
+          gradient.addColorStop(0, `rgba(255, 171, 145, ${this.alpha})`);
+          gradient.addColorStop(0.6, `rgba(255, 87, 34, ${this.alpha * 0.6})`);
+          gradient.addColorStop(1, 'rgba(255, 87, 34, 0)');
+          ctx.fillStyle = gradient;
+          ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (currentBranch === 'elif') {
+          // Sharp Hexagonal Ice Crystal / Diamond
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(186, 230, 253, ${this.alpha})`;
+          ctx.strokeStyle = `rgba(56, 189, 248, ${this.alpha * 0.8})`;
+          ctx.lineWidth = 1;
+          const s = this.size;
+          ctx.rect(-s/2, -s/2, s, s);
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          // Smooth Liquid Water Bubble
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(96, 165, 250, ${this.alpha * 0.8})`;
+          ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Highlight glint
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.9})`;
+          ctx.arc(-this.size * 0.3, -this.size * 0.3, this.size * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+    }
+
+    // Initialize particle pool
+    for (let i = 0; i < NUM_PARTICLES; i++) {
+      const p = new FluidParticle();
+      p.x = Math.random() * canvas.width;
+      particles.push(p);
+    }
+
+    function animateLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+
+      requestAnimationFrame(animateLoop);
+    }
+    requestAnimationFrame(animateLoop);
+
+    /* =========================================================
+       Event Listeners & User Interaction
+       ========================================================= */
+    tempSlider.addEventListener('input', (e) => {
+      initAudio();
+      updateVisualizer(e.target.value);
+    });
+
+    // Preset Buttons
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        initAudio();
+        const val = btn.getAttribute('data-temp');
+        tempSlider.value = val;
+        updateVisualizer(val);
+      });
+    });
+
+    // Fine adjustment buttons
+    document.getElementById('btnMinus10').addEventListener('click', () => {
+      initAudio();
+      const next = Math.max(-50, currentTemp - 10);
+      tempSlider.value = next;
+      updateVisualizer(next);
+    });
+
+    document.getElementById('btnMinus1').addEventListener('click', () => {
+      initAudio();
+      const next = Math.max(-50, currentTemp - 1);
+      tempSlider.value = next;
+      updateVisualizer(next);
+    });
+
+    document.getElementById('btnPlus1').addEventListener('click', () => {
+      initAudio();
+      const next = Math.min(150, currentTemp + 1);
+      tempSlider.value = next;
+      updateVisualizer(next);
+    });
+
+    document.getElementById('btnPlus10').addEventListener('click', () => {
+      initAudio();
+      const next = Math.min(150, currentTemp + 10);
+      tempSlider.value = next;
+      updateVisualizer(next);
+    });
+
+    // Audio Toggle
+    const btnAudioToggle = document.getElementById('btnAudioToggle');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioLabel = document.getElementById('audioLabel');
+
+    btnAudioToggle.addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) {
+        initAudio();
+        audioIcon.textContent = '🔊';
+        audioLabel.textContent = 'Sound ON';
+        playClankSound(currentBranch);
+      } else {
+        audioIcon.textContent = '🔇';
+        audioLabel.textContent = 'Sound OFF';
+      }
+    });
+
+    // Modal Guide
+    const helpModal = document.getElementById('helpModal');
+    const btnHelpModal = document.getElementById('btnHelpModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+
+    btnHelpModal.addEventListener('click', () => {
+      helpModal.classList.add('open');
+    });
+
+    btnCloseModal.addEventListener('click', () => {
+      helpModal.classList.remove('open');
+    });
+
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) {
+        helpModal.classList.remove('open');
+      }
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (helpModal.classList.contains('open')) {
+          helpModal.classList.remove('open');
+        } else {
+          window.location.href = './index.html';
+        }
+      } else if (e.key.toLowerCase() === 'h') {
+        window.location.href = './index.html';
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        const next = Math.min(150, currentTemp + 1);
+        tempSlider.value = next;
+        updateVisualizer(next);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        const next = Math.max(-50, currentTemp - 1);
+        tempSlider.value = next;
+        updateVisualizer(next);
+      }
+    });
+
+    // Initial render
+    updateVisualizer(25, true);
+  </script>
+</body>
+</html>

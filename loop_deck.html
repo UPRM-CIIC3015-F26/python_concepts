@@ -1,0 +1,6183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Python Loop Prediction Quiz | Playing Cards Lab</title>
+  <meta name="description" content="Master Python for loops, while loops, continue, and break through an interactive playing card prediction quiz. Zero dependencies, offline-first.">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --bg-base: #0a0e17;
+      --bg-panel: #111827;
+      --bg-panel-elevated: #1a2333;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.16);
+      --accent-cyan: #38bdf8;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --felt-green: #064e3b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0a0e17 80%);
+      color: #f1f5f9;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fixed App Header */
+    header {
+      height: 48px;
+      min-height: 48px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back-hub {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-back-hub:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .app-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-subtitle-pill {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 7px;
+      border-radius: 9999px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #cbd5e1;
+    }
+    .stat-pill strong {
+      color: #ffffff;
+    }
+
+    .btn-header-tool {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-header-tool:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+      border-color: var(--border-light);
+    }
+
+    /* Main Container (Full screen, no scrollbars) */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(360px, 1fr) minmax(400px, 1.15fr);
+      grid-template-rows: 1.25fr 0.85fr;
+      gap: 12px;
+      padding: 10px 14px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Top Left: The Code Editor */
+    .code-panel {
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+      background: #090d16;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+      min-height: 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .editor-header {
+      height: 36px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      flex-shrink: 0;
+    }
+
+    .window-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-close { background: #ef4444; }
+    .dot-min { background: #f59e0b; }
+    .dot-max { background: #10b981; }
+
+    .editor-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .editor-title .file-name {
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .question-badge {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #d8b4fe;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+    }
+
+    .code-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+      padding: 12px 14px;
+      font-family: var(--font-mono);
+      font-size: clamp(11px, 1.05vw, 13px);
+      line-height: 1.55;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      background: #090d16;
+      min-height: 0;
+    }
+    .code-body::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .code-body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .code-line {
+      display: flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+      white-space: pre;
+      min-width: max-content;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .code-line.active-line {
+      background: rgba(56, 189, 248, 0.2);
+      border-left: 3px solid var(--accent-cyan);
+    }
+    .line-number {
+      width: 24px;
+      color: #475569;
+      text-align: right;
+      margin-right: 12px;
+      font-size: 11px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .line-text {
+      flex: 1;
+      color: #e2e8f0;
+    }
+
+    /* Syntax Highlighting */
+    .syn-kw { color: #f472b6; font-weight: 600; } /* for, in, while, if, elif, else, continue, break */
+    .syn-var { color: #38bdf8; } /* deck, hand, card, i */
+    .syn-fn { color: #fbbf24; } /* len, append */
+    .syn-num { color: #f97316; } /* 0, 1, 2, ... */
+    .syn-op { color: #94a3b8; } /* =, ==, !=, %, <, > */
+    .syn-cm { color: #64748b; font-style: italic; }
+
+    /* Top Right: The Deck Panel */
+    .deck-panel {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+      min-height: 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .deck-header {
+      height: 36px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      flex-shrink: 0;
+    }
+
+    .deck-header-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .deck-header-title code {
+      font-family: var(--font-mono);
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .deck-hint {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .deck-cards-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 8px 10px;
+      gap: clamp(3px, 0.6vw, 8px);
+      background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Playing Card Design: Fluid & Adaptive so all 10 cards are always visible */
+    .card-item {
+      flex: 1 1 0px;
+      max-width: 64px;
+      min-width: 0;
+      aspect-ratio: 2.5 / 3.7;
+      height: auto;
+      max-height: calc(100% - 18px);
+      background: #ffffff;
+      border-radius: clamp(4px, 0.6vw, 7px);
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(2px, 0.5vw, 6px);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease, border-color 0.2s ease, filter 0.25s ease;
+      box-sizing: border-box;
+    }
+
+    .card-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-item.suit-red {
+      color: #dc2626;
+    }
+    .card-item.suit-black {
+      color: #1e293b;
+    }
+
+    .card-corner {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .card-corner.corner-bottom {
+      align-self: flex-end;
+      transform: rotate(180deg);
+    }
+    .card-corner-num {
+      font-size: clamp(8px, 1.1vw, 13px);
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+    .card-corner-suit {
+      font-size: clamp(7px, 0.9vw, 11px);
+      line-height: 1;
+    }
+
+    .card-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .card-center-suit {
+      font-size: clamp(14px, 2.2vw, 24px);
+      line-height: 1;
+    }
+    .card-center-num {
+      font-size: clamp(7px, 0.9vw, 11px);
+      font-weight: 700;
+      opacity: 0.8;
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+
+    /* Marked state (Selected by student for Predicted Hand) */
+    .card-item.is-marked {
+      transform: translateY(-8px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan), 0 8px 16px rgba(56, 189, 248, 0.4);
+    }
+    .card-item.is-marked::before {
+      content: "✓";
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: clamp(14px, 1.4vw, 18px);
+      height: clamp(14px, 1.4vw, 18px);
+      background: var(--accent-cyan);
+      color: #04101e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(8px, 1vw, 11px);
+      font-weight: 900;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      z-index: 5;
+    }
+
+    /* Stepping animation states during Run Code */
+    .card-item.evaluating {
+      border-color: #f59e0b !important;
+      box-shadow: 0 0 0 3px #f59e0b, 0 0 18px rgba(245, 158, 11, 0.6) !important;
+      transform: translateY(-8px) scale(1.04);
+      z-index: 10;
+    }
+
+    .card-item.skipped-continue {
+      filter: grayscale(85%) opacity(0.45);
+      transform: scale(0.95);
+    }
+
+    .card-item.broken-stop {
+      filter: grayscale(90%) opacity(0.35);
+      position: relative;
+    }
+    .card-item.break-trigger {
+      border-color: var(--accent-rose) !important;
+      box-shadow: 0 0 0 2px var(--accent-rose), 0 0 16px rgba(244, 63, 94, 0.6) !important;
+      filter: none !important;
+      opacity: 1 !important;
+    }
+    .card-item.break-trigger::after {
+      content: "🛑 STOP";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-10deg);
+      background: #dc2626;
+      color: #ffffff;
+      font-size: clamp(8px, 1vw, 11px);
+      font-weight: 900;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+      letter-spacing: 0.03em;
+    }
+
+    /* Bottom: The Prediction, Hand Trays, Stepper & Trace Table */
+    .bottom-panel {
+      grid-column: 1 / 3;
+      grid-row: 2 / 3;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px 12px;
+      overflow: hidden;
+      min-width: 0;
+      min-height: 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Stepper & View Mode Toolbar */
+    .bottom-panel-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+      background: #090d16;
+      border: 1px solid var(--border-subtle);
+      border-radius: 7px;
+      padding: 4px 8px;
+      flex-wrap: wrap;
+    }
+    .stepper-bar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 0;
+    }
+    .stepper-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-stepper {
+      background: #1e293b;
+      border: 1px solid var(--border-light);
+      color: #f1f5f9;
+      border-radius: 5px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+    .btn-stepper:hover:not(:disabled) {
+      background: #334155;
+      border-color: var(--accent-cyan);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .btn-stepper:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+    .btn-stepper-play {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+    .btn-stepper-play:hover:not(:disabled) {
+      background: #0369a1;
+      border-color: #7dd3fc;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.5);
+    }
+    .speed-selector {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 2px 4px;
+    }
+    .speed-label {
+      font-size: 9.5px;
+      color: #64748b;
+      margin-right: 2px;
+    }
+    .btn-speed {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+    .btn-speed.active {
+      background: #0284c7;
+      color: #ffffff;
+    }
+    .stepper-step-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 5px;
+      padding: 3px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 380px;
+    }
+    .step-indicator-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 6px #38bdf8;
+      flex-shrink: 0;
+    }
+    .step-indicator-dot.active {
+      animation: pulseDot 1.2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+    .view-mode-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .btn-view-tab {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-view-tab:hover {
+      color: #f1f5f9;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .btn-view-tab.active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: #38bdf8;
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    /* Main Body of Bottom Panel */
+    .bottom-panel-body {
+      flex: 1;
+      display: grid;
+      min-height: 0;
+      overflow: hidden;
+      gap: 10px;
+    }
+    .bottom-panel-body.view-split {
+      grid-template-columns: minmax(220px, 1fr) minmax(360px, 1.6fr) minmax(160px, 190px);
+    }
+    .bottom-panel-body.view-table {
+      grid-template-columns: 1fr minmax(160px, 190px);
+    }
+    .bottom-panel-body.view-table .trays-section {
+      display: none;
+    }
+    .bottom-panel-body.view-trays {
+      grid-template-columns: 1fr minmax(160px, 190px);
+    }
+    .bottom-panel-body.view-trays .trace-section {
+      display: none;
+    }
+
+    .trays-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .tray-box {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .tray-header {
+      height: 26px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+    .tray-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tray-title-pred { color: var(--accent-cyan); }
+    .tray-title-actual { color: #a3e635; }
+    .tray-count-badge {
+      font-size: 9.5px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      font-family: var(--font-mono);
+    }
+
+    /* Trace Table Section */
+    .trace-section {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .trace-box {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .trace-box-header {
+      height: 26px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+    .trace-box-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .trace-subhint {
+      font-size: 9.5px;
+      color: #64748b;
+      font-weight: normal;
+      margin-left: 6px;
+    }
+    .trace-stats-pill {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+    .trace-table-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+      min-height: 0;
+    }
+    .trace-table-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .trace-table-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+    .trace-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-align: left;
+    }
+    .trace-table th {
+      position: sticky;
+      top: 0;
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 5;
+      white-space: nowrap;
+    }
+    .trace-row {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .trace-row:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .trace-row.active {
+      background: rgba(56, 189, 248, 0.18) !important;
+      border-left: 3px solid #38bdf8;
+      box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.12);
+    }
+    .trace-row.completed {
+      opacity: 0.92;
+    }
+    .trace-row.pending {
+      opacity: 0.42;
+    }
+    .trace-table td {
+      padding: 4px 8px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .trace-cell-iter {
+      font-weight: 700;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .trace-row.active .trace-cell-iter {
+      color: #38bdf8;
+    }
+    .iter-pointer {
+      display: none;
+      color: #38bdf8;
+      font-size: 9px;
+      animation: pointerBounce 0.8s infinite;
+    }
+    .trace-row.active .iter-pointer {
+      display: inline;
+    }
+    @keyframes pointerBounce {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(2px); }
+    }
+    .trace-cell-card {
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .trace-cell-cond {
+      color: #f1f5f9;
+    }
+    .trace-cell-hand {
+      color: #34d399;
+      font-weight: 600;
+    }
+    .trace-cell-note {
+      color: #cbd5e1;
+      font-size: 10.5px;
+      white-space: normal;
+      min-width: 160px;
+    }
+    .act-badge {
+      display: inline-block;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+    .act-append {
+      background: #065f46;
+      color: #34d399;
+      border: 1px solid #059669;
+    }
+    .act-pass {
+      background: rgba(51, 65, 85, 0.6);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .act-continue {
+      background: rgba(180, 83, 9, 0.35);
+      color: #fbbf24;
+      border: 1px solid #d97706;
+    }
+    .act-break {
+      background: rgba(190, 18, 60, 0.35);
+      color: #fb7185;
+      border: 1px solid #e11d48;
+    }
+
+    .tray-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .tray-content::-webkit-scrollbar {
+      height: 4px;
+    }
+    .tray-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .empty-tray-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      color: #64748b;
+      font-size: 11px;
+      font-style: italic;
+      gap: 6px;
+    }
+
+    /* Cloned mini cards in trays */
+    .mini-card {
+      width: 48px;
+      height: 72px;
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3px 4px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      flex-shrink: 0;
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+    }
+    .mini-card:hover {
+      transform: translateY(-2px);
+    }
+    .mini-card.suit-red { color: #dc2626; }
+    .mini-card.suit-black { color: #1e293b; }
+
+    .mini-card-num {
+      font-size: 10px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+    .mini-card-suit {
+      font-size: 8px;
+      line-height: 1;
+    }
+    .mini-card-center-suit {
+      font-size: 16px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6) translateY(8px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* Controls & Status Column */
+    .controls-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .btn-run-code {
+      height: 42px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      border: 1px solid #38bdf8;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .btn-run-code:hover:not(:disabled) {
+      background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+    }
+    .btn-run-code:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .btn-run-code:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-next-question {
+      height: 36px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: 1px solid #34d399;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      transition: all 0.15s ease;
+      width: 100%;
+      animation: pulseGreen 2s infinite ease-in-out;
+    }
+    .btn-next-question:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-1px);
+    }
+    .btn-next-question.hidden {
+      display: none;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    }
+
+    .btn-clear-pred {
+      height: 28px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .btn-clear-pred:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      border-color: var(--border-light);
+    }
+    .btn-clear-pred:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-skip-question {
+      height: 28px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #7dd3fc;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .btn-skip-question:hover:not(:disabled) {
+      background: rgba(56, 189, 248, 0.18);
+      color: #ffffff;
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+    .btn-skip-question:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Result feedback banner */
+    .result-banner {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      animation: fadeIn 0.25s ease;
+    }
+    .result-banner.success {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+    }
+    .result-banner.fail {
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid rgba(244, 63, 94, 0.5);
+      color: #fda4af;
+    }
+    .result-banner.evaluating {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        overflow-y: auto;
+      }
+      .code-panel { grid-column: 1 / 2; grid-row: 1 / 2; min-height: 170px; }
+      .deck-panel { grid-column: 1 / 2; grid-row: 2 / 3; min-height: 130px; }
+      .bottom-panel { grid-column: 1 / 2; grid-row: 3 / 4; grid-template-columns: 1fr 1fr; }
+      .controls-col { grid-column: 1 / 3; }
+    }
+
+    @media (max-width: 540px) {
+      .bottom-panel {
+        grid-template-columns: 1fr;
+      }
+      .controls-col {
+        grid-column: 1 / 2;
+      }
+      .deck-cards-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <a href="./index.html" class="btn-back-hub" title="Return to Visualizer Hub (H or Esc)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Hub</span>
+      </a>
+      <div class="app-title-group">
+        <div class="app-icon-badge">🎴</div>
+        <div class="app-title">
+          <span>Loop Prediction Quiz</span>
+          <span class="app-subtitle-pill">for &bull; while &bull; range() &bull; continue &bull; break</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="stat-pill" title="Current Question Number in 90-Scenario Pool">
+        <span>Question</span>
+        <strong id="qNumDisplay">#1 / 90</strong>
+      </div>
+      <div class="stat-pill" title="Current Streak">
+        <span>🔥 Streak</span>
+        <strong id="streakDisplay">0</strong>
+      </div>
+      <div class="stat-pill" title="Score">
+        <span>Score</span>
+        <strong id="scoreDisplay">0</strong>
+      </div>
+      <button class="btn-header-tool" id="btnHeaderRandom" title="Shuffle a New Random Question (Hotkey: R)" style="gap: 5px; padding: 0 10px; width: auto; font-size: 11px; font-weight: 600; color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); background: rgba(56, 189, 248, 0.08);">
+        <span>🎲</span>
+        <span>Shuffle</span>
+      </button>
+      <button class="btn-header-tool" id="btnSoundToggle" title="Toggle Sound">
+        <span id="soundIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout (No scrollbars, 100vh) -->
+  <main>
+    <!-- Top Left: The Code Window -->
+    <section class="code-panel">
+      <div class="editor-header">
+        <div class="window-dots">
+          <div class="window-dot dot-close"></div>
+          <div class="window-dot dot-min"></div>
+          <div class="window-dot dot-max"></div>
+        </div>
+        <div class="editor-title">
+          <span class="file-name">quiz_loop.py</span>
+          <span>&bull;</span>
+          <span id="qTitleDisplay" style="color: #94a3b8;">Even Cards Only</span>
+        </div>
+        <span class="question-badge" id="qSuitBadge">♥ Hearts</span>
+      </div>
+
+      <div class="code-body" id="codeContainer">
+        <!-- Rendered with syntax highlighting -->
+      </div>
+    </section>
+
+    <!-- Top Right: The Deck Window -->
+    <section class="deck-panel">
+      <div class="deck-header">
+        <div class="deck-header-title">
+          <span>THE DECK:</span>
+          <code>deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</code>
+        </div>
+        <div class="deck-hint">Click cards to toggle your prediction</div>
+      </div>
+
+      <div class="deck-cards-container" id="deckCardsContainer">
+        <!-- 10 Playing Cards (1 through 10) -->
+      </div>
+    </section>
+
+    <!-- Bottom Panel: Synchronized Stepper, Hand Trays, Live Trace Table & Controls -->
+    <section class="bottom-panel" id="bottomPanel">
+      <!-- Top Stepper & View Mode Bar -->
+      <div class="bottom-panel-bar">
+        <!-- Left: Stepper Navigation & Controls -->
+        <div class="stepper-bar-group">
+          <div class="stepper-actions">
+            <button class="btn-stepper" id="btnStepReset" title="Reset Loop to Beginning (⏮)" disabled>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5v14l-11-7 11-7zM7 5h2v14H7z"/></svg>
+              <span>Reset</span>
+            </button>
+            <button class="btn-stepper" id="btnStepPrev" title="Previous Iteration Step (◀)" disabled>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M15 19l-7-7 7-7v14z"/></svg>
+              <span>Prev</span>
+            </button>
+            <button class="btn-stepper btn-stepper-play" id="btnRunCode" title="Auto-Play / Pause Step Execution">
+              <svg id="playIcon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <span id="playLabel">Run Loop</span>
+            </button>
+            <button class="btn-stepper" id="btnStepNext" title="Next Iteration Step (▶)">
+              <span>Next</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 5l7 7-7 7V5z"/></svg>
+            </button>
+            <button class="btn-stepper" id="btnStepFinish" title="Run Straight to Loop Completion (⏭)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5v14l11-7-11-7zM17 5h2v14h-2z"/></svg>
+              <span>Finish</span>
+            </button>
+          </div>
+
+          <!-- Speed Toggles -->
+          <div class="speed-selector">
+            <span class="speed-label">Speed:</span>
+            <button class="btn-speed" data-speed="0.5" id="speedSlow" title="0.5x Slow Speed">0.5x</button>
+            <button class="btn-speed active" data-speed="1" id="speedNormal" title="1x Normal Speed">1x</button>
+            <button class="btn-speed" data-speed="1.5" id="speedFast" title="1.5x Fast Speed">1.5x</button>
+          </div>
+
+          <!-- Stepper State Badge -->
+          <div class="stepper-step-badge" id="stepperStepBadge">
+            <span class="step-indicator-dot" id="stepIndicatorDot"></span>
+            <span id="stepperStatusText">Loop Ready • Step or Run to start trace</span>
+          </div>
+        </div>
+
+        <!-- Right: View Mode Toggle -->
+        <div class="view-mode-tabs">
+          <button class="btn-view-tab" data-view="trays" id="tabTrays" title="Show Hand Trays Only">🃏 Trays</button>
+          <button class="btn-view-tab active" data-view="split" id="tabSplit" title="Show Trays and Live Trace Table Side-by-Side">⚡ Split View</button>
+          <button class="btn-view-tab" data-view="table" id="tabTable" title="Show Live Trace Table Full Width">📊 Trace Table</button>
+        </div>
+      </div>
+
+      <!-- Main Body of Bottom Panel -->
+      <div class="bottom-panel-body view-split" id="bottomPanelBody">
+        <!-- Area 1: Trays Section -->
+        <div class="trays-section" id="traysSection">
+          <!-- Tray 1: Predicted Hand -->
+          <div class="tray-box">
+            <div class="tray-header">
+              <span class="tray-title tray-title-pred">
+                <span>🎯 Your Predicted Hand</span>
+              </span>
+              <span class="tray-count-badge" id="predCountBadge">0 cards</span>
+            </div>
+            <div class="tray-content" id="predictedHandTray">
+              <div class="empty-tray-placeholder" id="predPlaceholder">
+                <span>Click cards in the deck above to build prediction</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tray 2: Actual Hand (Accumulator) -->
+          <div class="tray-box">
+            <div class="tray-header">
+              <span class="tray-title tray-title-actual">
+                <span>⚡ Actual Hand (Accumulator)</span>
+              </span>
+              <span class="tray-count-badge" id="actualCountBadge">0 cards</span>
+            </div>
+            <div class="tray-content" id="actualHandTray">
+              <div class="empty-tray-placeholder" id="actualPlaceholder">
+                <span>Step or Run to watch cards append dynamically</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Area 2: Trace Table Section -->
+        <div class="trace-section" id="traceSection">
+          <div class="trace-box">
+            <div class="trace-box-header">
+              <div class="trace-box-title">
+                <span>📊</span>
+                <strong>Live Iteration Trace Table</strong>
+                <span class="trace-subhint">Click any row to jump stepper</span>
+              </div>
+              <div class="trace-stats-pill" id="traceStatsPill">0 / 0 steps evaluated</div>
+            </div>
+            <div class="trace-table-scroll" id="traceTableScroll">
+              <table class="trace-table" id="traceTable">
+                <thead>
+                  <tr>
+                    <th style="width: 38px;">#</th>
+                    <th style="width: 55px;">card</th>
+                    <th style="min-width: 155px;">Condition / Test</th>
+                    <th style="width: 85px;">Action</th>
+                    <th style="min-width: 120px;">hand (Accumulator)</th>
+                    <th>Runtime Note</th>
+                  </tr>
+                </thead>
+                <tbody id="traceTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Area 3: Controls Column -->
+        <div class="controls-col" id="controlsCol">
+          <button class="btn-next-question hidden" id="btnNextQuestion">
+            <span>Next Random Question</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+
+          <button class="btn-clear-pred" id="btnClearPred">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>Clear Prediction</span>
+          </button>
+
+          <button class="btn-skip-question" id="btnSkipQuestion" title="Skip to another random question (R)">
+            <span>🎲 Skip Question</span>
+          </button>
+
+          <div id="resultBannerContainer"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 50 Hardcoded Quiz Scenarios (Strict Python Accuracy)
+    const QUIZ_QUESTIONS = [
+  {
+    "id": 1,
+    "title": "Even Cards Only",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 == 0:\n        hand.append(card)",
+    "correct_hand": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 % 2 == 0 is False -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 % 2 == 0 is True -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 % 2 == 0 is False -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 % 2 == 0 is True -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 % 2 == 0 is False -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 % 2 == 0 is True -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 % 2 == 0 is False -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 % 2 == 0 is True -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 % 2 == 0 is False -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 % 2 == 0 is True -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Odd Cards Only",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0:\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5,
+      7,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 % 2 != 0 is True -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 % 2 != 0 is False -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 % 2 != 0 is True -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 % 2 != 0 is False -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 % 2 != 0 is True -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 % 2 != 0 is False -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 % 2 != 0 is True -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 % 2 != 0 is False -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 % 2 != 0 is True -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 % 2 != 0 is False -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Multiples of 3",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 3 == 0:\n        hand.append(card)",
+    "correct_hand": [
+      3,
+      6,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 % 3 == 0 is False -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 % 3 == 0 is False -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 % 3 == 0 is True -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 % 3 == 0 is False -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 % 3 == 0 is False -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 % 3 == 0 is True -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 % 3 == 0 is False -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 % 3 == 0 is False -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 % 3 == 0 is True -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 % 3 == 0 is False -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Multiples of 4",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 4 == 0:\n        hand.append(card)",
+    "correct_hand": [
+      4,
+      8
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 % 4 == 0 is True -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 % 4 == 0 is True -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 % 4 == 0 is False -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 % 4 == 0 is False -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Cards Greater Than 6",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card > 6:\n        hand.append(card)",
+    "correct_hand": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 > 6 is False -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 > 6 is False -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 > 6 is False -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 > 6 is False -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 > 6 is False -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 > 6 is False -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 > 6 is True -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 > 6 is True -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 > 6 is True -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 > 6 is True -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Cards At Most 4",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card <= 4:\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 <= 4 is True -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 <= 4 is True -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 <= 4 is True -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 <= 4 is True -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 <= 4 is False -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 <= 4 is False -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 <= 4 is False -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 <= 4 is False -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 <= 4 is False -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 <= 4 is False -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Cards from 3 to 8",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card >= 3 and card <= 8:\n        hand.append(card)",
+    "correct_hand": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 outside [3, 8] -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 outside [3, 8] -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 <= 3 <= 8 is True -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "3 <= 4 <= 8 is True -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "3 <= 5 <= 8 is True -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "3 <= 6 <= 8 is True -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "3 <= 7 <= 8 is True -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "3 <= 8 <= 8 is True -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 outside [3, 8] -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 outside [3, 8] -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Evens Greater Than 5",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 == 0 and card > 5:\n        hand.append(card)",
+    "correct_hand": [
+      6,
+      8,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 is even and > 5 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 is even and > 5 -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 does not meet even and > 5 -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 is even and > 5 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Odds Less Than 7",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0 and card < 7:\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 is odd and < 7 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 does not meet odd and < 7 -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is odd and < 7 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 does not meet odd and < 7 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is odd and < 7 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 does not meet odd and < 7 -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 does not meet odd and < 7 -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 does not meet odd and < 7 -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 does not meet odd and < 7 -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 does not meet odd and < 7 -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Multiples of 3 or 5",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 3 == 0 or card % 5 == 0:\n        hand.append(card)",
+    "correct_hand": [
+      3,
+      5,
+      6,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 not divisible by 3 or 5 -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 not divisible by 3 or 5 -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is multiple of 3 or 5 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 not divisible by 3 or 5 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is multiple of 3 or 5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 is multiple of 3 or 5 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 not divisible by 3 or 5 -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 not divisible by 3 or 5 -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 is multiple of 3 or 5 -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 is multiple of 3 or 5 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Extremes: Under 3 or Over 8",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card < 3 or card > 8:\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 < 3 or > 8 is True -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 < 3 or > 8 is True -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 is between 3 and 8 -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 is between 3 and 8 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 is between 3 and 8 -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 is between 3 and 8 -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 is between 3 and 8 -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 is between 3 and 8 -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 < 3 or > 8 is True -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 < 3 or > 8 is True -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Skip Only Five",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card != 5:\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 != 5 is True -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 != 5 is True -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 != 5 is True -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 != 5 is True -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 == 5 -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 != 5 is True -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 != 5 is True -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 != 5 is True -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 != 5 is True -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 != 5 is True -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Evens Not Divisible By 4",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 == 0 and card % 4 != 0:\n        hand.append(card)",
+    "correct_hand": [
+      2,
+      6,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 is even but not multiple of 4 -> append"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 is even but not multiple of 4 -> append"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "9 is either odd or divisible by 4 -> ignored"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 is even but not multiple of 4 -> append"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Odds 5 and Up",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0 and card >= 5:\n        hand.append(card)",
+    "correct_hand": [
+      5,
+      7,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 not odd and >= 5 -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 not odd and >= 5 -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 not odd and >= 5 -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 not odd and >= 5 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is odd and >= 5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 not odd and >= 5 -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 is odd and >= 5 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "8 not odd and >= 5 -> ignored"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 is odd and >= 5 -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "10 not odd and >= 5 -> ignored"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Excluding Low Evens",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if not (card % 2 == 0 and card <= 6):\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5,
+      7,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 is not a low even -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 is an even <= 6 -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is not a low even -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 is an even <= 6 -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is not a low even -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 is an even <= 6 -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 is not a low even -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 is not a low even -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 is not a low even -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 is not a low even -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "title": "Continue Past Evens",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 == 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5,
+      7,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 is odd -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "2 is even -> continue (skip!)"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is odd -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 is even -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is odd -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "6 is even -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 is odd -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "continue",
+        "note": "8 is even -> continue (skip!)"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 is odd -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "continue",
+        "note": "10 is even -> continue (skip!)"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "title": "Continue Past Odds",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "continue",
+        "note": "1 is odd -> continue (skip!)"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 is even -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 is odd -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 is even -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "5 is odd -> continue (skip!)"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 is even -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "7 is odd -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 is even -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "continue",
+        "note": "9 is odd -> continue (skip!)"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 is even -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "title": "Continue Past Multiples of 3",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 3 == 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      4,
+      5,
+      7,
+      8,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 not multiple of 3 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 not multiple of 3 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 is multiple of 3 -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 not multiple of 3 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 not multiple of 3 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "6 is multiple of 3 -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 not multiple of 3 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 not multiple of 3 -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "continue",
+        "note": "9 is multiple of 3 -> continue (skip!)"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 not multiple of 3 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "title": "Continue Past 5 and Below",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card <= 5:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "continue",
+        "note": "1 <= 5 -> continue (skip!)"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "2 <= 5 -> continue (skip!)"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 <= 5 -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 <= 5 -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "5 <= 5 -> continue (skip!)"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 > 5 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 > 5 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 > 5 -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 > 5 -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 > 5 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "title": "Continue Past Cards Over 4",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card > 4:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 <= 4 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 <= 4 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 <= 4 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 <= 4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "5 > 4 -> continue (skip!)"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "6 > 4 -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "7 > 4 -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "continue",
+        "note": "8 > 4 -> continue (skip!)"
+      },
+      {
+        "card": 9,
+        "action": "continue",
+        "note": "9 > 4 -> continue (skip!)"
+      },
+      {
+        "card": 10,
+        "action": "continue",
+        "note": "10 > 4 -> continue (skip!)"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "title": "Skip Card 7 With Continue",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card == 7:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 != 7 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 != 7 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 != 7 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 != 7 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 != 7 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 != 7 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "7 == 7 -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 != 7 -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 != 7 -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 != 7 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "title": "Skip Middle Range (4-7)",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card >= 4 and card <= 7:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 outside [4, 7] -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 outside [4, 7] -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 outside [4, 7] -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 <= 4 <= 7 -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "4 <= 5 <= 7 -> continue (skip!)"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "4 <= 6 <= 7 -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "4 <= 7 <= 7 -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 outside [4, 7] -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 outside [4, 7] -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 outside [4, 7] -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "title": "Skip High Odds",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0 and card > 5:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "7 is odd and > 5 -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "continue",
+        "note": "9 is odd and > 5 -> continue (skip!)"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "title": "Skip Low Evens",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 == 0 and card < 6:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "2 is even and < 6 -> continue (skip!)"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 is even and < 6 -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "8 -> append to hand"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "title": "Skip Multiples of 4",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 4 == 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 % 4 == 0 -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "continue",
+        "note": "8 % 4 == 0 -> continue (skip!)"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "9 -> append to hand"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "10 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "title": "Break When Card Is 6",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card == 6:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "6 == 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "title": "Break If Card Greater Than 5",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card > 5:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "6 > 5 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "title": "Append Then Break at 4",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    hand.append(card)\n    if card == 4:\n        break",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "break",
+        "note": "4 == 4 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "title": "Evens Until Break at 8",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card == 8:\n        break\n    if card % 2 == 0:\n        hand.append(card)",
+    "correct_hand": [
+      2,
+      4,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 is odd -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 is even -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 is odd -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 is even -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "5 is odd -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 is even -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "7 is odd -> ignored"
+      },
+      {
+        "card": 8,
+        "action": "break",
+        "note": "8 == 8 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "title": "Odds Until Break Above 6",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card > 6:\n        break\n    if card % 2 != 0:\n        hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 is odd -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 is even -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is odd -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 is even -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is odd -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "6 is even -> ignored"
+      },
+      {
+        "card": 7,
+        "action": "break",
+        "note": "7 > 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "title": "Break on First Multiple of 5",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 5 == 0:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "break",
+        "note": "5 % 5 == 0 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "title": "Collect First 3 Cards",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    hand.append(card)\n    if len(hand) == 3:\n        break",
+    "correct_hand": [
+      1,
+      2,
+      3
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append (len=1)"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append (len=2)"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append (len=3)"
+      },
+      {
+        "card": 3,
+        "action": "break",
+        "note": "len(hand) == 3 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "title": "Collect First 2 Evens",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 == 0:\n        hand.append(card)\n    if len(hand) == 2:\n        break",
+    "correct_hand": [
+      2,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "1 is odd -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 is even -> append (len=1)"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "3 is odd -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 is even -> append (len=2)"
+      },
+      {
+        "card": 4,
+        "action": "break",
+        "note": "len(hand) == 2 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "title": "Immediate Break on First Card",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card == 1:\n        break\n    hand.append(card)",
+    "correct_hand": [],
+    "steps": [
+      {
+        "card": 1,
+        "action": "break",
+        "note": "1 == 1 -> immediate break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "title": "Break When Doubled Exceeds 10",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card * 2 > 10:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 * 2 <= 10 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 * 2 <= 10 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 * 2 <= 10 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 * 2 <= 10 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 * 2 <= 10 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "6 * 2 = 12 > 10 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "title": "Skip Evens, Break at 7",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card == 7:\n        break\n    if card % 2 == 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 is odd -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "2 is even -> continue (skip!)"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is odd -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 is even -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is odd -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "6 is even -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "break",
+        "note": "7 == 7 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "title": "Skip Odds, Break Past 6",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0:\n        continue\n    if card > 6:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      2,
+      4,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "continue",
+        "note": "1 is odd -> continue (skip!)"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 is even and <= 6 -> append"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 is odd -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 is even and <= 6 -> append"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "5 is odd -> continue (skip!)"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 is even and <= 6 -> append"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "7 is odd -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "break",
+        "note": "8 > 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "title": "Skip 3, Stop at 6",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card == 3:\n        continue\n    if card == 6:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 == 3 -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "6 == 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "title": "Skip Multiples of 3, Break at 8",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 3 == 0:\n        continue\n    if card == 8:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      4,
+      5,
+      7
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 is multiple of 3 -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "6 is multiple of 3 -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "break",
+        "note": "8 == 8 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "title": "Break at 5 (Cards Under 5)",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card >= 5:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 < 5 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 < 5 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 < 5 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 < 5 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "break",
+        "note": "5 >= 5 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "title": "Window: Skip Under 4, Stop at 8",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card <= 3:\n        continue\n    if card >= 8:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "continue",
+        "note": "1 <= 3 -> continue (skip!)"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "2 <= 3 -> continue (skip!)"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 <= 3 -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "7 -> append to hand"
+      },
+      {
+        "card": 8,
+        "action": "break",
+        "note": "8 >= 8 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "title": "Evens Skipping 4 and Breaking at 8",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0:\n        continue\n    if card == 4:\n        continue\n    if card == 8:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      2,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "continue",
+        "note": "1 is odd -> continue (skip!)"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "3 is odd -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "4 == 4 -> continue (skip!)"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "5 is odd -> continue (skip!)"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 -> append to hand"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "7 is odd -> continue (skip!)"
+      },
+      {
+        "card": 8,
+        "action": "break",
+        "note": "8 == 8 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "title": "Append Then Break on 6",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    hand.append(card)\n    if card % 3 == 0 and card > 5:\n        break",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "6 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "6 is multiple of 3 and > 5 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "title": "From 3 Up To (Not Including) 6",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card <= 2:\n        continue\n    if card == 6:\n        break\n    hand.append(card)",
+    "correct_hand": [
+      3,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "continue",
+        "note": "1 <= 2 -> continue (skip!)"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "2 <= 2 -> continue (skip!)"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "6 == 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "title": "First 3 Odds Only",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor card in deck:\n    if card % 2 != 0:\n        hand.append(card)\n        if len(hand) == 3:\n            break",
+    "correct_hand": [
+      1,
+      3,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "1 is odd -> append (len=1)"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "2 is even -> ignored"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "3 is odd -> append (len=2)"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "4 is even -> ignored"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "5 is odd -> append (len=3)"
+      },
+      {
+        "card": 5,
+        "action": "break",
+        "note": "len(hand) == 3 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "title": "While Loop: First 5 Cards",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < 5:\n    card = deck[i]\n    hand.append(card)\n    i += 1",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i=0 < 5 -> append deck[0]=1"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i=1 < 5 -> append deck[1]=2"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i=2 < 5 -> append deck[2]=3"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i=3 < 5 -> append deck[3]=4"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i=4 < 5 -> append deck[4]=5"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "title": "While Loop: Evens With Break at 6",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    if card % 2 == 0:\n        hand.append(card)\n    if card == 6:\n        break\n    i += 1",
+    "correct_hand": [
+      2,
+      4,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "card 1 is odd -> ignored"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 is even -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "card 3 is odd -> ignored"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 is even -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "card 5 is odd -> ignored"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "card 6 is even -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "card 6 == 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "title": "While Loop: Every Other Card (Step 2)",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    hand.append(card)\n    i += 2",
+    "correct_hand": [
+      1,
+      3,
+      5,
+      7,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i=0 -> append deck[0]=1, i += 2"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i=2 -> append deck[2]=3, i += 2"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i=4 -> append deck[4]=5, i += 2"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "i=6 -> append deck[6]=7, i += 2"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "i=8 -> append deck[8]=9, i += 2"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "title": "While Loop: First 7 Skipping Multiples of 3",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < 7:\n    card = deck[i]\n    i += 1\n    if card % 3 == 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      4,
+      5,
+      7
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "card 3 % 3 == 0 -> continue (skip!)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 -> append to hand"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "card 6 % 3 == 0 -> continue (skip!)"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "card 7 -> append to hand"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "title": "While Loop: Cards Up To 4",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    if card > 4:\n        break\n    hand.append(card)\n    i += 1",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 <= 4 -> append to hand"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 <= 4 -> append to hand"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 <= 4 -> append to hand"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 <= 4 -> append to hand"
+      },
+      {
+        "card": 5,
+        "action": "break",
+        "note": "card 5 > 4 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "title": "While Loop: Backwards from Card 10 to 6",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 9\nwhile i >= 5:\n    hand.append(deck[i])\n    i -= 1",
+    "correct_hand": [
+      10,
+      9,
+      8,
+      7,
+      6
+    ],
+    "steps": [
+      {
+        "card": 10,
+        "action": "append",
+        "note": "i = 9 -> deck[9] is 10 -> append"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "i = 8 -> deck[8] is 9 -> append"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "i = 7 -> deck[7] is 8 -> append"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "i = 6 -> deck[6] is 7 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i = 5 -> deck[5] is 6 -> append (next i = 4 < 5)"
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "title": "While Loop: Step of 3 Forward",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < 10:\n    hand.append(deck[i])\n    i += 3",
+    "correct_hand": [
+      1,
+      4,
+      7,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i = 0 -> deck[0] is 1 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3] is 4 -> append (stride +3)"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "i = 6 -> deck[6] is 7 -> append (stride +3)"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "i = 9 -> deck[9] is 10 -> append (next i = 12 >= 10)"
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "title": "While Loop: Odd Indices (Even Cards)",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 1\nwhile i < len(deck):\n    hand.append(deck[i])\n    i += 2",
+    "correct_hand": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "steps": [
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i = 1 -> deck[1] is 2 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3] is 4 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i = 5 -> deck[5] is 6 -> append"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "i = 7 -> deck[7] is 8 -> append"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "i = 9 -> deck[9] is 10 -> append"
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "title": "While Loop: Compound Condition (deck[i] <= 4)",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck) and deck[i] <= 4:\n    hand.append(deck[i])\n    i += 1",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i = 0 -> deck[0]=1 <= 4 -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i = 1 -> deck[1]=2 <= 4 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i = 2 -> deck[2]=3 <= 4 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3]=4 <= 4 -> append"
+      },
+      {
+        "card": 5,
+        "action": "break",
+        "note": "i = 4 -> deck[4]=5 > 4 -> loop condition False (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "title": "While Loop: Odd Cards Filter",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    if card % 2 != 0:\n        hand.append(card)\n    i += 1",
+    "correct_hand": [
+      1,
+      3,
+      5,
+      7,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 is odd -> append"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "card 2 is even -> pass"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 is odd -> append"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "card 4 is even -> pass"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 is odd -> append"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "card 6 is even -> pass"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "card 7 is odd -> append"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "card 8 is even -> pass"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "card 9 is odd -> append"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "card 10 is even -> pass"
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "title": "While Loop: Running Sum Cap (total <= 15)",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\ntotal = 0\nwhile i < len(deck):\n    card = deck[i]\n    if total + card > 15:\n        break\n    hand.append(card)\n    total += card\n    i += 1",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 -> total becomes 1 -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 -> total becomes 3 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 -> total becomes 6 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 -> total becomes 10 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 -> total becomes 15 -> append"
+      },
+      {
+        "card": 6,
+        "action": "break",
+        "note": "card 6 -> 15 + 6 = 21 > 15 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "title": "While Loop: Skip Even Cards with continue",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < 6:\n    card = deck[i]\n    i += 1\n    if card % 2 == 0:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      3,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 is odd -> append"
+      },
+      {
+        "card": 2,
+        "action": "continue",
+        "note": "card 2 is even -> continue (skip)"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 is odd -> append"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "card 4 is even -> continue (skip)"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 is odd -> append"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "card 6 is even -> continue (skip)"
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "title": "While Loop: Middle Section (Indices 3 to 7)",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 3\nwhile i <= 7:\n    hand.append(deck[i])\n    i += 1",
+    "correct_hand": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "steps": [
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3] is 4 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i = 4 -> deck[4] is 5 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i = 5 -> deck[5] is 6 -> append"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "i = 6 -> deck[6] is 7 -> append"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "i = 7 -> deck[7] is 8 -> append (next i = 8 > 7)"
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "title": "While Loop: Powers of 2 Indices (i *= 2)",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 1\nwhile i < 10:\n    hand.append(deck[i])\n    i *= 2",
+    "correct_hand": [
+      2,
+      3,
+      5,
+      9
+    ],
+    "steps": [
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i = 1 -> deck[1] is 2 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i = 2 -> deck[2] is 3 -> append (i * 2)"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i = 4 -> deck[4] is 5 -> append (i * 2)"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "i = 8 -> deck[8] is 9 -> append (next i = 16 >= 10)"
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "title": "While Loop: Backwards Even Cards",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 9\nwhile i >= 0:\n    card = deck[i]\n    if card % 2 == 0:\n        hand.append(card)\n    i -= 1",
+    "correct_hand": [
+      10,
+      8,
+      6,
+      4,
+      2
+    ],
+    "steps": [
+      {
+        "card": 10,
+        "action": "append",
+        "note": "card 10 is even -> append"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "card 9 is odd -> pass"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "card 8 is even -> append"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "card 7 is odd -> pass"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "card 6 is even -> append"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "card 5 is odd -> pass"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 is even -> append"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "card 3 is odd -> pass"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 is even -> append"
+      },
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "card 1 is odd -> pass"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "title": "While Loop: Break on Target (card == 8)",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 2\nwhile i < len(deck):\n    card = deck[i]\n    if card == 8:\n        break\n    hand.append(card)\n    i += 1",
+    "correct_hand": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "steps": [
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 != 8 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 != 8 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 != 8 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "card 6 != 8 -> append"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "card 7 != 8 -> append"
+      },
+      {
+        "card": 8,
+        "action": "break",
+        "note": "card 8 == 8 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "title": "While Loop: Multiples of 4",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    if card % 4 == 0:\n        hand.append(card)\n    i += 1",
+    "correct_hand": [
+      4,
+      8
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "card 1 % 4 != 0 -> pass"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "card 2 % 4 != 0 -> pass"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "card 3 % 4 != 0 -> pass"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 % 4 == 0 -> append"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "card 5 % 4 != 0 -> pass"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "card 6 % 4 != 0 -> pass"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "card 7 % 4 != 0 -> pass"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "card 8 % 4 == 0 -> append"
+      },
+      {
+        "card": 9,
+        "action": "pass",
+        "note": "card 9 % 4 != 0 -> pass"
+      },
+      {
+        "card": 10,
+        "action": "pass",
+        "note": "card 10 % 4 != 0 -> pass"
+      }
+    ]
+  },
+  {
+    "id": 63,
+    "title": "While Loop: Backwards from Card 6",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 5\nwhile i >= 0:\n    hand.append(deck[i])\n    i -= 1",
+    "correct_hand": [
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "steps": [
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i = 5 -> deck[5] is 6 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i = 4 -> deck[4] is 5 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3] is 4 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i = 2 -> deck[2] is 3 -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i = 1 -> deck[1] is 2 -> append"
+      },
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i = 0 -> deck[0] is 1 -> append"
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "title": "While True Loop with Break",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile True:\n    card = deck[i]\n    hand.append(card)\n    i += 1\n    if i >= 4:\n        break",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 -> append -> i = 1"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 -> append -> i = 2"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 -> append -> i = 3"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 -> append -> i = 4 >= 4 -> break!"
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "title": "While Loop: Skip Between 3 and 8",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    i += 1\n    if 3 < card < 8:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      3,
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 not in (3,8) -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 not in (3,8) -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 not in (3,8) -> append"
+      },
+      {
+        "card": 4,
+        "action": "continue",
+        "note": "3 < 4 < 8 -> continue (skip)"
+      },
+      {
+        "card": 5,
+        "action": "continue",
+        "note": "3 < 5 < 8 -> continue (skip)"
+      },
+      {
+        "card": 6,
+        "action": "continue",
+        "note": "3 < 6 < 8 -> continue (skip)"
+      },
+      {
+        "card": 7,
+        "action": "continue",
+        "note": "3 < 7 < 8 -> continue (skip)"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "card 8 not in (3,8) -> append"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "card 9 not in (3,8) -> append"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "card 10 not in (3,8) -> append"
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "title": "While Loop: Stop When Hand Has 3 Cards",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile len(hand) < 3 and i < len(deck):\n    card = deck[i]\n    if card % 2 != 0:\n        hand.append(card)\n    i += 1",
+    "correct_hand": [
+      1,
+      3,
+      5
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 is odd -> append (hand has 1)"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "card 2 is even -> pass"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "card 3 is odd -> append (hand has 2)"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "card 4 is even -> pass"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 is odd -> append (hand has 3 -> loop ends!)"
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "title": "While Loop: Cards > 3 with Early Break at 7",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    if card == 7:\n        break\n    if card > 3:\n        hand.append(card)\n    i += 1",
+    "correct_hand": [
+      4,
+      5,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "card 1 <= 3 -> pass"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "card 2 <= 3 -> pass"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "card 3 <= 3 -> pass"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 > 3 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 > 3 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "card 6 > 3 -> append"
+      },
+      {
+        "card": 7,
+        "action": "break",
+        "note": "card 7 == 7 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "title": "While Loop: Stride of 4 (i += 4)",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    hand.append(deck[i])\n    i += 4",
+    "correct_hand": [
+      1,
+      5,
+      9
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i = 0 -> deck[0] is 1 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i = 4 -> deck[4] is 5 -> append"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "i = 8 -> deck[8] is 9 -> append (next i = 12 >= 10)"
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "title": "While Loop: Backwards Odd Indices (i -= 2)",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 9\nwhile i >= 0:\n    hand.append(deck[i])\n    i -= 2",
+    "correct_hand": [
+      10,
+      8,
+      6,
+      4,
+      2
+    ],
+    "steps": [
+      {
+        "card": 10,
+        "action": "append",
+        "note": "i = 9 -> deck[9] is 10 -> append"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "i = 7 -> deck[7] is 8 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i = 5 -> deck[5] is 6 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3] is 4 -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i = 1 -> deck[1] is 2 -> append"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "title": "While Loop: Backwards Even Indices (i -= 2)",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 8\nwhile i >= 0:\n    hand.append(deck[i])\n    i -= 2",
+    "correct_hand": [
+      9,
+      7,
+      5,
+      3,
+      1
+    ],
+    "steps": [
+      {
+        "card": 9,
+        "action": "append",
+        "note": "i = 8 -> deck[8] is 9 -> append"
+      },
+      {
+        "card": 7,
+        "action": "append",
+        "note": "i = 6 -> deck[6] is 7 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i = 4 -> deck[4] is 5 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i = 2 -> deck[2] is 3 -> append"
+      },
+      {
+        "card": 1,
+        "action": "append",
+        "note": "i = 0 -> deck[0] is 1 -> append"
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "title": "While Loop: Stop at Card > 6, Skip 3",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    i += 1\n    if card > 6:\n        break\n    if card == 3:\n        continue\n    hand.append(card)",
+    "correct_hand": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "append",
+        "note": "card 1 -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "card 2 -> append"
+      },
+      {
+        "card": 3,
+        "action": "continue",
+        "note": "card 3 == 3 -> continue (skip)"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "card 4 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "card 5 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "card 6 -> append"
+      },
+      {
+        "card": 7,
+        "action": "break",
+        "note": "card 7 > 6 -> break (STOP!)"
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "title": "While Loop: Only Greater Than 7",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < len(deck):\n    card = deck[i]\n    if card > 7:\n        hand.append(card)\n    i += 1",
+    "correct_hand": [
+      8,
+      9,
+      10
+    ],
+    "steps": [
+      {
+        "card": 1,
+        "action": "pass",
+        "note": "card 1 <= 7 -> pass"
+      },
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "card 2 <= 7 -> pass"
+      },
+      {
+        "card": 3,
+        "action": "pass",
+        "note": "card 3 <= 7 -> pass"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "card 4 <= 7 -> pass"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "card 5 <= 7 -> pass"
+      },
+      {
+        "card": 6,
+        "action": "pass",
+        "note": "card 6 <= 7 -> pass"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "card 7 <= 7 -> pass"
+      },
+      {
+        "card": 8,
+        "action": "append",
+        "note": "card 8 > 7 -> append"
+      },
+      {
+        "card": 9,
+        "action": "append",
+        "note": "card 9 > 7 -> append"
+      },
+      {
+        "card": 10,
+        "action": "append",
+        "note": "card 10 > 7 -> append"
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "title": "While Loop: Divisible by 3 in Range (1 to 7)",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 1\nwhile i < 8:\n    card = deck[i]\n    if card % 3 == 0:\n        hand.append(card)\n    i += 1",
+    "correct_hand": [
+      3,
+      6
+    ],
+    "steps": [
+      {
+        "card": 2,
+        "action": "pass",
+        "note": "i=1: card 2 % 3 != 0 -> pass"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i=2: card 3 % 3 == 0 -> append"
+      },
+      {
+        "card": 4,
+        "action": "pass",
+        "note": "i=3: card 4 % 3 != 0 -> pass"
+      },
+      {
+        "card": 5,
+        "action": "pass",
+        "note": "i=4: card 5 % 3 != 0 -> pass"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i=5: card 6 % 3 == 0 -> append"
+      },
+      {
+        "card": 7,
+        "action": "pass",
+        "note": "i=6: card 7 % 3 != 0 -> pass"
+      },
+      {
+        "card": 8,
+        "action": "pass",
+        "note": "i=7: card 8 % 3 != 0 -> pass"
+      }
+    ]
+  },
+  {
+    "id": 74,
+    "title": "While Loop: Pre-increment (i += 1 before append)",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 0\nwhile i < 5:\n    i += 1\n    card = deck[i]\n    hand.append(card)",
+    "correct_hand": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "steps": [
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i incremented to 1 -> deck[1]=2 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i incremented to 2 -> deck[2]=3 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i incremented to 3 -> deck[3]=4 -> append"
+      },
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i incremented to 4 -> deck[4]=5 -> append"
+      },
+      {
+        "card": 6,
+        "action": "append",
+        "note": "i incremented to 5 -> deck[5]=6 -> append"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "title": "While Loop: Countdown from Index 4 to 1",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\ni = 4\nwhile i >= 1:\n    hand.append(deck[i])\n    i -= 1",
+    "correct_hand": [
+      5,
+      4,
+      3,
+      2
+    ],
+    "steps": [
+      {
+        "card": 5,
+        "action": "append",
+        "note": "i = 4 -> deck[4] is 5 -> append"
+      },
+      {
+        "card": 4,
+        "action": "append",
+        "note": "i = 3 -> deck[3] is 4 -> append"
+      },
+      {
+        "card": 3,
+        "action": "append",
+        "note": "i = 2 -> deck[2] is 3 -> append"
+      },
+      {
+        "card": 2,
+        "action": "append",
+        "note": "i = 1 -> deck[1] is 2 -> append"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "title": "range(5) - First 5 Cards",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(5):\n    hand.append(deck[i])",
+    "correct_hand": [1, 2, 3, 4, 5],
+    "steps": [
+      { "card": 1, "action": "append", "note": "i = 0 -> deck[0] is 1 -> append" },
+      { "card": 2, "action": "append", "note": "i = 1 -> deck[1] is 2 -> append" },
+      { "card": 3, "action": "append", "note": "i = 2 -> deck[2] is 3 -> append" },
+      { "card": 4, "action": "append", "note": "i = 3 -> deck[3] is 4 -> append" },
+      { "card": 5, "action": "append", "note": "i = 4 -> deck[4] is 5 -> append (range ends before 5)" }
+    ]
+  },
+  {
+    "id": 77,
+    "title": "range(3, 8) - Slice by Index",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(3, 8):\n    hand.append(deck[i])",
+    "correct_hand": [4, 5, 6, 7, 8],
+    "steps": [
+      { "card": 4, "action": "append", "note": "i = 3 -> deck[3] is 4 -> append" },
+      { "card": 5, "action": "append", "note": "i = 4 -> deck[4] is 5 -> append" },
+      { "card": 6, "action": "append", "note": "i = 5 -> deck[5] is 6 -> append" },
+      { "card": 7, "action": "append", "note": "i = 6 -> deck[6] is 7 -> append" },
+      { "card": 8, "action": "append", "note": "i = 7 -> deck[7] is 8 -> append (stop 8 is excluded)" }
+    ]
+  },
+  {
+    "id": 78,
+    "title": "range(0, 10, 2) - Even Indices",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(0, 10, 2):\n    hand.append(deck[i])",
+    "correct_hand": [1, 3, 5, 7, 9],
+    "steps": [
+      { "card": 1, "action": "append", "note": "i = 0 -> deck[0] is 1 -> append" },
+      { "card": 3, "action": "append", "note": "i = 2 -> deck[2] is 3 -> append (step +2)" },
+      { "card": 5, "action": "append", "note": "i = 4 -> deck[4] is 5 -> append (step +2)" },
+      { "card": 7, "action": "append", "note": "i = 6 -> deck[6] is 7 -> append (step +2)" },
+      { "card": 9, "action": "append", "note": "i = 8 -> deck[8] is 9 -> append (step +2)" }
+    ]
+  },
+  {
+    "id": 79,
+    "title": "range(1, 10, 2) - Odd Indices",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(1, 10, 2):\n    hand.append(deck[i])",
+    "correct_hand": [2, 4, 6, 8, 10],
+    "steps": [
+      { "card": 2, "action": "append", "note": "i = 1 -> deck[1] is 2 -> append" },
+      { "card": 4, "action": "append", "note": "i = 3 -> deck[3] is 4 -> append (step +2)" },
+      { "card": 6, "action": "append", "note": "i = 5 -> deck[5] is 6 -> append (step +2)" },
+      { "card": 8, "action": "append", "note": "i = 7 -> deck[7] is 8 -> append (step +2)" },
+      { "card": 10, "action": "append", "note": "i = 9 -> deck[9] is 10 -> append (step +2)" }
+    ]
+  },
+  {
+    "id": 80,
+    "title": "range(0, 10, 3) - Step of 3",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(0, 10, 3):\n    hand.append(deck[i])",
+    "correct_hand": [1, 4, 7, 10],
+    "steps": [
+      { "card": 1, "action": "append", "note": "i = 0 -> deck[0] is 1 -> append" },
+      { "card": 4, "action": "append", "note": "i = 3 -> deck[3] is 4 -> append (step +3)" },
+      { "card": 7, "action": "append", "note": "i = 6 -> deck[6] is 7 -> append (step +3)" },
+      { "card": 10, "action": "append", "note": "i = 9 -> deck[9] is 10 -> append (step +3)" }
+    ]
+  },
+  {
+    "id": 81,
+    "title": "range(len(deck)) with Filter",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(len(deck)):\n    if deck[i] >= 7:\n        hand.append(deck[i])",
+    "correct_hand": [7, 8, 9, 10],
+    "steps": [
+      { "card": 1, "action": "pass", "note": "deck[0]=1 < 7 -> ignored" },
+      { "card": 2, "action": "pass", "note": "deck[1]=2 < 7 -> ignored" },
+      { "card": 3, "action": "pass", "note": "deck[2]=3 < 7 -> ignored" },
+      { "card": 4, "action": "pass", "note": "deck[3]=4 < 7 -> ignored" },
+      { "card": 5, "action": "pass", "note": "deck[4]=5 < 7 -> ignored" },
+      { "card": 6, "action": "pass", "note": "deck[5]=6 < 7 -> ignored" },
+      { "card": 7, "action": "append", "note": "deck[6]=7 >= 7 -> append" },
+      { "card": 8, "action": "append", "note": "deck[7]=8 >= 7 -> append" },
+      { "card": 9, "action": "append", "note": "deck[8]=9 >= 7 -> append" },
+      { "card": 10, "action": "append", "note": "deck[9]=10 >= 7 -> append" }
+    ]
+  },
+  {
+    "id": 82,
+    "title": "range(5, 10) - Second Half of Deck",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(5, 10):\n    hand.append(deck[i])",
+    "correct_hand": [6, 7, 8, 9, 10],
+    "steps": [
+      { "card": 6, "action": "append", "note": "i = 5 -> deck[5] is 6 -> append" },
+      { "card": 7, "action": "append", "note": "i = 6 -> deck[6] is 7 -> append" },
+      { "card": 8, "action": "append", "note": "i = 7 -> deck[7] is 8 -> append" },
+      { "card": 9, "action": "append", "note": "i = 8 -> deck[8] is 9 -> append" },
+      { "card": 10, "action": "append", "note": "i = 9 -> deck[9] is 10 -> append" }
+    ]
+  },
+  {
+    "id": 83,
+    "title": "range(2, 9, 3) - Middle Stride",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(2, 9, 3):\n    hand.append(deck[i])",
+    "correct_hand": [3, 6, 9],
+    "steps": [
+      { "card": 3, "action": "append", "note": "i = 2 -> deck[2] is 3 -> append" },
+      { "card": 6, "action": "append", "note": "i = 5 -> deck[5] is 6 -> append (step +3)" },
+      { "card": 9, "action": "append", "note": "i = 8 -> deck[8] is 9 -> append (next 11 >= 9)" }
+    ]
+  },
+  {
+    "id": 84,
+    "title": "range(8) with Early Break",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(8):\n    if deck[i] == 5:\n        break\n    hand.append(deck[i])",
+    "correct_hand": [1, 2, 3, 4],
+    "steps": [
+      { "card": 1, "action": "append", "note": "i = 0 -> deck[0]=1 != 5 -> append" },
+      { "card": 2, "action": "append", "note": "i = 1 -> deck[1]=2 != 5 -> append" },
+      { "card": 3, "action": "append", "note": "i = 2 -> deck[2]=3 != 5 -> append" },
+      { "card": 4, "action": "append", "note": "i = 3 -> deck[3]=4 != 5 -> append" },
+      { "card": 5, "action": "break", "note": "i = 4 -> deck[4]=5 == 5 -> break (STOP!)" }
+    ]
+  },
+  {
+    "id": 85,
+    "title": "range(len(deck)) with continue",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(len(deck)):\n    if i % 2 == 0:\n        continue\n    hand.append(deck[i])",
+    "correct_hand": [2, 4, 6, 8, 10],
+    "steps": [
+      { "card": 1, "action": "continue", "note": "i = 0 is even -> continue (skip)" },
+      { "card": 2, "action": "append", "note": "i = 1 is odd -> append 2" },
+      { "card": 3, "action": "continue", "note": "i = 2 is even -> continue (skip)" },
+      { "card": 4, "action": "append", "note": "i = 3 is odd -> append 4" },
+      { "card": 5, "action": "continue", "note": "i = 4 is even -> continue (skip)" },
+      { "card": 6, "action": "append", "note": "i = 5 is odd -> append 6" },
+      { "card": 7, "action": "continue", "note": "i = 6 is even -> continue (skip)" },
+      { "card": 8, "action": "append", "note": "i = 7 is odd -> append 8" },
+      { "card": 9, "action": "continue", "note": "i = 8 is even -> continue (skip)" },
+      { "card": 10, "action": "append", "note": "i = 9 is odd -> append 10" }
+    ]
+  },
+  {
+    "id": 86,
+    "title": "range(1, 8, 4) - Wide Leap",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(1, 8, 4):\n    hand.append(deck[i])",
+    "correct_hand": [2, 6],
+    "steps": [
+      { "card": 2, "action": "append", "note": "i = 1 -> deck[1] is 2 -> append" },
+      { "card": 6, "action": "append", "note": "i = 5 -> deck[5] is 6 -> append (step +4, next 9 >= 8)" }
+    ]
+  },
+  {
+    "id": 87,
+    "title": "range(4, 4) - Empty Range",
+    "suit": "♣",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(4, 4):\n    hand.append(deck[i])",
+    "correct_hand": [],
+    "steps": []
+  },
+  {
+    "id": 88,
+    "title": "range(0, 10, 2) - Even Indices Filter",
+    "suit": "♠",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(0, 10, 2):\n    if deck[i] > 4:\n        hand.append(deck[i])",
+    "correct_hand": [5, 7, 9],
+    "steps": [
+      { "card": 1, "action": "pass", "note": "i = 0 -> deck[0]=1 <= 4 -> ignored" },
+      { "card": 3, "action": "pass", "note": "i = 2 -> deck[2]=3 <= 4 -> ignored" },
+      { "card": 5, "action": "append", "note": "i = 4 -> deck[4]=5 > 4 -> append" },
+      { "card": 7, "action": "append", "note": "i = 6 -> deck[6]=7 > 4 -> append" },
+      { "card": 9, "action": "append", "note": "i = 8 -> deck[8]=9 > 4 -> append" }
+    ]
+  },
+  {
+    "id": 89,
+    "title": "range(7) with Modulo Break",
+    "suit": "♥",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(7):\n    card = deck[i]\n    if card % 4 == 0:\n        break\n    hand.append(card)",
+    "correct_hand": [1, 2, 3],
+    "steps": [
+      { "card": 1, "action": "append", "note": "card 1 % 4 != 0 -> append" },
+      { "card": 2, "action": "append", "note": "card 2 % 4 != 0 -> append" },
+      { "card": 3, "action": "append", "note": "card 3 % 4 != 0 -> append" },
+      { "card": 4, "action": "break", "note": "card 4 % 4 == 0 is True -> break (STOP!)" }
+    ]
+  },
+  {
+    "id": 90,
+    "title": "range(len(deck)) - Filter Odd Cards",
+    "suit": "♦",
+    "code": "deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\nhand = []\n\nfor i in range(len(deck)):\n    if deck[i] % 2 != 0:\n        hand.append(deck[i])",
+    "correct_hand": [1, 3, 5, 7, 9],
+    "steps": [
+      { "card": 1, "action": "append", "note": "deck[0]=1 is odd -> append" },
+      { "card": 2, "action": "pass", "note": "deck[1]=2 is even -> ignored" },
+      { "card": 3, "action": "append", "note": "deck[2]=3 is odd -> append" },
+      { "card": 4, "action": "pass", "note": "deck[3]=4 is even -> ignored" },
+      { "card": 5, "action": "append", "note": "deck[4]=5 is odd -> append" },
+      { "card": 6, "action": "pass", "note": "deck[5]=6 is even -> ignored" },
+      { "card": 7, "action": "append", "note": "deck[6]=7 is odd -> append" },
+      { "card": 8, "action": "pass", "note": "deck[7]=8 is even -> ignored" },
+      { "card": 9, "action": "append", "note": "deck[8]=9 is odd -> append" },
+      { "card": 10, "action": "pass", "note": "deck[9]=10 is even -> ignored" }
+    ]
+  }
+];
+
+    // State
+    let currentQuestionIndex = 0;
+    let selectedPredictedCards = new Set(); // integers 1..10
+    let isEvaluating = false;
+    let hasEvaluated = false;
+    let currentStreak = 0;
+    let currentScore = 0;
+    let soundEnabled = true;
+
+    // Web Audio Synthesizer (Zero Dependencies, Offline-first, Lazy Init)
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        } catch (e) {
+          audioCtx = null;
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.1, gain = 0.1) {
+      if (!soundEnabled) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gainNode.gain.setValueAtTime(gain, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playCardClick() { playTone(420, 'triangle', 0.05, 0.08); }
+    function playAppendSound() { playTone(587.33, 'sine', 0.12, 0.1); } // D5
+    function playSkipSound() { playTone(260, 'sawtooth', 0.08, 0.04); }
+    function playBreakSound() { playTone(140, 'square', 0.25, 0.12); }
+    function playSuccessChord() {
+      if (!soundEnabled) return;
+      setTimeout(() => playTone(523.25, 'sine', 0.2, 0.12), 0);   // C5
+      setTimeout(() => playTone(659.25, 'sine', 0.25, 0.12), 100); // E5
+      setTimeout(() => playTone(783.99, 'sine', 0.35, 0.14), 200); // G5
+      setTimeout(() => playTone(1046.50, 'sine', 0.45, 0.15), 300); // C6
+    }
+    function playFailBuzz() {
+      if (!soundEnabled) return;
+      setTimeout(() => playTone(196, 'sawtooth', 0.15, 0.1), 0);
+      setTimeout(() => playTone(174.61, 'sawtooth', 0.25, 0.1), 120);
+    }
+
+    // DOM Elements
+    const qNumDisplay = document.getElementById('qNumDisplay');
+    const streakDisplay = document.getElementById('streakDisplay');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const qTitleDisplay = document.getElementById('qTitleDisplay');
+    const qSuitBadge = document.getElementById('qSuitBadge');
+    const codeContainer = document.getElementById('codeContainer');
+    const deckCardsContainer = document.getElementById('deckCardsContainer');
+    const predictedHandTray = document.getElementById('predictedHandTray');
+    const predPlaceholder = document.getElementById('predPlaceholder');
+    const actualHandTray = document.getElementById('actualHandTray');
+    const actualPlaceholder = document.getElementById('actualPlaceholder');
+    const predCountBadge = document.getElementById('predCountBadge');
+    const actualCountBadge = document.getElementById('actualCountBadge');
+    const btnRunCode = document.getElementById('btnRunCode');
+    const btnNextQuestion = document.getElementById('btnNextQuestion');
+    const btnClearPred = document.getElementById('btnClearPred');
+    const btnHeaderRandom = document.getElementById('btnHeaderRandom');
+    const btnSkipQuestion = document.getElementById('btnSkipQuestion');
+    const resultBannerContainer = document.getElementById('resultBannerContainer');
+    const btnSoundToggle = document.getElementById('btnSoundToggle');
+    const soundIcon = document.getElementById('soundIcon');
+
+    // Stepper & Trace Table Elements
+    const btnStepReset = document.getElementById('btnStepReset');
+    const btnStepPrev = document.getElementById('btnStepPrev');
+    const btnStepNext = document.getElementById('btnStepNext');
+    const btnStepFinish = document.getElementById('btnStepFinish');
+    const playIcon = document.getElementById('playIcon');
+    const playLabel = document.getElementById('playLabel');
+    const stepperStatusText = document.getElementById('stepperStatusText');
+    const stepIndicatorDot = document.getElementById('stepIndicatorDot');
+    const traceTableBody = document.getElementById('traceTableBody');
+    const traceStatsPill = document.getElementById('traceStatsPill');
+    const traceTableScroll = document.getElementById('traceTableScroll');
+    const tabTrays = document.getElementById('tabTrays');
+    const tabSplit = document.getElementById('tabSplit');
+    const tabTable = document.getElementById('tabTable');
+    const bottomPanelBody = document.getElementById('bottomPanelBody');
+
+    // Stepper State
+    let currentStepIndex = -1; // -1 = before step 0; 0..steps.length-1
+    let isAutoPlaying = false;
+    let autoPlayTimer = null;
+    let currentSpeedMultiplier = 1.0;
+    let stepSnapshots = [];
+
+    // Helper: Escape HTML
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Syntax Highlighting Helper
+    function highlightPython(code) {
+      const lines = code.split('\n');
+      return lines.map((line, idx) => {
+        let text = line;
+        
+        // Escape HTML
+        text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        
+        // Highlight keywords
+        text = text.replace(/\b(for|in|while|if|elif|else|continue|break|not|and|or)\b/g, '<span class="syn-kw">$1</span>');
+        // Highlight functions
+        text = text.replace(/\b(len|append|range)\b/g, '<span class="syn-fn">$1</span>');
+        // Highlight numbers
+        text = text.replace(/\b(\d+)\b/g, '<span class="syn-num">$1</span>');
+        // Highlight core variables
+        text = text.replace(/\b(deck|hand|card|i|total)\b/g, '<span class="syn-var">$1</span>');
+
+        return `
+          <div class="code-line" id="codeLine_${idx + 1}">
+            <span class="line-number">${idx + 1}</span>
+            <span class="line-text">${text}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Suit name helper
+    function getSuitName(suit) {
+      switch (suit) {
+        case '♥': return 'Hearts';
+        case '♦': return 'Diamonds';
+        case '♠': return 'Spades';
+        case '♣': return 'Clubs';
+        default: return 'Deck';
+      }
+    }
+
+    // Load Question
+    function loadQuestion(index) {
+      stopAutoPlay();
+      currentQuestionIndex = index;
+      const q = QUIZ_QUESTIONS[currentQuestionIndex];
+      selectedPredictedCards.clear();
+      isEvaluating = false;
+      hasEvaluated = false;
+
+      // Update Header & Metadata
+      qNumDisplay.textContent = `#${q.id} / ${QUIZ_QUESTIONS.length}`;
+      qTitleDisplay.textContent = q.title;
+      qSuitBadge.textContent = `${q.suit} ${getSuitName(q.suit)}`;
+      qSuitBadge.style.color = (q.suit === '♥' || q.suit === '♦') ? '#fda4af' : '#d8b4fe';
+
+      // Render Code
+      codeContainer.innerHTML = highlightPython(q.code);
+
+      // Render Deck
+      renderDeck(q.suit);
+
+      // Reset Trays
+      updatePredictedTray();
+
+      // Prepare Step Snapshots
+      let runningHand = [];
+      stepSnapshots = q.steps.map((st, i) => {
+        if (st.action === 'append') {
+          runningHand = [...runningHand, st.card];
+        }
+        let cond = '';
+        if (st.note && st.note.includes('->')) {
+          const parts = st.note.split('->');
+          cond = parts[0].trim().replace(/\bis\b/g, '➔');
+        } else {
+          cond = `card == ${st.card}`;
+        }
+        return {
+          index: i,
+          iteration: i + 1,
+          card: st.card,
+          action: st.action,
+          condition: cond,
+          handAfter: [...runningHand],
+          note: st.note
+        };
+      });
+
+      // Render Live Trace Table
+      traceTableBody.innerHTML = stepSnapshots.map(snap => `
+        <tr class="trace-row pending" id="traceRow_${snap.index}" data-idx="${snap.index}" title="Click to step directly to iteration #${snap.iteration}">
+          <td class="trace-cell-iter"><span class="iter-pointer">▶</span>${snap.iteration}</td>
+          <td class="trace-cell-card">${snap.card}</td>
+          <td class="trace-cell-cond"><code>${escapeHtml(snap.condition)}</code></td>
+          <td class="trace-cell-action"><span class="act-badge act-${snap.action}">${snap.action.toUpperCase()}</span></td>
+          <td class="trace-cell-hand"><code>[${snap.handAfter.join(', ')}]</code></td>
+          <td class="trace-cell-note">${escapeHtml(snap.note)}</td>
+        </tr>
+      `).join('');
+
+      // Attach click listeners to trace rows for scrubbing
+      document.querySelectorAll('.trace-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const target = parseInt(row.dataset.idx, 10);
+          stopAutoPlay();
+          goToStep(target, true);
+        });
+      });
+
+      // Reset state to before loop
+      goToStep(-1, false);
+
+      btnNextQuestion.classList.add('hidden');
+      resultBannerContainer.innerHTML = '';
+    }
+
+    // Render 10 Cards in Deck
+    function renderDeck(suit) {
+      deckCardsContainer.innerHTML = '';
+      const isRed = (suit === '♥' || suit === '♦');
+      const suitClass = isRed ? 'suit-red' : 'suit-black';
+
+      for (let num = 1; num <= 10; num++) {
+        const cardEl = document.createElement('div');
+        cardEl.className = `card-item ${suitClass}`;
+        cardEl.id = `deckCard_${num}`;
+        cardEl.dataset.num = num;
+
+        cardEl.innerHTML = `
+          <div class="card-corner">
+            <span class="card-corner-num">${num}</span>
+            <span class="card-corner-suit">${suit}</span>
+          </div>
+          <div class="card-center">
+            <span class="card-center-suit">${suit}</span>
+            <span class="card-center-num">${num}</span>
+          </div>
+          <div class="card-corner corner-bottom">
+            <span class="card-corner-num">${num}</span>
+            <span class="card-corner-suit">${suit}</span>
+          </div>
+        `;
+
+        cardEl.addEventListener('click', () => {
+          if (isEvaluating) return;
+          toggleCardPrediction(num);
+        });
+
+        deckCardsContainer.appendChild(cardEl);
+      }
+    }
+
+    // Toggle card prediction (Non-destructive deck)
+    function toggleCardPrediction(num) {
+      if (selectedPredictedCards.has(num)) {
+        selectedPredictedCards.delete(num);
+      } else {
+        selectedPredictedCards.add(num);
+      }
+      playCardClick();
+
+      // Update Deck Card visual
+      const deckCard = document.getElementById(`deckCard_${num}`);
+      if (deckCard) {
+        if (selectedPredictedCards.has(num)) {
+          deckCard.classList.add('is-marked');
+        } else {
+          deckCard.classList.remove('is-marked');
+        }
+      }
+
+      updatePredictedTray();
+
+      // If already evaluated, clear actual hand and banner so user can test again
+      if (hasEvaluated) {
+        hasEvaluated = false;
+        btnNextQuestion.classList.add('hidden');
+        actualHandTray.innerHTML = '';
+        actualHandTray.appendChild(actualPlaceholder);
+        actualCountBadge.textContent = '0 cards';
+        resultBannerContainer.innerHTML = '';
+      }
+    }
+
+    // Update Predicted Tray
+    function updatePredictedTray() {
+      const q = QUIZ_QUESTIONS[currentQuestionIndex];
+      const sortedCards = Array.from(selectedPredictedCards).sort((a, b) => a - b);
+      predCountBadge.textContent = `${sortedCards.length} ${sortedCards.length === 1 ? 'card' : 'cards'}`;
+
+      if (sortedCards.length === 0) {
+        predictedHandTray.innerHTML = '';
+        predictedHandTray.appendChild(predPlaceholder);
+        return;
+      }
+
+      predictedHandTray.innerHTML = '';
+      const isRed = (q.suit === '♥' || q.suit === '♦');
+      const suitClass = isRed ? 'suit-red' : 'suit-black';
+
+      sortedCards.forEach(num => {
+        const mini = document.createElement('div');
+        mini.className = `mini-card ${suitClass}`;
+        mini.title = `Predicted card: ${num} ${q.suit} (Click to remove)`;
+        mini.innerHTML = `
+          <div>
+            <div class="mini-card-num">${num}</div>
+            <div class="mini-card-suit">${q.suit}</div>
+          </div>
+          <div class="mini-card-center-suit">${q.suit}</div>
+          <div style="transform: rotate(180deg); text-align: right;">
+            <div class="mini-card-num">${num}</div>
+          </div>
+        `;
+        mini.addEventListener('click', () => {
+          if (isEvaluating) return;
+          toggleCardPrediction(num);
+        });
+        predictedHandTray.appendChild(mini);
+      });
+    }
+
+    // Clear Prediction
+    btnClearPred.addEventListener('click', () => {
+      if (isEvaluating) return;
+      selectedPredictedCards.clear();
+      document.querySelectorAll('.card-item').forEach(c => c.classList.remove('is-marked'));
+      updatePredictedTray();
+      playCardClick();
+    });
+
+    // Synchronized Code Line Highlighting
+    function highlightLinesForStep(step) {
+      const q = QUIZ_QUESTIONS[currentQuestionIndex];
+      if (!q) return;
+      document.querySelectorAll('.code-line').forEach(line => line.classList.remove('active-line'));
+      
+      const lines = q.code.split('\n');
+      let loopLine = -1;
+      let ifLine = -1;
+      let actionLine = -1;
+
+      lines.forEach((lineText, idx) => {
+        const lineNum = idx + 1;
+        if (/\bfor\s+card\s+in\b/i.test(lineText) || /\bwhile\b/i.test(lineText)) {
+          loopLine = lineNum;
+        }
+        if (/^\s*if\b/i.test(lineText)) {
+          ifLine = lineNum;
+        }
+        if (step.action === 'append' && /\.append\(/i.test(lineText)) {
+          actionLine = lineNum;
+        } else if (step.action === 'continue' && /\bcontinue\b/i.test(lineText)) {
+          actionLine = lineNum;
+        } else if (step.action === 'break' && /\bbreak\b/i.test(lineText)) {
+          actionLine = lineNum;
+        }
+      });
+
+      if (loopLine > 0) document.getElementById(`codeLine_${loopLine}`)?.classList.add('active-line');
+      if (ifLine > 0) document.getElementById(`codeLine_${ifLine}`)?.classList.add('active-line');
+      if (actionLine > 0) document.getElementById(`codeLine_${actionLine}`)?.classList.add('active-line');
+    }
+
+    // Go To Specific Stepper Step
+    function goToStep(targetIndex, playAudio = true) {
+      const q = QUIZ_QUESTIONS[currentQuestionIndex];
+      const steps = stepSnapshots;
+      if (!steps || steps.length === 0) return;
+
+      targetIndex = Math.max(-1, Math.min(targetIndex, steps.length - 1));
+      currentStepIndex = targetIndex;
+
+      // Update Trace Stats Pill
+      traceStatsPill.textContent = `${Math.max(0, targetIndex + 1)} / ${steps.length} steps evaluated`;
+
+      // Update Stepper Control Buttons
+      btnStepReset.disabled = (targetIndex === -1);
+      btnStepPrev.disabled = (targetIndex === -1);
+      btnStepNext.disabled = (targetIndex === steps.length - 1);
+      btnStepFinish.disabled = (targetIndex === steps.length - 1);
+
+      // Clear deck card highlights & line highlights
+      document.querySelectorAll('.card-item').forEach(card => {
+        card.classList.remove('evaluating', 'skipped-continue', 'broken-stop', 'break-trigger');
+      });
+      document.querySelectorAll('.code-line').forEach(line => line.classList.remove('active-line'));
+
+      // Update Trace Table Rows
+      steps.forEach((snap, idx) => {
+        const row = document.getElementById(`traceRow_${idx}`);
+        if (!row) return;
+        row.classList.remove('active', 'completed', 'pending');
+        if (idx < targetIndex) {
+          row.classList.add('completed');
+        } else if (idx === targetIndex) {
+          row.classList.add('active');
+          row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+          row.classList.add('pending');
+        }
+      });
+
+      if (targetIndex === -1) {
+        // Initial pre-loop state
+        actualHandTray.innerHTML = '';
+        actualHandTray.appendChild(actualPlaceholder);
+        actualCountBadge.textContent = '0 cards';
+        stepperStatusText.textContent = `Loop Ready • Click Run or Step to evaluate`;
+        stepIndicatorDot.classList.remove('active');
+        return;
+      }
+
+      const currentSnap = steps[targetIndex];
+      stepIndicatorDot.classList.add('active');
+      stepperStatusText.innerHTML = `Iter <strong>${currentSnap.iteration}/${steps.length}</strong>: card = <strong>${currentSnap.card}</strong> ➔ <span class="act-badge act-${currentSnap.action}">${currentSnap.action.toUpperCase()}</span>`;
+
+      // Render Actual Hand Tray matching handAfter
+      actualHandTray.innerHTML = '';
+      const isRed = (q.suit === '♥' || q.suit === '♦');
+      const suitClass = isRed ? 'suit-red' : 'suit-black';
+
+      currentSnap.handAfter.forEach(num => {
+        const mini = document.createElement('div');
+        mini.className = `mini-card ${suitClass}`;
+        mini.innerHTML = `
+          <div>
+            <div class="mini-card-num">${num}</div>
+            <div class="mini-card-suit">${q.suit}</div>
+          </div>
+          <div class="mini-card-center-suit">${q.suit}</div>
+          <div style="transform: rotate(180deg); text-align: right;">
+            <div class="mini-card-num">${num}</div>
+          </div>
+        `;
+        actualHandTray.appendChild(mini);
+      });
+      actualCountBadge.textContent = `${currentSnap.handAfter.length} ${currentSnap.handAfter.length === 1 ? 'card' : 'cards'}`;
+
+      // Apply historical styling up to this step on deck cards
+      for (let i = 0; i <= targetIndex; i++) {
+        const s = steps[i];
+        const el = document.getElementById(`deckCard_${s.card}`);
+        if (!el) continue;
+        if (s.action === 'continue') {
+          el.classList.add('skipped-continue');
+        } else if (s.action === 'break') {
+          el.classList.add('break-trigger');
+          const isBackward = steps.length > 1 && steps[0].card > steps[1].card;
+          if (isBackward) {
+            for (let rem = s.card - 1; rem >= 1; rem--) {
+              const remEl = document.getElementById(`deckCard_${rem}`);
+              if (remEl) remEl.classList.add('broken-stop');
+            }
+          } else {
+            for (let rem = s.card + 1; rem <= 10; rem++) {
+              const remEl = document.getElementById(`deckCard_${rem}`);
+              if (remEl) remEl.classList.add('broken-stop');
+            }
+          }
+        }
+      }
+
+      // Active card indicator
+      const activeCardEl = document.getElementById(`deckCard_${currentSnap.card}`);
+      if (activeCardEl && currentSnap.action !== 'break') {
+        activeCardEl.classList.add('evaluating');
+      }
+
+      // Synchronize Code Line Highlighting
+      highlightLinesForStep(currentSnap);
+
+      // Sound effects
+      if (playAudio) {
+        if (currentSnap.action === 'append') playAppendSound();
+        else if (currentSnap.action === 'continue') playSkipSound();
+        else if (currentSnap.action === 'break') playBreakSound();
+        else playCardClick();
+      }
+
+      // If we arrived at the final step, evaluate quiz outcome
+      if (targetIndex === steps.length - 1) {
+        evaluateQuizOutcome();
+      }
+    }
+
+    // Auto-Play & Stepper Controls
+    function startAutoPlay() {
+      if (isAutoPlaying) return;
+      if (currentStepIndex >= stepSnapshots.length - 1) {
+        goToStep(-1, false);
+        hasEvaluated = false;
+        resultBannerContainer.innerHTML = '';
+      }
+      isAutoPlaying = true;
+      playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+      playLabel.textContent = 'Pause';
+      btnRunCode.classList.add('active');
+
+      const baseDelay = 580;
+      const interval = Math.round(baseDelay / currentSpeedMultiplier);
+
+      autoPlayTimer = setInterval(() => {
+        if (currentStepIndex < stepSnapshots.length - 1) {
+          goToStep(currentStepIndex + 1, true);
+        } else {
+          stopAutoPlay();
+        }
+      }, interval);
+    }
+
+    function stopAutoPlay() {
+      isAutoPlaying = false;
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+      playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+      playLabel.textContent = 'Run Loop';
+      btnRunCode.classList.remove('active');
+    }
+
+    // Evaluate Prediction Against Actual Hand (Order-Independent)
+    function evaluateQuizOutcome() {
+      if (hasEvaluated) return;
+      hasEvaluated = true;
+      const q = QUIZ_QUESTIONS[currentQuestionIndex];
+      const userPredictedArray = Array.from(selectedPredictedCards).sort((a, b) => a - b);
+      const correctHandSorted = [...q.correct_hand].sort((a, b) => a - b);
+
+      // Order-independent match: Verify that the exact set of cards matches
+      const isMatch = (userPredictedArray.length === correctHandSorted.length) &&
+                      userPredictedArray.every((val, idx) => val === correctHandSorted[idx]);
+
+      if (isMatch) {
+        playSuccessChord();
+        currentStreak++;
+        currentScore += 10;
+        streakDisplay.textContent = currentStreak;
+        scoreDisplay.textContent = currentScore;
+
+        const predStr = userPredictedArray.length ? `[${userPredictedArray.join(', ')}]` : '[]';
+        const actualStr = q.correct_hand.length ? `[${q.correct_hand.join(', ')}]` : '[]';
+
+        resultBannerContainer.innerHTML = `
+          <div class="result-banner success">
+            <span>🎉 Correct! Selected cards ${predStr} match loop output ${actualStr}!</span>
+          </div>
+        `;
+        btnNextQuestion.classList.remove('hidden');
+      } else {
+        playFailBuzz();
+        currentStreak = 0;
+        streakDisplay.textContent = currentStreak;
+
+        const predStr = userPredictedArray.length ? `[${userPredictedArray.join(', ')}]` : '[]';
+        const actualStr = q.correct_hand.length ? `[${q.correct_hand.join(', ')}]` : '[]';
+
+        resultBannerContainer.innerHTML = `
+          <div class="result-banner fail">
+            <span>❌ Output: ${actualStr} &bull; Prediction: ${predStr}</span>
+          </div>
+        `;
+        btnNextQuestion.classList.remove('hidden');
+      }
+    }
+
+    // Button event listeners
+    btnRunCode.addEventListener('click', () => {
+      if (isAutoPlaying) {
+        stopAutoPlay();
+      } else {
+        startAutoPlay();
+      }
+    });
+
+    btnStepNext.addEventListener('click', () => {
+      stopAutoPlay();
+      if (currentStepIndex < stepSnapshots.length - 1) {
+        goToStep(currentStepIndex + 1, true);
+      }
+    });
+
+    btnStepPrev.addEventListener('click', () => {
+      stopAutoPlay();
+      if (currentStepIndex > -1) {
+        goToStep(currentStepIndex - 1, true);
+      }
+    });
+
+    btnStepReset.addEventListener('click', () => {
+      stopAutoPlay();
+      goToStep(-1, false);
+      hasEvaluated = false;
+      resultBannerContainer.innerHTML = '';
+    });
+
+    btnStepFinish.addEventListener('click', () => {
+      stopAutoPlay();
+      goToStep(stepSnapshots.length - 1, true);
+    });
+
+    // Speed Controls
+    document.querySelectorAll('.btn-speed').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSpeedMultiplier = parseFloat(btn.dataset.speed) || 1.0;
+        if (isAutoPlaying) {
+          stopAutoPlay();
+          startAutoPlay();
+        }
+      });
+    });
+
+    // View Mode Tabs
+    const viewTabs = [tabTrays, tabSplit, tabTable];
+    viewTabs.forEach(tab => {
+      if (!tab) return;
+      tab.addEventListener('click', () => {
+        viewTabs.forEach(t => t?.classList.remove('active'));
+        tab.classList.add('active');
+        const view = tab.dataset.view;
+        bottomPanelBody.className = `bottom-panel-body view-${view}`;
+      });
+    });
+
+    // Shuffled question playlist to guarantee non-repeating variety across all 50 scenarios
+    let playlist = [];
+    let playlistPos = 0;
+
+    function initPlaylist() {
+      playlist = Array.from({ length: QUIZ_QUESTIONS.length }, (_, i) => i);
+      // Fisher-Yates shuffle
+      for (let i = playlist.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+      }
+      playlistPos = 0;
+    }
+
+    function loadNextRandomQuestion() {
+      if (isEvaluating) return;
+      if (playlist.length === 0 || playlistPos >= playlist.length) {
+        initPlaylist();
+      }
+      const nextIdx = playlist[playlistPos];
+      playlistPos++;
+      loadQuestion(nextIdx);
+    }
+
+    // Button event listeners for loading random questions
+    btnNextQuestion.addEventListener('click', loadNextRandomQuestion);
+    if (btnHeaderRandom) btnHeaderRandom.addEventListener('click', loadNextRandomQuestion);
+    if (btnSkipQuestion) btnSkipQuestion.addEventListener('click', loadNextRandomQuestion);
+
+    // Sound toggle
+    btnSoundToggle.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
+    });
+
+    // Keyboard navigation: [H] or [Esc] to go back to Hub, [R] for random question
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'h' || e.key === 'H' || e.key === 'Escape') {
+        window.location.href = './index.html';
+      } else if ((e.key === 'r' || e.key === 'R') && !isEvaluating) {
+        loadNextRandomQuestion();
+      }
+    });
+
+    // Initialize with a truly random question from the shuffled 50-card quiz deck
+    initPlaylist();
+    loadNextRandomQuestion();
+  </script>
+</body>
+</html>

@@ -1,0 +1,3680 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Python Logic Visualizer</title>
+    <meta name="description" content="Interactive CS visualizer and simulation suite for Python classes, featuring the Python Variable Box quiz, hydraulic Boolean logic gates, automated water diverter if/elif/else control flow, Detroit Pizzeria function scope, Loop Prediction Quiz (for/while loops, continue, break), Python Slicing Visualizer (indices, strides, defaults), and 100% offline PWA capability." />
+    <meta property="og:title" content="Python Logic Visualizer" />
+    <meta property="og:description" content="Interactive CS visualizer and simulation suite for Python classes, featuring the Python Variable Box quiz, hydraulic Boolean logic gates, automated water diverter if/elif/else control flow, Detroit Pizzeria function scope, Loop Prediction Quiz (for/while loops, continue, break), Python Slicing Visualizer (indices, strides, defaults), and 100% offline PWA capability." />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LogicVis" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+
+    <style>
+      :root {
+        --bg-main: #0f172a;
+        --bg-radial: #1e3a8a;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-bg-hover: rgba(255, 255, 255, 0.09);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-border-bright: rgba(255, 255, 255, 0.2);
+        --glass-blur: blur(20px);
+        --accent-blue: #3b82f6;
+        --accent-blue-glow: rgba(59, 130, 246, 0.3);
+        --water-primary: #38bdf8;
+        --water-secondary: #0ea5e9;
+        --water-cyan: #22d3ee;
+        --water-blue: #2563eb;
+        --text-bright: #f8fafc;
+        --text-regular: #cbd5e1;
+        --text-muted: #94a3b8;
+        --text-blue-light: #93c5fd;
+        --true-green: #4ade80;
+        --false-red: #f87171;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      html, body {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        background-color: #0f172a;
+        background-image: radial-gradient(circle at 85% 10%, #1e3a8a 0%, #0f172a 75%);
+        color: var(--text-bright);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Top Fixed Frosted Glass Navigation Header */
+      header {
+        height: 60px;
+        min-height: 60px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 20;
+        gap: 16px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        white-space: nowrap;
+      }
+
+      .brand-icon-box {
+        width: 36px;
+        height: 36px;
+        background: #3b82f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px -2px rgba(59, 130, 246, 0.35);
+        flex-shrink: 0;
+      }
+
+      .brand-icon-svg {
+        width: 20px;
+        height: 20px;
+        color: #ffffff;
+      }
+
+      .brand-text-col {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.15;
+      }
+
+      .brand-title {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #f8fafc;
+      }
+
+      .brand-subtitle {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #93c5fd;
+      }
+
+      /* Gate Switcher Navigation Tabs - Frosted Glass */
+      .gate-tabs {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 4px;
+        border-radius: 16px;
+        border: 1px solid var(--glass-border);
+      }
+
+      .gate-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-muted);
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
+      }
+
+      .gate-btn:hover {
+        color: var(--text-bright);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .gate-btn.active {
+        background: #2563eb;
+        border: 1px solid #60a5fa;
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      }
+
+      /* Header Action Controls */
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .header-badges {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .badge-pwa {
+        padding: 4px 10px;
+        background: rgba(34, 197, 94, 0.2);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        color: #4ade80;
+        font-size: 10px;
+        font-weight: 700;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+
+      .badge-offline {
+        padding: 4px 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 10px;
+        font-weight: 700;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--true-green);
+        box-shadow: 0 0 6px var(--true-green);
+      }
+
+      .tool-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: var(--text-regular);
+        padding: 6px 12px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        backdrop-filter: blur(12px);
+      }
+
+      .tool-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--glass-border-bright);
+        color: var(--text-bright);
+      }
+
+      .tool-btn.active {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: #60a5fa;
+        color: #93c5fd;
+      }
+
+      .tool-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .install-pwa-btn {
+        background: #2563eb;
+        color: #ffffff;
+        border: 1px solid #60a5fa;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      }
+
+      .install-pwa-btn:hover {
+        background: #1d4ed8;
+      }
+
+      /* Multi-View Screen Management */
+      .view-screen {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: fixed;
+        inset: 0;
+        background: inherit;
+        transition: opacity 0.2s ease;
+      }
+
+      .view-screen.hidden {
+        display: none !important;
+      }
+
+      /* Hub Viewport Layout */
+      #hubView main {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding: 24px 32px 40px 32px;
+        max-width: 1240px;
+        width: 100%;
+        margin: 0 auto;
+        gap: 24px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+      }
+
+      /* Hub Hero Banner */
+      .hub-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 26px 30px;
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+      }
+
+      .hub-hero::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.28) 0%, rgba(59, 130, 246, 0) 70%);
+        pointer-events: none;
+      }
+
+      .hub-hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #93c5fd;
+      }
+
+      .hub-hero-title {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: #ffffff;
+        line-height: 1.25;
+      }
+
+      .hub-hero-desc {
+        font-size: 14px;
+        color: var(--text-regular);
+        max-width: 760px;
+        line-height: 1.6;
+      }
+
+      /* Category Filter Chips */
+      .hub-filters {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      .filter-chip {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: var(--text-regular);
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filter-chip:hover {
+        background: rgba(255, 255, 255, 0.09);
+        color: #ffffff;
+        border-color: var(--glass-border-bright);
+      }
+
+      .filter-chip.active {
+        background: #2563eb;
+        border-color: #60a5fa;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+      }
+
+      /* Hub Visualizer Cards Grid */
+      .hub-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        max-width: 1240px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      @media (max-width: 860px) {
+        .hub-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .hub-card {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hub-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(96, 165, 250, 0.4);
+        box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.35);
+      }
+
+      .hub-card.card-live {
+        border-color: rgba(56, 189, 248, 0.3);
+      }
+
+      .hub-card.card-live:hover {
+        border-color: rgba(56, 189, 248, 0.6);
+        box-shadow: 0 12px 40px 0 rgba(56, 189, 248, 0.15);
+      }
+
+      .hub-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .status-pill-live {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        color: #4ade80;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 4px 10px;
+        border-radius: 9999px;
+      }
+
+      .status-pill-live .pulse-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #4ade80;
+        box-shadow: 0 0 8px #4ade80;
+      }
+
+      .hub-card-category {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #93c5fd;
+      }
+
+      .hub-card-preview {
+        height: 120px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Animated Preview Visuals */
+      .pipeline-preview-art {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 20px;
+      }
+
+      .pipe-art-segment {
+        height: 16px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .pipe-art-water {
+        position: absolute;
+        inset: 3px 0;
+        background: linear-gradient(90deg, #22d3ee, #2563eb);
+        box-shadow: 0 0 12px #22d3ee;
+        animation: flowAnimation 2s linear infinite;
+      }
+
+      @keyframes flowAnimation {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+      }
+
+      .pipe-art-valve {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(15, 23, 42, 0.95);
+        border: 2px solid #38bdf8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        color: #38bdf8;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+        z-index: 2;
+        margin: 0 8px;
+      }
+
+      .pipe-art-basin {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(37, 99, 235, 0.25);
+        border: 1.5px solid #22d3ee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #38bdf8;
+        box-shadow: 0 0 16px rgba(34, 211, 238, 0.3);
+      }
+
+      .pizzeria-preview-art {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 24px;
+        background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%);
+      }
+
+      .pizzeria-mini-shaker {
+        width: 32px;
+        height: 52px;
+        background: rgba(254, 240, 138, 0.2);
+        border: 1.5px solid #eab308;
+        border-radius: 6px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 0 10px rgba(234, 179, 8, 0.3);
+      }
+
+      .pizzeria-mini-shaker::before {
+        content: "";
+        width: 20px;
+        height: 10px;
+        background: #94a3b8;
+        border-radius: 3px 3px 0 0;
+        margin-top: -10px;
+      }
+
+      .pizzeria-mini-pan {
+        width: 60px;
+        height: 46px;
+        background: #18181b;
+        border: 2px solid #ea580c;
+        border-radius: 6px;
+        box-shadow: 0 0 14px rgba(234, 88, 12, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .pizzeria-mini-pizza {
+        width: 50px;
+        height: 36px;
+        background: linear-gradient(135deg, #fef08a, #f59e0b);
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .pizzeria-mini-pizza::before {
+        content: "";
+        position: absolute;
+        width: 8px;
+        top: 2px;
+        bottom: 2px;
+        left: 12px;
+        background: #dc2626;
+        border-radius: 2px;
+      }
+
+      .pizzeria-mini-pizza::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        top: 2px;
+        bottom: 2px;
+        right: 12px;
+        background: #dc2626;
+        border-radius: 2px;
+      }
+
+      .pizzeria-mini-doors {
+        width: 44px;
+        height: 50px;
+        background: #1e293b;
+        border: 1.5px solid #38bdf8;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+      }
+
+      .diverter-preview-art {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 24px;
+        background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
+      }
+
+      .diverter-mini-intake {
+        width: 44px;
+        height: 40px;
+        background: #1e293b;
+        border: 1.5px solid #38bdf8;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        font-size: 16px;
+      }
+
+      .diverter-mini-junction {
+        width: 54px;
+        height: 54px;
+        background: #0f172a;
+        border: 2px solid #64748b;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
+      }
+
+      .diverter-mini-led {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 6px #22c55e;
+      }
+
+      .diverter-mini-destinations {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .diverter-mini-dest {
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 9px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .variable-box-preview-art {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 20px;
+        background: radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%);
+      }
+
+      .var-mini-code {
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 10px;
+        color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .var-mini-box {
+        width: 58px;
+        height: 58px;
+        background: linear-gradient(135deg, #c29b68 0%, #a27a46 100%);
+        border: 2px solid #7c5c32;
+        border-radius: 8px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .var-mini-box-label {
+        background: #ffffff;
+        color: #0f172a;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 2px 5px;
+        border-radius: 3px;
+        border: 1px solid #334155;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        transform: rotate(-3deg);
+      }
+
+      .var-mini-types {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .var-mini-type-pill {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 8.5px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .loop-deck-preview-art {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 16px;
+        background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%);
+      }
+
+      .loop-mini-cards {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .loop-mini-card {
+        width: 32px;
+        height: 46px;
+        background: #ffffff;
+        border-radius: 4px;
+        border: 1px solid #cbd5e1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2px 3px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 8px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .loop-mini-card.suit-red { color: #dc2626; }
+      .loop-mini-card.suit-black { color: #0f172a; }
+
+      .loop-mini-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .loop-mini-badge {
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 8.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .slicing-preview-art {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 16px;
+        background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.15) 0%, rgba(15, 23, 42, 0.7) 100%);
+      }
+
+      .slice-mini-grid {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .slice-mini-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .slice-mini-idx {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 8px;
+        font-weight: 700;
+      }
+
+      .slice-mini-box {
+        width: 22px;
+        height: 24px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .slice-mini-box.active {
+        background: #059669;
+        color: #ffffff;
+        border: 1px solid #34d399;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+      }
+
+      .slice-mini-box.faded {
+        background: rgba(30, 41, 59, 0.5);
+        color: #64748b;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .slice-mini-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .slice-mini-badge {
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 8.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .hub-card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+      }
+
+      .hub-card-desc {
+        font-size: 13px;
+        color: var(--text-regular);
+        line-height: 1.55;
+        flex: 1;
+      }
+
+      .hub-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .hub-tag {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      .hub-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .hub-launch-btn {
+        background: #2563eb;
+        color: #ffffff;
+        border: 1px solid #60a5fa;
+        padding: 8px 18px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .hub-launch-btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
+      }
+
+      /* Hub Bottom PWA Info Bar */
+      .hub-pwa-banner {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-muted);
+        gap: 16px;
+      }
+
+      .hub-pwa-banner strong {
+        color: #93c5fd;
+      }
+
+      /* Back to Hub Button inside Visualizer */
+      .back-to-hub-btn {
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid var(--glass-border);
+        color: var(--text-regular);
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .back-to-hub-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        border-color: var(--glass-border-bright);
+      }
+
+      /* Visualizer Viewport Layout */
+      #vizView main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 390px;
+        gap: 14px;
+        padding: 14px;
+        min-height: 0;
+        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
+        overflow: hidden;
+      }
+
+      /* Left Side: Hydraulic Fluid Simulation - Frosted Glass Container */
+      .canvas-viewport {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      }
+
+      .canvas-container {
+        flex: 1;
+        position: relative;
+        min-height: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #simCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      /* Bottom Status Banner for Simulation - Floating Frosted Glass Bar */
+      .simulation-bar {
+        height: 58px;
+        min-height: 58px;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        margin: 0 12px 12px 12px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 10;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      .valves-quickbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .valve-toggle-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        border-radius: 9999px;
+        padding: 6px 14px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-regular);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(12px);
+      }
+
+      .valve-toggle-btn .state-led {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #475569;
+        transition: all 0.2s ease;
+      }
+
+      .valve-toggle-btn.is-true {
+        background: rgba(37, 99, 235, 0.25);
+        border-color: rgba(96, 165, 250, 0.6);
+        color: #93c5fd;
+        box-shadow: 0 0 16px rgba(59, 130, 246, 0.3);
+      }
+
+      .valve-toggle-btn.is-true .state-led {
+        background: #38bdf8;
+        box-shadow: 0 0 8px #38bdf8;
+      }
+
+      .valve-toggle-btn.is-false {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: var(--glass-border);
+        color: var(--text-muted);
+      }
+
+      .valve-toggle-btn.is-false .state-led {
+        background: #64748b;
+      }
+
+      .output-result-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+      }
+
+      .output-result-badge.flows {
+        background: rgba(37, 99, 235, 0.25);
+        border: 1px solid rgba(34, 211, 238, 0.5);
+        color: #38bdf8;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+      }
+
+      .output-result-badge.blocked {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+      }
+
+      /* Right Side: Frosted Glass Sidebar */
+      .sidebar {
+        background: transparent;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        height: 100%;
+        overflow-y: auto;
+        padding-right: 4px;
+        gap: 12px;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--glass-border);
+        border-radius: 4px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 22px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #93c5fd;
+      }
+
+      .card-header .tag {
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--glass-border);
+        color: var(--text-regular);
+      }
+
+      /* Python Code Sandbox Terminal - Frosted Terminal */
+      .terminal-card {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 22px;
+        padding: 14px;
+      }
+
+      .terminal-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .window-dots {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .dot-red { background: #ef4444; }
+      .dot-yellow { background: #f59e0b; }
+      .dot-green { background: #10b981; }
+
+      .terminal-title {
+        font-size: 10px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .code-block {
+        background: transparent;
+        border: none;
+        padding: 4px 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.6;
+        color: #e2e8f0;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .code-keyword { color: #f472b6; font-weight: 600; }
+      .code-bool-true { color: #4ade80; font-weight: 700; }
+      .code-bool-false { color: #f87171; font-weight: 700; }
+      .code-op { color: #38bdf8; font-weight: 700; }
+      .code-var { color: #93c5fd; }
+      .code-comment { color: #64748b; font-style: italic; }
+      .code-string { color: #facc15; }
+      .code-highlight {
+        background: rgba(56, 189, 248, 0.15);
+        display: block;
+        margin: 0 -8px;
+        padding: 0 8px;
+        border-left: 3px solid #38bdf8;
+        border-radius: 0 6px 6px 0;
+      }
+
+      /* Short-Circuit Explanation Pill - Frosted */
+      .short-circuit-banner {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 16px;
+        padding: 8px 12px;
+        font-size: 11px;
+        line-height: 1.45;
+        color: #bfdbfe;
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+      }
+
+      .short-circuit-banner svg {
+        width: 15px;
+        height: 15px;
+        color: #60a5fa;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* Truth Table - Frosted Panel */
+      .truth-table-wrapper {
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      table.truth-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        text-align: center;
+      }
+
+      table.truth-table th {
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.45);
+        padding: 8px 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      table.truth-table td {
+        padding: 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+
+      table.truth-table tr:hover td {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      table.truth-table tr.active-row td {
+        background: rgba(37, 99, 235, 0.25);
+        font-weight: 700;
+      }
+
+      table.truth-table tr.active-row td:first-child {
+        border-left: 3px solid #60a5fa;
+      }
+
+      .val-badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 9999px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .val-true {
+        background: rgba(34, 197, 94, 0.2);
+        color: #4ade80;
+      }
+
+      .val-false {
+        background: rgba(239, 68, 68, 0.18);
+        color: #f87171;
+      }
+
+      /* Hydraulic Metaphor Guide Card */
+      .pedagogy-card {
+        background: rgba(59, 130, 246, 0.08);
+        border: 1px solid rgba(59, 130, 246, 0.22);
+        border-radius: 20px;
+      }
+
+      .pedagogy-guide {
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--text-regular);
+      }
+
+      .pedagogy-guide p {
+        margin-bottom: 6px;
+      }
+
+      .pedagogy-guide strong {
+        color: #93c5fd;
+      }
+
+      /* Challenge Mode Overlay Card */
+      .challenge-card {
+        border: 1px solid rgba(250, 204, 21, 0.35);
+        background: linear-gradient(180deg, rgba(250, 204, 21, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+        border-radius: 22px;
+      }
+
+      .challenge-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .challenge-target {
+        font-size: 12px;
+        font-weight: 600;
+        color: #fef08a;
+      }
+
+      .challenge-score {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .challenge-btn {
+        background: #facc15;
+        color: #0f172a;
+        font-weight: 700;
+        border: none;
+        border-radius: 9999px;
+        padding: 6px 14px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .challenge-btn:hover {
+        background: #eab308;
+      }
+
+      .challenge-feedback {
+        font-size: 11px;
+        line-height: 1.5;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 4px;
+      }
+
+      .challenge-feedback.success {
+        background: rgba(74, 222, 128, 0.15);
+        border: 1px solid rgba(74, 222, 128, 0.4);
+        color: #86efac;
+      }
+
+      .challenge-feedback.error {
+        background: rgba(248, 113, 113, 0.15);
+        border: 1px solid rgba(248, 113, 113, 0.4);
+        color: #fca5a5;
+      }
+
+      /* iOS Safari PWA Install Modal */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-content {
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border-bright);
+        border-radius: 24px;
+        max-width: 360px;
+        width: 90%;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.6);
+      }
+
+      .modal-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-bright);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .modal-steps {
+        font-size: 13px;
+        color: var(--text-regular);
+        line-height: 1.5;
+      }
+
+      .modal-steps li {
+        margin-left: 18px;
+        margin-bottom: 8px;
+      }
+
+      .modal-close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        color: var(--text-bright);
+        padding: 8px 16px;
+        border-radius: 9999px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+        align-self: flex-end;
+      }
+
+      /* Responsive Breakpoint for Mobile/Tablet */
+      @media (max-width: 880px) {
+        #vizView main {
+          grid-template-columns: 1fr;
+          grid-template-rows: 56% 44%;
+          padding: 8px;
+          gap: 8px;
+        }
+        .brand-text-col {
+          display: none;
+        }
+        .header-badges {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- VIEW 1: THE CS VISUALIZER HUB -->
+    <div id="hubView" class="view-screen">
+      <!-- Hub Top Frosted Glass Navigation Header -->
+      <header>
+        <div class="brand">
+          <div class="brand-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="brand-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+          </div>
+          <div class="brand-text-col">
+            <h1 class="brand-title">CS Visualizer Suite</h1>
+            <p class="brand-subtitle">Interactive Learning Hub</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="header-badges">
+            <span class="badge-pwa">PWA Suite</span>
+            <span class="badge-offline" id="hubOfflineStatus">
+              <span class="status-dot"></span>
+              <span>Offline Ready</span>
+            </span>
+          </div>
+
+          <!-- Root PWA Install Button -->
+          <button class="tool-btn install-pwa-btn" id="hubPwaInstallBtn" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Install Suite
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <!-- Hub Hero Section -->
+        <section class="hub-hero">
+          <div class="hub-hero-eyebrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Interactive Computer Science Simulations
+          </div>
+          <h2 class="hub-hero-title">Python Logic Visualizer</h2>
+          <p class="hub-hero-desc">
+            Model Boolean logic circuits and Python conditionals through tactile, physics-driven fluid simulations. Features interactive gates, live Python 3.12 evaluation, truth tables, short-circuit paths, and quiz challenges.
+          </p>
+          <div class="hub-filters" id="hubFilters">
+            <span style="font-size: 12px; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+              Direct Gate Launch:
+            </span>
+            <button class="filter-chip" data-gate="and">and</button>
+            <button class="filter-chip" data-gate="or">or</button>
+            <button class="filter-chip" data-gate="not">not</button>
+            <button class="filter-chip" data-gate="nand">not(and)</button>
+            <button class="filter-chip" data-gate="nor">not(or)</button>
+            <button class="filter-chip" data-gate="compound">(A or B) and C</button>
+            <button class="filter-chip" data-gate="challenge">Quiz Mode</button>
+          </div>
+        </section>
+
+        <!-- Hub Modules Grid -->
+        <section class="hub-grid" id="hubGrid">
+          <!-- Module 1: Python Variable Box Quiz -->
+          <article class="hub-card card-live" style="border-color: rgba(217, 119, 6, 0.35);">
+            <div class="hub-card-header">
+              <span class="status-pill-live" style="background: rgba(217, 119, 6, 0.18); border-color: rgba(217, 119, 6, 0.4); color: #fcd34d;">
+                <span class="pulse-dot" style="background: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+                Active Simulation
+              </span>
+              <span class="hub-card-category" style="color: #fbbf24;">Variables &amp; Types</span>
+            </div>
+
+            <!-- Cardboard Box Memory Graphic -->
+            <div class="hub-card-preview" style="cursor: pointer;" id="launchVariableBoxPreview" onclick="window.location.href='./variable_box.html'" title="Click to launch Python Variable Box Quiz">
+              <div class="variable-box-preview-art">
+                <div class="var-mini-code" title="Python Snippet">
+                  <span style="color: #64748b;"># Evaluate</span>
+                  <span><span style="color: #f59e0b; font-weight: bold;">ans</span> = 4 / 2</span>
+                </div>
+                <div class="var-mini-box" title="Cardboard Variable Box">
+                  <div class="var-mini-box-label">name: ans</div>
+                </div>
+                <div class="var-mini-types" title="Python Types">
+                  <div class="var-mini-type-pill" style="background: rgba(45, 212, 191, 0.2); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.4);">
+                    <span>float:</span><span>2.0</span>
+                  </div>
+                  <div class="var-mini-type-pill" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                    <span>int:</span><span>42</span>
+                  </div>
+                  <div class="var-mini-type-pill" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);">
+                    <span>Error:</span><span>ValueError</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="hub-card-title">Variable Box: Types, Math &amp; ValueErrors</h3>
+              <p class="hub-card-desc" style="margin-top: 6px;">
+                Master Python variables, data types, type casting, ValueErrors, and Python-specific operators (+, -, *, /, //, %, **). Inspect the Python code window, test your prediction on the closed cardboard memory box, and see the box open or destructively collapse upon evaluation.
+              </p>
+            </div>
+
+            <div class="hub-card-footer">
+              <span style="font-size: 11px; color: #94a3b8;">Question Bank &bull; 3D Box Physics</span>
+              <a href="./variable_box.html" class="hub-launch-btn" style="text-decoration: none; background: #d97706; border-color: #f59e0b; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);" id="launchVariableBoxBtn">
+                <span>Launch Variable Box</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Module 2: Boolean Logic Visualizer -->
+          <article class="hub-card card-live">
+            <div class="hub-card-header">
+              <span class="status-pill-live">
+                <span class="pulse-dot"></span>
+                Active Simulation
+              </span>
+              <span class="hub-card-category">Intro Python & Logic</span>
+            </div>
+
+            <!-- Animated Fluid Flow Graphic -->
+            <div class="hub-card-preview" style="cursor: pointer;" id="launchPreviewCard1" title="Click to launch visualizer">
+              <div class="pipeline-preview-art">
+                <div class="pipe-art-segment">
+                  <div class="pipe-art-water"></div>
+                </div>
+                <div class="pipe-art-valve" title="Valve A">A</div>
+                <div class="pipe-art-segment">
+                  <div class="pipe-art-water"></div>
+                </div>
+                <div class="pipe-art-valve" title="Valve B">B</div>
+                <div class="pipe-art-segment">
+                  <div class="pipe-art-water"></div>
+                </div>
+                <div class="pipe-art-basin" title="Output Basin">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="hub-card-title">Boolean Logic & Fluid Hydraulics</h3>
+              <p class="hub-card-desc" style="margin-top: 6px;">
+                Model AND, OR, NOT, NAND, NOR, and compound logic circuits through industrial fluid dynamics. Includes real-time Python 3.12 syntax, interactive truth tables, short-circuit path banners, and quiz challenges.
+              </p>
+            </div>
+
+            <div class="hub-card-footer">
+              <span style="font-size: 11px; color: #94a3b8;">Logic Gates &bull; Quiz Mode</span>
+              <button class="hub-launch-btn" id="launchVizBtn">
+                <span>Launch Visualizer</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Module 3: Python Control Flow (Automated Water Diverter) -->
+          <article class="hub-card card-live" style="border-color: rgba(59, 130, 246, 0.35);">
+            <div class="hub-card-header">
+              <span class="status-pill-live" style="background: rgba(59, 130, 246, 0.18); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
+                <span class="pulse-dot" style="background: #3b82f6; box-shadow: 0 0 8px #3b82f6;"></span>
+                Active Simulation
+              </span>
+              <span class="hub-card-category" style="color: #60a5fa;">Control Flow &amp; Branching</span>
+            </div>
+
+            <div class="hub-card-preview" style="cursor: pointer;" id="launchDiverterPreview" onclick="window.location.href='./diverter.html'" title="Click to launch Automated Water Diverter">
+              <div class="diverter-preview-art">
+                <div class="diverter-mini-intake" title="Water Intake: temperature variable">
+                  <span>💧</span>
+                </div>
+                <div class="diverter-mini-junction" title="Mechanical Sorting Junction">
+                  <div class="diverter-mini-led"></div>
+                  <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 8px; color: #94a3b8; font-weight: 700;">T-400</span>
+                </div>
+                <div class="diverter-mini-destinations">
+                  <div class="diverter-mini-dest" style="background: rgba(255, 87, 34, 0.2); border: 1px solid rgba(255, 87, 34, 0.4); color: #ff8a65;">
+                    <span>♨️</span><span>if &gt;= 100</span>
+                  </div>
+                  <div class="diverter-mini-dest" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                    <span>❄️</span><span>elif &lt;= 0</span>
+                  </div>
+                  <div class="diverter-mini-dest" style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd;">
+                    <span>🚰</span><span>else (1-99)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="hub-card-title">Conditional Branching &amp; Mutual Exclusivity</h3>
+              <p class="hub-card-desc" style="margin-top: 6px;">
+                Learn Python <code style="color:#60a5fa;">if / elif / else</code> logic through an automated industrial water diverter analogy. Move the temperature slider (-50°C to 150°C) to dynamically route water into the Steam Turbine, Ice Crusher, or Municipal Tank. Visually proves mutual exclusivity (only 1 path open at a time) and the non-conditional nature of <code style="color:#60a5fa;">else:</code> as a default fallback.
+              </p>
+            </div>
+
+            <div class="hub-card-footer">
+              <span style="font-size: 11px; color: #94a3b8;">Standalone Offline Lab</span>
+              <a href="./diverter.html" class="hub-launch-btn" style="text-decoration: none; background: #2563eb; border-color: #3b82f6; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);" id="launchDiverterBtn">
+                <span>Launch Diverter Lab</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Module 4: Python Function Scope (Detroit Pizzeria) -->
+          <article class="hub-card card-live">
+            <div class="hub-card-header">
+              <span class="status-pill-live" style="background: rgba(249, 115, 22, 0.2); border-color: rgba(249, 115, 22, 0.4); color: #fb923c;">
+                <span class="pulse-dot" style="background: #f97316;"></span>
+                Active Simulation
+              </span>
+              <span class="hub-card-category" style="color: #fdba74;">Functions & Scope</span>
+            </div>
+
+            <div class="hub-card-preview" style="cursor: pointer;" id="launchPizzeriaPreview" onclick="window.location.href='./pizzeria.html'" title="Click to launch Pizzeria Scope Lab">
+              <div class="pizzeria-preview-art">
+                <div class="pizzeria-mini-shaker" title="Global Shaker: cheese = 'parmesan'"></div>
+                <div class="pizzeria-mini-pan" title="Detroit Pizza Pan: return 'Detroit Pizza'">
+                  <div class="pizzeria-mini-pizza"></div>
+                </div>
+                <div class="pizzeria-mini-doors" title="Kitchen Scope Doors: cheese = 'mozzarella'">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M12 3v18M7 12h2M15 12h2"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="hub-card-title">Function Scope, Parameters &amp; Shadowing</h3>
+              <p class="hub-card-desc" style="margin-top: 6px;">
+                Learn Python scope through a Detroit-style pizzeria analogy. Visualizes Function Parameters (<code style="color:#fdba74;">size</code>, <code style="color:#fdba74;">toppings</code>), Global Scope (Dining Room), Local Scope (Kitchen), Variable Shadowing with Mozzarella vs Parmesan, captured returns, and unreferenced garbage collection.
+              </p>
+            </div>
+
+            <div class="hub-card-footer">
+              <span style="font-size: 11px; color: #94a3b8;">Standalone Offline Lab</span>
+              <a href="./pizzeria.html" class="hub-launch-btn" style="text-decoration: none; background: #ea580c; border-color: #f97316; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);" id="launchPizzeriaBtn">
+                <span>Launch Scope Lab</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Module 5: Python Loops (Playing Card Prediction Quiz) -->
+          <article class="hub-card card-live" style="border-color: rgba(16, 185, 129, 0.35);">
+            <div class="hub-card-header">
+              <span class="status-pill-live" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                <span class="pulse-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                Active Simulation
+              </span>
+              <span class="hub-card-category" style="color: #34d399;">Loops &amp; Control</span>
+            </div>
+
+            <div class="hub-card-preview" style="cursor: pointer;" id="launchLoopDeckPreview" onclick="window.location.href='./loop_deck.html'" title="Click to launch Python Loop Prediction Quiz">
+              <div class="loop-deck-preview-art">
+                <div class="loop-mini-cards">
+                  <div class="loop-mini-card suit-red" style="transform: translateY(-4px); box-shadow: 0 0 0 1.5px #38bdf8, 0 4px 8px rgba(0,0,0,0.3);" title="Predicted: 2♥">
+                    <span>2♥</span>
+                    <span style="font-size: 11px; text-align: center;">♥</span>
+                    <span style="text-align: right;">2</span>
+                  </div>
+                  <div class="loop-mini-card suit-black" style="filter: grayscale(80%) opacity(0.5);" title="Skipped: continue on odd">
+                    <span>3♠</span>
+                    <span style="font-size: 11px; text-align: center;">♠</span>
+                    <span style="text-align: right;">3</span>
+                  </div>
+                  <div class="loop-mini-card suit-red" style="transform: translateY(-4px); box-shadow: 0 0 0 1.5px #38bdf8, 0 4px 8px rgba(0,0,0,0.3);" title="Predicted: 4♥">
+                    <span>4♥</span>
+                    <span style="font-size: 11px; text-align: center;">♥</span>
+                    <span style="text-align: right;">4</span>
+                  </div>
+                  <div class="loop-mini-card suit-red" style="border-color: #ef4444; box-shadow: 0 0 6px #ef4444;" title="Loop Break: card == 6">
+                    <span style="color: #ef4444;">🛑</span>
+                    <span style="font-size: 8px; text-align: center; color: #ef4444;">STOP</span>
+                    <span style="text-align: right; color: #ef4444;">6</span>
+                  </div>
+                </div>
+                <div class="loop-mini-badges">
+                  <div class="loop-mini-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                    <span>for</span><span>card in deck:</span>
+                  </div>
+                  <div class="loop-mini-badge" style="background: rgba(244, 114, 182, 0.2); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.4);">
+                    <span>if</span><span>continue / break</span>
+                  </div>
+                  <div class="loop-mini-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">
+                    <span>hand:</span><span>.append(card)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="hub-card-title">Loop Prediction Quiz: Cards &amp; Control Flow</h3>
+              <p class="hub-card-desc" style="margin-top: 6px;">
+                Predict the outcome of Python <code style="color:#34d399;">for</code>, <code style="color:#34d399;">while</code>, and <code style="color:#fbbf24;">range()</code> loops using a visual deck of 10 playing cards. Toggle predictions into your Predicted Hand, run the step-through loop evaluator, and observe card-by-card appending, <code style="color:#f472b6;">continue</code> skips, and <code style="color:#ef4444;">break</code> terminations across vetted loop scenarios.
+              </p>
+            </div>
+
+            <div class="hub-card-footer">
+              <span style="font-size: 11px; color: #94a3b8;">Question Deck &bull; Step Engine</span>
+              <a href="./loop_deck.html" class="hub-launch-btn" style="text-decoration: none; background: #059669; border-color: #10b981; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);" id="launchLoopDeckBtn">
+                <span>Launch Loop Quiz</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Module 6: Python String Slicing Visualizer -->
+          <article class="hub-card card-live" style="border-color: rgba(56, 189, 248, 0.35);">
+            <div class="hub-card-header">
+              <span class="status-pill-live" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                <span class="pulse-dot" style="background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+                Active Simulation
+              </span>
+              <span class="hub-card-category" style="color: #38bdf8;">Strings &amp; Slicing</span>
+            </div>
+
+            <div class="hub-card-preview" style="cursor: pointer;" id="launchSlicingPreview" onclick="window.location.href='./slicing.html'" title="Click to launch Python Slicing Visualizer">
+              <div class="slicing-preview-art">
+                <div class="slice-mini-grid">
+                  <div class="slice-mini-col">
+                    <span class="slice-mini-idx" style="color: #38bdf8;">0</span>
+                    <div class="slice-mini-box active">P</div>
+                    <span class="slice-mini-idx" style="color: #fb923c;">-6</span>
+                  </div>
+                  <div class="slice-mini-col">
+                    <span class="slice-mini-idx" style="color: #38bdf8;">1</span>
+                    <div class="slice-mini-box faded">y</div>
+                    <span class="slice-mini-idx" style="color: #fb923c;">-5</span>
+                  </div>
+                  <div class="slice-mini-col">
+                    <span class="slice-mini-idx" style="color: #38bdf8;">2</span>
+                    <div class="slice-mini-box active">t</div>
+                    <span class="slice-mini-idx" style="color: #fb923c;">-4</span>
+                  </div>
+                  <div class="slice-mini-col">
+                    <span class="slice-mini-idx" style="color: #38bdf8;">3</span>
+                    <div class="slice-mini-box faded">h</div>
+                    <span class="slice-mini-idx" style="color: #fb923c;">-3</span>
+                  </div>
+                  <div class="slice-mini-col">
+                    <span class="slice-mini-idx" style="color: #38bdf8;">4</span>
+                    <div class="slice-mini-box active">o</div>
+                    <span class="slice-mini-idx" style="color: #fb923c;">-2</span>
+                  </div>
+                  <div class="slice-mini-col">
+                    <span class="slice-mini-idx" style="color: #38bdf8;">5</span>
+                    <div class="slice-mini-box faded">n</div>
+                    <span class="slice-mini-idx" style="color: #fb923c;">-1</span>
+                  </div>
+                </div>
+                <div class="slice-mini-badges">
+                  <div class="slice-mini-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                    <span>syntax:</span><span>s[start:stop:step]</span>
+                  </div>
+                  <div class="slice-mini-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">
+                    <span>stride:</span><span>s[::2] &rarr; "Pto"</span>
+                  </div>
+                  <div class="slice-mini-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">
+                    <span>reverse:</span><span>s[::-1]</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="hub-card-title">String Slicing: Indices, Strides &amp; Defaults</h3>
+              <p class="hub-card-desc" style="margin-top: 6px;">
+                Master Python string slicing syntax, positive indices (0 to len-1), negative indices (-len to -1), default bounds, and stride steps. Interactive Index Grid highlights included characters in real time and animates step-by-step traversal.
+              </p>
+            </div>
+
+            <div class="hub-card-footer">
+              <span style="font-size: 11px; color: #94a3b8;">Interactive Lab &bull; Visual Index Grid</span>
+              <a href="./slicing.html" class="hub-launch-btn" style="text-decoration: none; background: #0284c7; border-color: #38bdf8; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);" id="launchSlicingBtn">
+                <span>Launch Slicing Lab</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        </section>
+
+        <!-- Hub Footer / PWA Banner -->
+        <div class="hub-pwa-banner">
+          <div>
+            <strong>Offline-First PWA:</strong> Complete offline operation for classrooms, lectures, and computer labs.
+          </div>
+          <div style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: #94a3b8;">
+            Keyboard: Press [H] or [Esc] to return to Hub
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- VIEW 2: THE HYDRAULIC LOGIC VISUALIZER -->
+    <div id="vizView" class="view-screen hidden">
+      <!-- Top Fixed Frosted Glass Navigation Header -->
+      <header>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="back-to-hub-btn" id="backToHubBtn" title="Return to Visualizer Hub (Esc or H)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Hub</span>
+          </button>
+
+          <div class="brand">
+            <div class="brand-icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" class="brand-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div class="brand-text-col">
+              <h1 class="brand-title">Boolean Hydraulics</h1>
+              <p class="brand-subtitle">Python Logic Module</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logic Gate Selector -->
+        <nav class="gate-tabs" id="gateTabs">
+          <button class="gate-btn active" data-mode="and">and</button>
+          <button class="gate-btn" data-mode="or">or</button>
+          <button class="gate-btn" data-mode="not">not</button>
+          <button class="gate-btn" data-mode="nand">not(and)</button>
+          <button class="gate-btn" data-mode="nor">not(or)</button>
+          <button class="gate-btn" data-mode="compound">(A or B) and C</button>
+          <button class="gate-btn" data-mode="challenge">Quiz</button>
+        </nav>
+
+        <!-- Action Tools & Status Badges -->
+        <div class="header-actions">
+          <div class="header-badges">
+            <span class="badge-offline" id="offlineStatus">
+              <span class="status-dot"></span>
+              <span>Offline Ready</span>
+            </span>
+          </div>
+
+          <button class="tool-btn" id="audioToggleBtn" title="Toggle hydraulic fluid sounds">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M17.95 6.05a8 8 0 010 11.9M11 5L6 9H2v6h4l5 4V5z" />
+            </svg>
+            <span id="audioLabel">Muted</span>
+          </button>
+
+          <button class="tool-btn" id="speedToggleBtn" title="Flow animation speed">
+            <span>Speed: <strong id="speedLabel">1x</strong></span>
+          </button>
+
+          <!-- Install PWA Button (Managed dynamically) -->
+          <button class="tool-btn install-pwa-btn" id="pwaInstallBtn" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Install
+          </button>
+        </div>
+      </header>
+
+    <!-- Main Application Viewport -->
+    <main>
+      <!-- Simulation Canvas Viewport - Frosted Glass -->
+      <section class="canvas-viewport">
+        <div class="canvas-container" id="canvasWrapper">
+          <canvas id="simCanvas"></canvas>
+        </div>
+
+        <!-- Bottom Simulation Controls & Real-time Indicator -->
+        <div class="simulation-bar">
+          <div class="valves-quickbar" id="valvesQuickbar">
+            <!-- Dynamically populated valve toggles -->
+          </div>
+
+          <div class="output-result-badge" id="outputBadge">
+            <svg id="outputIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <span id="outputStateText">result = True</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Inspection Sidebar - Frosted Glass Panels -->
+      <aside class="sidebar">
+        <!-- Challenge Card (Shown in Quiz mode) -->
+        <div class="card challenge-card" id="challengeCard" style="display: none; flex-direction: column; gap: 10px;">
+          <div class="challenge-header">
+            <div>
+              <span class="card-header" style="color: #facc15; font-size: 13px;" id="challengeTitleText">Q#1: AND Gate: Series Flow</span>
+              <div class="challenge-score" id="challengeScoreText">Score: 0 | Streak: 0</div>
+            </div>
+            <span class="tag" style="background: rgba(250, 204, 21, 0.2); border-color: rgba(250, 204, 21, 0.4); color: #fde047;">Quiz Mode</span>
+          </div>
+          <div class="challenge-target" id="challengePromptText" style="font-size: 13px; line-height: 1.4; color: #fef08a; padding: 6px 10px; background: rgba(0,0,0,0.25); border-radius: 8px;">Target: Configure the valves so result = True</div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="challenge-btn" id="checkChallengeBtn">Check Answer</button>
+            <button class="tool-btn" id="btnPrevChallenge" style="padding: 5px 10px; font-size: 11px;">◀ Prev</button>
+            <button class="tool-btn" id="nextChallengeBtn" style="padding: 5px 10px; font-size: 11px;">Next ▶</button>
+            <button class="tool-btn" id="btnToggleHint" style="padding: 5px 10px; font-size: 11px; margin-left: auto;">💡 Hint</button>
+          </div>
+          <div id="challengeHintText" style="display: none; font-size: 11px; line-height: 1.5; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px; border-left: 3px solid #facc15;"></div>
+          <div id="challengeFeedback" class="challenge-feedback" style="display: none;"></div>
+        </div>
+
+        <!-- Live Python Code Terminal - Frosted Glass Window -->
+        <div class="card terminal-card">
+          <div class="terminal-top-bar">
+            <div class="window-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="terminal-title">logic.py</span>
+            <span class="card-header" style="padding:0; margin:0;"><span class="tag">Live REPL</span></span>
+          </div>
+          <div class="code-block" id="pythonCodeBlock">
+            <!-- Rendered in script -->
+          </div>
+        </div>
+
+        <!-- Short-Circuit / Execution Path Banner -->
+        <div class="short-circuit-banner" id="shortCircuitBanner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <div id="shortCircuitText">
+            Python evaluates expressions from left to right.
+          </div>
+        </div>
+
+        <!-- Dynamic Interactive Truth Table -->
+        <div class="card">
+          <div class="card-header">
+            <span>Truth Table</span>
+            <span class="tag" style="font-size: 9px;">Click row to test</span>
+          </div>
+          <div class="truth-table-wrapper">
+            <table class="truth-table" id="truthTable">
+              <!-- Dynamically populated -->
+            </table>
+          </div>
+        </div>
+
+        <!-- Fluid Logic Metaphor / Educational Guide -->
+        <div class="card pedagogy-card">
+          <div class="card-header">
+            <span>Fluidics Metaphor</span>
+            <span class="tag" id="gateMetaphorTag">Series Circuit</span>
+          </div>
+          <div class="pedagogy-guide" id="pedagogyGuideText">
+            <!-- Explanations populated dynamically -->
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- iOS Safari Add to Home Screen Instructions Modal -->
+  <div class="modal-overlay" id="iosModal">
+      <div class="modal-content">
+        <div class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+          </svg>
+          Install on iOS Safari
+        </div>
+        <ol class="modal-steps">
+          <li>Tap the <strong>Share</strong> button <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> at the bottom of Safari.</li>
+          <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+          <li>Tap <strong>Add</strong> in the upper-right corner. The app will run completely offline!</li>
+        </ol>
+        <button class="modal-close-btn" id="closeIosModalBtn">Got it</button>
+      </div>
+    </div>
+
+    <!-- Application Script (Self-Contained Vanilla JS) -->
+    <script>
+      /**
+       * Python Logic Visualizer - Core Engine
+       * Pure Vanilla JS - Zero External Dependencies
+       */
+
+      // --- STATE & CONFIGURATION ---
+      const state = {
+        mode: 'and', // 'and', 'or', 'not', 'nand', 'nor', 'compound', 'challenge'
+        valves: {
+          A: false,
+          B: true,
+          C: false
+        },
+        speed: 1.0,
+        audioEnabled: false,
+        deferredPrompt: null,
+        particles: [],
+        bubbleTimer: 0,
+        turbineAngle: 0,
+        waterLevelOutput: 0,
+        targetWaterLevelOutput: 0,
+        plungerOffset: 0,
+        challenge: {
+          score: 0,
+          streak: 0,
+          currentQuestionIndex: 0,
+          currentQuestion: null
+        }
+      };
+
+      // Hydraulic Gate Configurations
+      const GATE_SPECS = {
+        and: {
+          name: 'and',
+          title: 'Logical AND (Series Plumbing)',
+          expression: 'A and B',
+          inputs: ['A', 'B'],
+          eval: (v) => v.A && v.B,
+          metaphor: 'Series flow: Water must pass through Valve A AND Valve B. If either valve is closed, the pipe is blocked and the output basin remains dry.',
+          shortCircuit: (v) => !v.A ? 'Short-circuit: Valve A is False, so Python halts and returns False immediately without evaluating B!' : 'Valve A is True, so Python must evaluate Valve B.'
+        },
+        or: {
+          name: 'or',
+          title: 'Logical OR (Parallel Plumbing)',
+          expression: 'A or B',
+          inputs: ['A', 'B'],
+          eval: (v) => v.A || v.B,
+          metaphor: 'Parallel branches: Water can flow via Pipe A OR Pipe B. If at least one valve is open, water reaches the output turbine.',
+          shortCircuit: (v) => v.A ? 'Short-circuit: Valve A is True, so Python knows the entire expression is True and skips evaluating B!' : 'Valve A is False, so Python must evaluate Valve B to find out.'
+        },
+        not: {
+          name: 'not',
+          title: 'Logical NOT (Hydraulic Inverter)',
+          expression: 'not A',
+          inputs: ['A'],
+          eval: (v) => !v.A,
+          metaphor: 'Inverter Plunger: When Valve A is ON, water pressure drives a heavy shut-off piston down, blocking the main line. When Valve A is OFF, a spring retracts the piston and water gushes freely!',
+          shortCircuit: (v) => 'The not operator inverts the Boolean operand: not True becomes False, and not False becomes True.'
+        },
+        nand: {
+          name: 'nand',
+          title: 'Logical NAND: not (A and B)',
+          expression: 'not (A and B)',
+          inputs: ['A', 'B'],
+          eval: (v) => !(v.A && v.B),
+          metaphor: 'Series Pilot Actuator: Only when BOTH Valve A and Valve B are open does water push the piston to close the output channel.',
+          shortCircuit: (v) => !v.A ? 'Short-circuit: A is False, so (A and B) is False, meaning not (A and B) is True immediately.' : 'A is True, so Python evaluates B before inverting with not.'
+        },
+        nor: {
+          name: 'nor',
+          title: 'Logical NOR: not (A or B)',
+          expression: 'not (A or B)',
+          inputs: ['A', 'B'],
+          eval: (v) => !(v.A || v.B),
+          metaphor: 'Parallel Pilot Actuator: If EITHER Valve A OR Valve B is open, hydraulic pressure triggers the shut-off gate, cutting the main supply.',
+          shortCircuit: (v) => v.A ? 'Short-circuit: A is True, so (A or B) is True, meaning not (A or B) evaluates to False right away!' : 'A is False, so Python checks B before inverting.'
+        },
+        compound: {
+          name: 'compound',
+          title: 'Compound: (A or B) and C',
+          expression: '(A or B) and C',
+          inputs: ['A', 'B', 'C'],
+          eval: (v) => (v.A || v.B) && v.C,
+          metaphor: 'Multi-stage plumbing: Parallel channels (A and B) converge into a single pipe regulated by Valve C in series. Both the first branch AND Valve C must permit flow.',
+          shortCircuit: (v) => !(v.A || v.B) ? 'Short-circuit: Neither A nor B is open, so (A or B) is False, causing the entire and expression to be False!' : (!v.C ? 'The first stage flowed, but Valve C is closed, blocking the output.' : 'Both stages flow water: output is True!')
+        },
+        challenge: {
+          name: 'challenge',
+          title: 'Hydraulic Logic Challenge',
+          expression: 'Dynamic Quiz',
+          inputs: ['A', 'B'],
+          eval: (v) => v.A && v.B,
+          metaphor: 'Solve introductory Python logic puzzles by manipulating the hydraulic valves to achieve the specified output.',
+          shortCircuit: () => 'Test your understanding of short-circuiting and boolean precedence!'
+        }
+      };
+
+      // Challenge Questions Bank (Comprehensive Logic Curriculum)
+      const CHALLENGES = [
+        {
+          mode: 'and',
+          title: 'AND Gate: Series Flow',
+          prompt: 'Configure valves so: result = True (water reaches turbine)',
+          target: true,
+          hint: 'In an AND gate, water flows through valves in series. Both Valve A AND Valve B must be open (True).',
+          successMsg: 'Both valves are open in series, allowing water to flow all the way through (True and True = True).'
+        },
+        {
+          mode: 'and',
+          title: 'AND Gate: Short-Circuit',
+          prompt: 'Configure Valve A to short-circuit the AND expression so Valve B is never evaluated',
+          validate: (v) => v.A === false,
+          hint: 'In Python, if the first operand of "and" is False, the outcome is guaranteed False. Python stops immediately without evaluating Valve B.',
+          successMsg: 'Since Valve A is False (closed), Python short-circuits: water is blocked at A and never reaches B!'
+        },
+        {
+          mode: 'or',
+          title: 'OR Gate: Parallel Branches',
+          prompt: 'Configure valves so: result = True using exactly ONE open valve',
+          validate: (v) => (v.A || v.B) && !(v.A && v.B),
+          hint: 'In an OR gate (parallel pipes), water can take either branch. Open either Valve A or Valve B, but keep the other closed.',
+          successMsg: 'Water took the open parallel branch to reach the output (True or False = True).'
+        },
+        {
+          mode: 'or',
+          title: 'OR Gate: Short-Circuit',
+          prompt: 'Configure Valve A so the OR expression short-circuits to True immediately',
+          validate: (v) => v.A === true,
+          hint: 'If Valve A is True (open), the entire (A or B) expression is already guaranteed True. Python skips evaluating Valve B.',
+          successMsg: 'Since Valve A is True, Python short-circuits: flow is already guaranteed through pipe A!'
+        },
+        {
+          mode: 'not',
+          title: 'NOT Gate: Spring Inverter',
+          prompt: 'Configure Valve A so: result = True (Main pipe flows)',
+          validate: (v) => v.A === false,
+          hint: 'In the hydraulic inverter, Valve A controls pilot pressure. When Valve A is closed (False), the spring holds the main gate open (not False = True).',
+          successMsg: 'Valve A is False (closed), so pilot pressure is zero and the spring keeps the main stream flowing (not False = True).'
+        },
+        {
+          mode: 'not',
+          title: 'NOT Gate: Pilot Shutoff',
+          prompt: 'Configure Valve A so: result = False (Pilot shuts main gate)',
+          validate: (v) => v.A === true,
+          hint: 'When Valve A is open (True), pilot water pressure pushes the piston down to block the main stream (not True = False).',
+          successMsg: 'Valve A is True (open), driving pilot pressure down to block the main line (not True = False).'
+        },
+        {
+          mode: 'nand',
+          title: 'NAND Gate: not (A and B)',
+          prompt: 'Configure valves so: result = False (Trigger pilot shutoff)',
+          validate: (v) => v.A === true && v.B === true,
+          hint: 'not (A and B) is False ONLY when both A and B are True, opening both pilot valves to press the shutoff plunger down.',
+          successMsg: 'Both pilot valves are open, pressurizing the pilot chamber to shut off the main gate (not (True and True) = False).'
+        },
+        {
+          mode: 'nor',
+          title: 'NOR Gate: not (A or B)',
+          prompt: 'Configure valves so: result = True (Main pipe flows)',
+          validate: (v) => v.A === false && v.B === false,
+          hint: 'not (A or B) is True ONLY when neither A nor B is open. If either is open, pilot pressure cuts the main line.',
+          successMsg: 'Both valves are closed, so zero pilot pressure is generated, allowing the spring-loaded gate to stay open (not (False or False) = True).'
+        },
+        {
+          mode: 'compound',
+          title: 'Compound: (A or B) and C',
+          prompt: 'Make (A or B) and C = True with Valve A CLOSED',
+          validate: (v) => v.A === false && v.B === true && v.C === true,
+          hint: 'Since Valve A is closed, Valve B must be open to let water pass the parallel stage, AND Valve C must be open in series.',
+          successMsg: 'Valve B allowed water through the first stage, and Valve C in series allowed it through to the output ((False or True) and True = True).'
+        },
+        {
+          mode: 'compound',
+          title: 'Compound: Chokepoint at C',
+          prompt: 'Open both A and B, but block the output with Valve C (result = False)',
+          validate: (v) => v.A === true && v.B === true && v.C === false,
+          hint: 'Even if the parallel stage (A or B) flows, Valve C is in series and acts as a master shutoff when closed.',
+          successMsg: 'Water flowed past parallel valves A & B, but was completely stopped by closed series Valve C ((True or True) and False = False).'
+        }
+      ];
+
+      // --- WEB AUDIO SYNTHESIZER (ZERO ASSETS) ---
+      let audioCtx = null;
+      let waterNoiseNode = null;
+      let waterGainNode = null;
+
+      function initAudio() {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            audioCtx = new AudioContext();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function playValveSound() {
+        if (!state.audioEnabled || !audioCtx) return;
+        try {
+          const now = audioCtx.currentTime;
+          // Metallic mechanical click
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.09);
+
+          // Pressure hiss burst
+          const bufferSize = audioCtx.sampleRate * 0.06;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1400;
+          const noiseGain = audioCtx.createGain();
+          noiseGain.gain.setValueAtTime(0.12, now);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          noise.connect(filter);
+          filter.connect(noiseGain);
+          noiseGain.connect(audioCtx.destination);
+          noise.start(now);
+        } catch (e) {
+          console.warn('Audio error', e);
+        }
+      }
+
+      function updateWaterSound(flowing) {
+        if (!state.audioEnabled || !audioCtx) {
+          if (waterGainNode) waterGainNode.gain.value = 0;
+          return;
+        }
+        try {
+          if (!waterNoiseNode) {
+            // Continuous looped white noise for water trickle
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              data[i] = Math.random() * 2 - 1;
+            }
+            waterNoiseNode = audioCtx.createBufferSource();
+            waterNoiseNode.buffer = buffer;
+            waterNoiseNode.loop = true;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 650;
+
+            waterGainNode = audioCtx.createGain();
+            waterGainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+
+            waterNoiseNode.connect(filter);
+            filter.connect(waterGainNode);
+            waterGainNode.connect(audioCtx.destination);
+            waterNoiseNode.start(0);
+          }
+
+          const targetGain = flowing ? 0.08 : 0.0001;
+          waterGainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.15);
+        } catch (e) {
+          console.warn('Water audio error', e);
+        }
+      }
+
+      // --- DOM ELEMENT REFERENCES ---
+      const canvas = document.getElementById('simCanvas');
+      const ctx = canvas.getContext('2d');
+      const canvasWrapper = document.getElementById('canvasWrapper');
+      const gateTabs = document.getElementById('gateTabs');
+      const valvesQuickbar = document.getElementById('valvesQuickbar');
+      const outputBadge = document.getElementById('outputBadge');
+      const outputStateText = document.getElementById('outputStateText');
+      const pythonCodeBlock = document.getElementById('pythonCodeBlock');
+      const shortCircuitText = document.getElementById('shortCircuitText');
+      const truthTable = document.getElementById('truthTable');
+      const pedagogyGuideText = document.getElementById('pedagogyGuideText');
+      const gateMetaphorTag = document.getElementById('gateMetaphorTag');
+      const audioToggleBtn = document.getElementById('audioToggleBtn');
+      const audioLabel = document.getElementById('audioLabel');
+      const speedToggleBtn = document.getElementById('speedToggleBtn');
+      const speedLabel = document.getElementById('speedLabel');
+      const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+      const iosModal = document.getElementById('iosModal');
+      const closeIosModalBtn = document.getElementById('closeIosModalBtn');
+      const challengeCard = document.getElementById('challengeCard');
+      const challengePromptText = document.getElementById('challengePromptText');
+      const challengeScoreText = document.getElementById('challengeScoreText');
+      const checkChallengeBtn = document.getElementById('checkChallengeBtn');
+      const nextChallengeBtn = document.getElementById('nextChallengeBtn');
+      const challengeFeedback = document.getElementById('challengeFeedback');
+      const challengeTitleText = document.getElementById('challengeTitleText');
+      const challengeHintText = document.getElementById('challengeHintText');
+      const btnToggleHint = document.getElementById('btnToggleHint');
+      const btnPrevChallenge = document.getElementById('btnPrevChallenge');
+
+      // Helper: Determines active gate type (synchronizing Quiz Mode with its current question)
+      function getActiveGateMode() {
+        if (state.mode === 'challenge' && state.challenge.currentQuestion) {
+          return state.challenge.currentQuestion.mode;
+        }
+        return state.mode;
+      }
+
+      // --- RESIZE OBSERVER (NO SCROLLBARS GUARANTEE) ---
+      let canvasWidth = 800;
+      let canvasHeight = 600;
+
+      function resizeCanvas() {
+        const rect = canvasWrapper.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvasWidth = rect.width;
+        canvasHeight = rect.height;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.resetTransform();
+        ctx.scale(dpr, dpr);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+
+      // --- HYDRAULIC LOGIC EVALUATION ---
+      function getCurrentResult() {
+        const mode = getActiveGateMode();
+        const spec = GATE_SPECS[mode];
+        if (!spec) return false;
+        return spec.eval(state.valves);
+      }
+
+      // --- UI UPDATERS ---
+      function updateQuickbar() {
+        valvesQuickbar.innerHTML = '';
+        const mode = getActiveGateMode();
+        const spec = GATE_SPECS[mode];
+        const inputs = spec ? spec.inputs : ['A', 'B'];
+
+        inputs.forEach((key) => {
+          const btn = document.createElement('button');
+          btn.className = `valve-toggle-btn ${state.valves[key] ? 'is-true' : 'is-false'}`;
+          btn.id = `valveBtn_${key}`;
+          btn.innerHTML = `
+            <span class="state-led"></span>
+            <span>Valve ${key}: <strong>${state.valves[key] ? 'True (Open)' : 'False (Closed)'}</strong></span>
+          `;
+          btn.addEventListener('click', () => {
+            initAudio();
+            state.valves[key] = !state.valves[key];
+            playValveSound();
+            refreshAll();
+          });
+          valvesQuickbar.appendChild(btn);
+        });
+      }
+
+      function updateOutputUI(result) {
+        state.targetWaterLevelOutput = result ? 1 : 0;
+        updateWaterSound(result);
+
+        if (result) {
+          outputBadge.className = 'output-result-badge flows';
+          outputStateText.innerHTML = 'result = <span style="color:#4ade80">True</span> (Water Flowing)';
+        } else {
+          outputBadge.className = 'output-result-badge blocked';
+          outputStateText.innerHTML = 'result = <span style="color:#f87171">False</span> (Flow Blocked)';
+        }
+      }
+
+      function updatePythonSnippet(result) {
+        const mode = getActiveGateMode();
+        const spec = GATE_SPECS[mode];
+        if (!spec) return;
+        const v = state.valves;
+        let lines = [];
+
+        lines.push('<span class="code-comment"># Python Boolean Evaluation</span>');
+
+        spec.inputs.forEach((key) => {
+          const valStr = v[key] ? 'True' : 'False';
+          const valClass = v[key] ? 'code-bool-true' : 'code-bool-false';
+          lines.push(`<span class="code-var">${key.toLowerCase()}</span> = <span class="${valClass}">${valStr}</span>`);
+        });
+
+        lines.push('');
+
+        let exprCode = '';
+        if (mode === 'and') exprCode = 'a and b';
+        else if (mode === 'or') exprCode = 'a or b';
+        else if (mode === 'not') exprCode = 'not a';
+        else if (mode === 'nand') exprCode = 'not (a and b)';
+        else if (mode === 'nor') exprCode = 'not (a or b)';
+        else if (mode === 'compound') exprCode = '(a or b) and c';
+        else exprCode = 'a and b';
+
+        const resStr = result ? 'True' : 'False';
+        const resClass = result ? 'code-bool-true' : 'code-bool-false';
+
+        lines.push(`<span class="code-highlight"><span class="code-var">result</span> = ${exprCode}  <span class="code-comment"># -> </span><span class="${resClass}">${resStr}</span></span>`);
+        lines.push('');
+        lines.push(`<span class="code-keyword">if</span> <span class="code-var">result</span>:`);
+        lines.push(`    <span class="code-keyword">print</span>(<span class="code-string">"[OK] Hydraulic output flowing!"</span>)`);
+        lines.push(`<span class="code-keyword">else</span>:`);
+        lines.push(`    <span class="code-keyword">print</span>(<span class="code-string">"[BLOCKED] Pipeline is dry or blocked."</span>)`);
+
+        pythonCodeBlock.innerHTML = lines.join('\n');
+      }
+
+      function updateShortCircuitBanner() {
+        const mode = getActiveGateMode();
+        const spec = GATE_SPECS[mode];
+        if (spec && spec.shortCircuit) {
+          shortCircuitText.textContent = spec.shortCircuit(state.valves);
+        }
+      }
+
+      function updateTruthTable(result) {
+        const mode = getActiveGateMode();
+        const spec = GATE_SPECS[mode];
+        if (!spec) return;
+        const inputs = spec.inputs;
+        truthTable.innerHTML = '';
+
+        // Header Row
+        const thead = document.createElement('thead');
+        const hRow = document.createElement('tr');
+        inputs.forEach(k => {
+          const th = document.createElement('th');
+          th.textContent = k;
+          hRow.appendChild(th);
+        });
+        const thExp = document.createElement('th');
+        thExp.textContent = spec.expression;
+        hRow.appendChild(thExp);
+        const thWater = document.createElement('th');
+        thWater.textContent = 'Flow';
+        hRow.appendChild(thWater);
+        thead.appendChild(hRow);
+        truthTable.appendChild(thead);
+
+        // Generate combinations
+        const tbody = document.createElement('tbody');
+        const numRows = Math.pow(2, inputs.length);
+
+        for (let i = 0; i < numRows; i++) {
+          const row = document.createElement('tr');
+          const rowValves = {};
+
+          for (let j = 0; j < inputs.length; j++) {
+            // High order bit corresponds to input 0
+            const bit = (i >> (inputs.length - 1 - j)) & 1;
+            const boolVal = bit === 1;
+            rowValves[inputs[j]] = boolVal;
+          }
+
+          const rowResult = spec.eval(rowValves);
+
+          // Check if this matches current state
+          const isActive = inputs.every(k => state.valves[k] === rowValves[k]);
+          if (isActive) {
+            row.className = 'active-row';
+          }
+
+          // Populate cells
+          inputs.forEach(k => {
+            const td = document.createElement('td');
+            const v = rowValves[k];
+            td.innerHTML = `<span class="val-badge ${v ? 'val-true' : 'val-false'}">${v ? 'T' : 'F'}</span>`;
+            row.appendChild(td);
+          });
+
+          // Result cell
+          const tdRes = document.createElement('td');
+          tdRes.innerHTML = `<span class="val-badge ${rowResult ? 'val-true' : 'val-false'}">${rowResult ? 'True' : 'False'}</span>`;
+          row.appendChild(tdRes);
+
+          // Flow icon cell
+          const tdFlow = document.createElement('td');
+          tdFlow.innerHTML = rowResult ? '<span style="color:#38bdf8;font-weight:bold;">Flow ON</span>' : '<span style="color:#64748b;">Blocked</span>';
+          row.appendChild(tdFlow);
+
+          // Clicking row sets state
+          row.addEventListener('click', () => {
+            initAudio();
+            inputs.forEach(k => {
+              state.valves[k] = rowValves[k];
+            });
+            playValveSound();
+            refreshAll();
+          });
+
+          tbody.appendChild(row);
+        }
+
+        truthTable.appendChild(tbody);
+      }
+
+      function updatePedagogyGuide() {
+        const mode = getActiveGateMode();
+        const spec = GATE_SPECS[mode];
+        if (!spec) return;
+        gateMetaphorTag.textContent = state.mode === 'challenge' ? `Quiz Mode: ${spec.title}` : spec.title;
+        pedagogyGuideText.innerHTML = `
+          <p><strong>Metaphor:</strong> ${spec.metaphor}</p>
+          <p><strong>Python Rule:</strong> In Python, booleans are strict type objects <code>True</code> and <code>False</code> (subclasses of <code>int</code>). The keyword operators evaluate truth values and short-circuit when the outcome is guaranteed.</p>
+        `;
+      }
+
+      function refreshAll() {
+        const result = getCurrentResult();
+        updateQuickbar();
+        updateOutputUI(result);
+        updatePythonSnippet(result);
+        updateShortCircuitBanner();
+        updateTruthTable(result);
+        updatePedagogyGuide();
+      }
+
+      // --- INTERACTIVE GATE SWITCHER ---
+      function switchGate(mode) {
+        state.mode = mode;
+        document.querySelectorAll('.gate-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.mode === mode);
+        });
+
+        if (mode === 'challenge') {
+          challengeCard.style.display = 'flex';
+          setupChallenge(state.challenge.currentQuestionIndex || 0);
+        } else {
+          challengeCard.style.display = 'none';
+          refreshAll();
+        }
+      }
+
+      gateTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.gate-btn');
+        if (!btn) return;
+        initAudio();
+        switchGate(btn.dataset.mode);
+      });
+
+      // --- CHALLENGE / QUIZ ENGINE ---
+      function setupChallenge(index) {
+        if (typeof index !== 'number') {
+          index = state.challenge.currentQuestionIndex || 0;
+        }
+        if (index < 0) index = 0;
+        if (index >= CHALLENGES.length) index = CHALLENGES.length - 1;
+        state.challenge.currentQuestionIndex = index;
+        const q = CHALLENGES[index];
+        state.challenge.currentQuestion = q;
+
+        if (challengeTitleText) {
+          challengeTitleText.textContent = `Q#${index + 1}/${CHALLENGES.length}: ${q.title}`;
+        }
+        challengePromptText.textContent = q.prompt;
+        challengeFeedback.style.display = 'none';
+        if (challengeHintText) {
+          challengeHintText.style.display = 'none';
+          challengeHintText.textContent = q.hint;
+        }
+        if (btnToggleHint) btnToggleHint.textContent = '💡 Show Hint';
+        
+        if (btnPrevChallenge) btnPrevChallenge.disabled = (index === 0);
+        if (nextChallengeBtn) nextChallengeBtn.disabled = (index === CHALLENGES.length - 1);
+
+        // Reset valves for fresh challenge attempt
+        state.valves.A = false;
+        state.valves.B = false;
+        state.valves.C = false;
+
+        refreshAll();
+      }
+
+      checkChallengeBtn.addEventListener('click', () => {
+        initAudio();
+        const q = state.challenge.currentQuestion;
+        if (!q) return;
+        const res = getCurrentResult();
+        let passed = false;
+
+        if (q.validate) {
+          passed = q.validate(state.valves);
+        } else {
+          passed = (res === q.target);
+        }
+
+        challengeFeedback.style.display = 'block';
+        if (passed) {
+          state.challenge.score += 10;
+          state.challenge.streak += 1;
+          playValveSound();
+          challengeFeedback.className = 'challenge-feedback success';
+          challengeFeedback.innerHTML = `<strong>✅ [CORRECT]</strong> ${q.successMsg || 'Great job! Your valve configuration satisfies the logic.'}`;
+        } else {
+          state.challenge.streak = 0;
+          challengeFeedback.className = 'challenge-feedback error';
+          challengeFeedback.innerHTML = `<strong>❌ [NOT QUITE]</strong> ${q.hint}`;
+        }
+        challengeScoreText.textContent = `Score: ${state.challenge.score} | Streak: ${state.challenge.streak}`;
+      });
+
+      if (btnToggleHint) {
+        btnToggleHint.addEventListener('click', () => {
+          initAudio();
+          const isHidden = challengeHintText.style.display === 'none';
+          challengeHintText.style.display = isHidden ? 'block' : 'none';
+          btnToggleHint.textContent = isHidden ? '🙈 Hide Hint' : '💡 Show Hint';
+        });
+      }
+
+      if (nextChallengeBtn) {
+        nextChallengeBtn.addEventListener('click', () => {
+          initAudio();
+          if (state.challenge.currentQuestionIndex < CHALLENGES.length - 1) {
+            setupChallenge(state.challenge.currentQuestionIndex + 1);
+          }
+        });
+      }
+
+      if (btnPrevChallenge) {
+        btnPrevChallenge.addEventListener('click', () => {
+          initAudio();
+          if (state.challenge.currentQuestionIndex > 0) {
+            setupChallenge(state.challenge.currentQuestionIndex - 1);
+          }
+        });
+      }
+
+      // --- HYDRAULIC CANVAS SIMULATION & PARTICLES ---
+      // Particle Pool
+      const MAX_PARTICLES = 160;
+
+      function spawnParticle(x, y, vx, vy, color) {
+        if (state.particles.length > MAX_PARTICLES) return;
+        state.particles.push({
+          x, y, vx, vy,
+          radius: 2 + Math.random() * 2.5,
+          life: 1.0,
+          color: color || '#7dd3fc'
+        });
+      }
+
+      // Valve click zones on canvas
+      let interactiveValveZones = [];
+
+      canvas.addEventListener('click', (e) => {
+        initAudio();
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        for (const zone of interactiveValveZones) {
+          const dx = clickX - zone.x;
+          const dy = clickY - zone.y;
+          if (dx * dx + dy * dy <= zone.radius * zone.radius) {
+            state.valves[zone.key] = !state.valves[zone.key];
+            playValveSound();
+            refreshAll();
+            break;
+          }
+        }
+      });
+
+      // --- RENDERING PIPELINE ---
+      let lastTime = performance.now();
+
+      function renderSimulation(now) {
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        const w = canvasWidth;
+        const h = canvasHeight;
+        interactiveValveZones = [];
+
+        // Clear canvas
+        ctx.clearRect(0, 0, w, h);
+
+        // Smooth output water level
+        state.waterLevelOutput += (state.targetWaterLevelOutput - state.waterLevelOutput) * (dt * 3 * state.speed);
+
+        // Rotate turbine if flowing
+        const result = getCurrentResult();
+        if (result) {
+          state.turbineAngle += dt * 8 * state.speed;
+        }
+
+        // Draw background grid lines (engineering schematic look)
+        drawGrid(w, h);
+
+        // Render Hydraulic System based on active gate mode
+        const mode = getActiveGateMode();
+        if (mode === 'and') {
+          drawAndGateSimulation(w, h, dt);
+        } else if (mode === 'or') {
+          drawOrGateSimulation(w, h, dt);
+        } else if (mode === 'not') {
+          drawNotGateSimulation(w, h, dt);
+        } else if (mode === 'nand') {
+          drawNandGateSimulation(w, h, dt);
+        } else if (mode === 'nor') {
+          drawNorGateSimulation(w, h, dt);
+        } else if (mode === 'compound') {
+          drawCompoundSimulation(w, h, dt);
+        } else {
+          drawAndGateSimulation(w, h, dt);
+        }
+
+        // Update and render water bubble particles
+        renderParticles(dt);
+
+        requestAnimationFrame(renderSimulation);
+      }
+
+      function drawGrid(w, h) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+        ctx.lineWidth = 1;
+        const step = 40;
+        ctx.beginPath();
+        for (let x = 0; x < w; x += step) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+        }
+        for (let y = 0; y < h; y += step) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+      }
+
+      // Draw Supply Reservoir (Top Left) - Frosted Glass Vessel
+      function drawSupplyTank(x, y, width, height) {
+        // Tank outer frosted container
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, [16]);
+        ctx.fill();
+        ctx.stroke();
+
+        // Water level (always full source tank) - Glowing blue/cyan gradient
+        const pad = 6;
+        const waterHeight = height - pad * 2;
+        const grad = ctx.createLinearGradient(x, y, x, y + height);
+        grad.addColorStop(0, '#22d3ee');
+        grad.addColorStop(1, '#2563eb');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(x + pad, y + pad, width - pad * 2, waterHeight, [12]);
+        ctx.fill();
+
+        // Subtle specular highlight on glass
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(x + pad + 2, y + pad + 2, width - pad * 2 - 4, waterHeight * 0.4, [10]);
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('SUPPLY', x + width / 2, y + height / 2 - 4);
+        ctx.font = '9px ui-monospace, sans-serif';
+        ctx.fillStyle = '#e0f2fe';
+        ctx.fillText('100% PSI', x + width / 2, y + height / 2 + 10);
+      }
+
+      // Draw Output Reservoir (Bottom Right) - Frosted Glass Vessel
+      function drawOutputBasin(x, y, width, height, level) {
+        // Basin outer frosted body
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.strokeStyle = level > 0.1 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, [16]);
+        ctx.fill();
+        ctx.stroke();
+
+        // Water fill
+        const pad = 6;
+        const maxWaterH = height - pad * 2;
+        const currentWaterH = maxWaterH * level;
+        if (currentWaterH > 2) {
+          const waterY = y + height - pad - currentWaterH;
+          const grad = ctx.createLinearGradient(x, waterY, x, y + height);
+          grad.addColorStop(0, '#22d3ee');
+          grad.addColorStop(1, '#2563eb');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.roundRect(x + pad, waterY, width - pad * 2, currentWaterH, [8, 8, 12, 12]);
+          ctx.fill();
+
+          // Surface ripple wave
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x + pad, waterY);
+          for (let i = 0; i < width - pad * 2; i += 6) {
+            const waveY = waterY + Math.sin(Date.now() * 0.006 + i * 0.2) * 2;
+            ctx.lineTo(x + pad + i, waveY);
+          }
+          ctx.stroke();
+        }
+
+        // Draw Water Turbine above or inside basin
+        const turbineX = x + width / 2;
+        const turbineY = y + 28;
+        drawTurbine(turbineX, turbineY, 18, state.turbineAngle, level > 0.05);
+
+        // Output Status Indicator
+        ctx.fillStyle = level > 0.5 ? '#4ade80' : '#94a3b8';
+        ctx.font = 'bold 11px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('OUTPUT BASIN', turbineX, y + height - 14);
+        ctx.font = '9px ui-monospace, sans-serif';
+        ctx.fillText(level > 0.5 ? 'result = True' : 'result = False', turbineX, y + height - 4);
+      }
+
+      function drawTurbine(cx, cy, radius, angle, spinning) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+
+        // Central hub
+        ctx.fillStyle = spinning ? '#38bdf8' : '#475569';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Blades
+        const bladeCount = 6;
+        for (let i = 0; i < bladeCount; i++) {
+          ctx.rotate((Math.PI * 2) / bladeCount);
+          ctx.fillStyle = spinning ? '#7dd3fc' : '#64748b';
+          ctx.beginPath();
+          ctx.roundRect(2, -2.5, radius - 4, 5, 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Draw Industrial Pipe Segment with Glass Conduit styling
+      function drawPipe(x1, y1, x2, y2, hasWater, isVertical = false) {
+        const pipeThickness = 24;
+        const innerThickness = 14;
+
+        ctx.lineCap = 'round';
+
+        // Outer conduit glass shell
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = pipeThickness;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Pipe highlight edge
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = pipeThickness - 4;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Inner channel
+        ctx.strokeStyle = hasWater ? 'rgba(37, 99, 235, 0.35)' : 'rgba(0, 0, 0, 0.35)';
+        ctx.lineWidth = innerThickness;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Glowing water stream inside channel
+        if (hasWater) {
+          ctx.strokeStyle = '#22d3ee';
+          ctx.lineWidth = innerThickness - 4;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+
+          // Flowing stream dashes
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([8, 12]);
+          ctx.lineDashOffset = -Date.now() * 0.04 * state.speed;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+          ctx.setLineDash([]); // Reset dash
+
+          // Spawn fluid bubbles
+          if (Math.random() < 0.15 * state.speed) {
+            const lerp = Math.random();
+            const px = x1 + (x2 - x1) * lerp;
+            const py = y1 + (y2 - y1) * lerp;
+            spawnParticle(px + (Math.random() - 0.5) * 4, py + (Math.random() - 0.5) * 4, isVertical ? 0 : 25 * state.speed, isVertical ? 25 * state.speed : 0);
+          }
+        }
+      }
+
+      // Draw Interactive Rotary Valve with Glass & Neon Accent
+      function drawValve(cx, cy, label, isOpen, key) {
+        const radius = 22;
+
+        // Register clickable zone
+        interactiveValveZones.push({ x: cx, y: cy, radius: 28, key });
+
+        // Outer flange ring
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.strokeStyle = isOpen ? '#38bdf8' : 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Rotating valve wheel spokes
+        ctx.save();
+        ctx.translate(cx, cy);
+        const rotationAngle = isOpen ? Math.PI / 4 : 0;
+        ctx.rotate(rotationAngle);
+
+        ctx.strokeStyle = isOpen ? '#38bdf8' : '#94a3b8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-radius + 4, 0);
+        ctx.lineTo(radius - 4, 0);
+        ctx.moveTo(0, -radius + 4);
+        ctx.lineTo(0, radius - 4);
+        ctx.stroke();
+
+        // Central bolt
+        ctx.fillStyle = isOpen ? '#22d3ee' : '#64748b';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // State indicator LED
+        ctx.fillStyle = isOpen ? '#38bdf8' : '#64748b';
+        ctx.beginPath();
+        ctx.arc(cx, cy - radius - 8, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Text label
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Valve ${label}`, cx, cy + radius + 16);
+        ctx.font = '10px ui-monospace, sans-serif';
+        ctx.fillStyle = isOpen ? '#93c5fd' : '#94a3b8';
+        ctx.fillText(isOpen ? 'True (Open)' : 'False (Closed)', cx, cy + radius + 28);
+      }
+
+      // --- GATE SIMULATIONS ---
+
+      // 1. AND Gate (Series Plumbing)
+      function drawAndGateSimulation(w, h, dt) {
+        const tankW = 90;
+        const tankH = 110;
+        const tankX = 40;
+        const tankY = h * 0.35;
+
+        const basinW = 110;
+        const basinH = 120;
+        const basinX = w - 150;
+        const basinY = h * 0.35;
+
+        const pipeY = tankY + tankH / 2;
+        const valveAX = tankX + (basinX - tankX) * 0.35;
+        const valveBX = tankX + (basinX - tankX) * 0.68;
+
+        const flow1 = true; // Supply to Valve A
+        const flow2 = state.valves.A; // Valve A to Valve B
+        const flow3 = state.valves.A && state.valves.B; // Valve B to Output Basin
+
+        // Draw Pipes
+        drawPipe(tankX + tankW, pipeY, valveAX, pipeY, flow1);
+        drawPipe(valveAX, pipeY, valveBX, pipeY, flow2);
+        drawPipe(valveBX, pipeY, basinX, pipeY, flow3);
+
+        // Draw Valves
+        drawValve(valveAX, pipeY, 'A', state.valves.A, 'A');
+        drawValve(valveBX, pipeY, 'B', state.valves.B, 'B');
+
+        // Draw Tanks
+        drawSupplyTank(tankX, tankY, tankW, tankH);
+        drawOutputBasin(basinX, basinY, basinW, basinH, state.waterLevelOutput);
+
+        // Series Logic Formula on Canvas
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Series Circuit: Both valves must be open for water to reach the basin.', w / 2, h - 24);
+      }
+
+      // 2. OR Gate (Parallel Plumbing)
+      function drawOrGateSimulation(w, h, dt) {
+        const tankW = 90;
+        const tankH = 110;
+        const tankX = 40;
+        const tankY = h * 0.35;
+
+        const basinW = 110;
+        const basinH = 120;
+        const basinX = w - 150;
+        const basinY = h * 0.35;
+
+        const startY = tankY + tankH / 2;
+        const splitX = tankX + tankW + 40;
+        const topY = startY - 70;
+        const botY = startY + 70;
+        const mergeX = basinX - 40;
+
+        const valveX = (splitX + mergeX) / 2;
+
+        const flowA = state.valves.A;
+        const flowB = state.valves.B;
+        const flowOut = flowA || flowB;
+
+        // Feed to split
+        drawPipe(tankX + tankW, startY, splitX, startY, true);
+
+        // Split vertical pipe
+        drawPipe(splitX, topY, splitX, botY, true, true);
+
+        // Branch A (Top)
+        drawPipe(splitX, topY, valveX, topY, true);
+        drawPipe(valveX, topY, mergeX, topY, flowA);
+
+        // Branch B (Bottom)
+        drawPipe(splitX, botY, valveX, botY, true);
+        drawPipe(valveX, botY, mergeX, botY, flowB);
+
+        // Merge vertical pipe
+        drawPipe(mergeX, topY, mergeX, botY, flowOut, true);
+
+        // Final run to basin
+        drawPipe(mergeX, startY, basinX, startY, flowOut);
+
+        // Valves
+        drawValve(valveX, topY, 'A', state.valves.A, 'A');
+        drawValve(valveX, botY, 'B', state.valves.B, 'B');
+
+        // Tanks
+        drawSupplyTank(tankX, tankY, tankW, tankH);
+        drawOutputBasin(basinX, basinY, basinW, basinH, state.waterLevelOutput);
+
+        // Explanatory label
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Parallel Circuit: Water flows through Valve A OR Valve B (or both).', w / 2, h - 24);
+      }
+
+      // 3. NOT Gate (Hydraulic Inverter / Deflector Plunger)
+      function drawNotGateSimulation(w, h, dt) {
+        const tankW = 90;
+        const tankH = 110;
+        const tankX = 40;
+        const tankY = h * 0.4;
+
+        const basinW = 110;
+        const basinH = 120;
+        const basinX = w - 150;
+        const basinY = h * 0.4;
+
+        const mainPipeY = tankY + tankH / 2;
+        const chamberX = (tankX + basinX) / 2 + 30;
+
+        // Pilot line from Valve A (Top)
+        const valveAX = chamberX - 100;
+        const pilotY = mainPipeY - 110;
+
+        const pilotFlow = state.valves.A;
+        const mainFlowOut = !state.valves.A;
+
+        // Animate plunger piston (down when pilot pressure is on)
+        const targetPlunger = pilotFlow ? 22 : 0;
+        state.plungerOffset += (targetPlunger - state.plungerOffset) * (dt * 6 * state.speed);
+
+        // Main water line from Supply to chamber
+        drawPipe(tankX + tankW, mainPipeY, chamberX, mainPipeY, true);
+
+        // Pilot line: Supply tap going up to Valve A, then into chamber actuator
+        drawPipe(tankX + tankW + 20, mainPipeY, tankX + tankW + 20, pilotY, true, true);
+        drawPipe(tankX + tankW + 20, pilotY, valveAX, pilotY, true);
+        drawPipe(valveAX, pilotY, chamberX, pilotY, pilotFlow);
+        drawPipe(chamberX, pilotY, chamberX, mainPipeY - 30, pilotFlow, true);
+
+        // Hydraulic Cylinder Chamber
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 22, pilotY + 15, 44, mainPipeY - pilotY + 15, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        // Plunger Piston Head
+        const pistonY = pilotY + 35 + state.plungerOffset * 2.5;
+        ctx.fillStyle = pilotFlow ? '#38bdf8' : '#64748b';
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 16, pistonY, 32, 28, 4);
+        ctx.fill();
+
+        // Stopper Gate extending down into main pipe when actuated
+        ctx.fillStyle = '#f87171';
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 8, pistonY + 28, 16, 24, 2);
+        ctx.fill();
+
+        // Counter spring
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let y = pilotY + 15; y < pistonY; y += 4) {
+          ctx.lineTo(chamberX + (y % 8 === 0 ? 8 : -8), y);
+        }
+        ctx.stroke();
+
+        // Output pipe from chamber to basin
+        drawPipe(chamberX, mainPipeY, basinX, mainPipeY, mainFlowOut);
+
+        // Valve A
+        drawValve(valveAX, pilotY, 'A', state.valves.A, 'A');
+
+        // Tanks
+        drawSupplyTank(tankX, tankY, tankW, tankH);
+        drawOutputBasin(basinX, basinY, basinW, basinH, state.waterLevelOutput);
+
+        // Inverter label
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Hydraulic Inverter: Pressure from Valve A drives piston DOWN to seal the main channel.', w / 2, h - 24);
+      }
+
+      // 4. NAND Gate: not (A and B)
+      function drawNandGateSimulation(w, h, dt) {
+        const tankW = 90;
+        const tankH = 110;
+        const tankX = 40;
+        const tankY = h * 0.4;
+
+        const basinW = 110;
+        const basinH = 120;
+        const basinX = w - 150;
+        const basinY = h * 0.4;
+
+        const mainPipeY = tankY + tankH / 2;
+        const chamberX = (tankX + basinX) / 2 + 50;
+        const pilotY = mainPipeY - 110;
+
+        const valveAX = chamberX - 160;
+        const valveBX = chamberX - 80;
+
+        const pilotSeriesFlow = state.valves.A && state.valves.B;
+        const mainFlowOut = !pilotSeriesFlow;
+
+        // Animate plunger
+        const targetPlunger = pilotSeriesFlow ? 22 : 0;
+        state.plungerOffset += (targetPlunger - state.plungerOffset) * (dt * 6 * state.speed);
+
+        // Main pipe
+        drawPipe(tankX + tankW, mainPipeY, chamberX, mainPipeY, true);
+
+        // Pilot series feed
+        drawPipe(tankX + tankW + 20, mainPipeY, tankX + tankW + 20, pilotY, true, true);
+        drawPipe(tankX + tankW + 20, pilotY, valveAX, pilotY, true);
+        drawPipe(valveAX, pilotY, valveBX, pilotY, state.valves.A);
+        drawPipe(valveBX, pilotY, chamberX, pilotY, pilotSeriesFlow);
+        drawPipe(chamberX, pilotY, chamberX, mainPipeY - 30, pilotSeriesFlow, true);
+
+        // Cylinder chamber & piston
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 22, pilotY + 15, 44, mainPipeY - pilotY + 15, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        const pistonY = pilotY + 35 + state.plungerOffset * 2.5;
+        ctx.fillStyle = pilotSeriesFlow ? '#38bdf8' : '#64748b';
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 16, pistonY, 32, 28, 4);
+        ctx.fill();
+
+        // Stopper
+        ctx.fillStyle = '#f87171';
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 8, pistonY + 28, 16, 24, 2);
+        ctx.fill();
+
+        // Output pipe
+        drawPipe(chamberX, mainPipeY, basinX, mainPipeY, mainFlowOut);
+
+        // Valves
+        drawValve(valveAX, pilotY, 'A', state.valves.A, 'A');
+        drawValve(valveBX, pilotY, 'B', state.valves.B, 'B');
+
+        // Tanks
+        drawSupplyTank(tankX, tankY, tankW, tankH);
+        drawOutputBasin(basinX, basinY, basinW, basinH, state.waterLevelOutput);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('NAND: Piston blocks main channel ONLY when Valve A and Valve B are BOTH open.', w / 2, h - 24);
+      }
+
+      // 5. NOR Gate: not (A or B)
+      function drawNorGateSimulation(w, h, dt) {
+        const tankW = 90;
+        const tankH = 110;
+        const tankX = 40;
+        const tankY = h * 0.4;
+
+        const basinW = 110;
+        const basinH = 120;
+        const basinX = w - 150;
+        const basinY = h * 0.4;
+
+        const mainPipeY = tankY + tankH / 2;
+        const chamberX = (tankX + basinX) / 2 + 50;
+
+        const pilotY = mainPipeY - 120;
+        const splitX = tankX + tankW + 20;
+        const branchAX = chamberX - 110;
+        const branchBX = chamberX - 110;
+        const branchAY = pilotY - 20;
+        const branchBY = pilotY + 30;
+
+        const pilotOrFlow = state.valves.A || state.valves.B;
+        const mainFlowOut = !pilotOrFlow;
+
+        const targetPlunger = pilotOrFlow ? 22 : 0;
+        state.plungerOffset += (targetPlunger - state.plungerOffset) * (dt * 6 * state.speed);
+
+        // Main line
+        drawPipe(tankX + tankW, mainPipeY, chamberX, mainPipeY, true);
+
+        // Parallel pilot line feed
+        drawPipe(splitX, mainPipeY, splitX, branchAY, true, true);
+        drawPipe(splitX, branchAY, branchAX, branchAY, true);
+        drawPipe(splitX, branchBY, branchBX, branchBY, true);
+
+        drawPipe(branchAX, branchAY, chamberX - 30, branchAY, state.valves.A);
+        drawPipe(branchBX, branchBY, chamberX - 30, branchBY, state.valves.B);
+
+        // Merge pilot
+        drawPipe(chamberX - 30, branchAY, chamberX - 30, branchBY, pilotOrFlow, true);
+        drawPipe(chamberX - 30, pilotY, chamberX, pilotY, pilotOrFlow);
+        drawPipe(chamberX, pilotY, chamberX, mainPipeY - 30, pilotOrFlow, true);
+
+        // Cylinder chamber & piston
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 22, pilotY + 15, 44, mainPipeY - pilotY + 15, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        const pistonY = pilotY + 35 + state.plungerOffset * 2.5;
+        ctx.fillStyle = pilotOrFlow ? '#38bdf8' : '#64748b';
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 16, pistonY, 32, 28, 4);
+        ctx.fill();
+
+        ctx.fillStyle = '#f87171';
+        ctx.beginPath();
+        ctx.roundRect(chamberX - 8, pistonY + 28, 16, 24, 2);
+        ctx.fill();
+
+        // Output pipe
+        drawPipe(chamberX, mainPipeY, basinX, mainPipeY, mainFlowOut);
+
+        // Valves
+        drawValve(branchAX, branchAY, 'A', state.valves.A, 'A');
+        drawValve(branchBX, branchBY, 'B', state.valves.B, 'B');
+
+        // Tanks
+        drawSupplyTank(tankX, tankY, tankW, tankH);
+        drawOutputBasin(basinX, basinY, basinW, basinH, state.waterLevelOutput);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('NOR: If EITHER Valve A OR Valve B opens, the stopper shuts off the output.', w / 2, h - 24);
+      }
+
+      // 6. Compound: (A or B) and C
+      function drawCompoundSimulation(w, h, dt) {
+        const tankW = 85;
+        const tankH = 100;
+        const tankX = 35;
+        const tankY = h * 0.35;
+
+        const basinW = 105;
+        const basinH = 115;
+        const basinX = w - 145;
+        const basinY = h * 0.35;
+
+        const midY = tankY + tankH / 2;
+        const splitX = tankX + tankW + 35;
+        const topY = midY - 60;
+        const botY = midY + 60;
+
+        const valveABX = splitX + 70;
+        const mergeX = valveABX + 70;
+        const valveCX = mergeX + 75;
+
+        const flowA = state.valves.A;
+        const flowB = state.valves.B;
+        const stage1Flow = flowA || flowB;
+        const finalFlow = stage1Flow && state.valves.C;
+
+        // Split to parallel valves A and B
+        drawPipe(tankX + tankW, midY, splitX, midY, true);
+        drawPipe(splitX, topY, splitX, botY, true, true);
+
+        drawPipe(splitX, topY, valveABX, topY, true);
+        drawPipe(valveABX, topY, mergeX, topY, flowA);
+
+        drawPipe(splitX, botY, valveABX, botY, true);
+        drawPipe(valveABX, botY, mergeX, botY, flowB);
+
+        // Merge
+        drawPipe(mergeX, topY, mergeX, botY, stage1Flow, true);
+        drawPipe(mergeX, midY, valveCX, midY, stage1Flow);
+
+        // Valve C in series
+        drawPipe(valveCX, midY, basinX, midY, finalFlow);
+
+        // Valves
+        drawValve(valveABX, topY, 'A', state.valves.A, 'A');
+        drawValve(valveABX, botY, 'B', state.valves.B, 'B');
+        drawValve(valveCX, midY, 'C', state.valves.C, 'C');
+
+        // Tanks
+        drawSupplyTank(tankX, tankY, tankW, tankH);
+        drawOutputBasin(basinX, basinY, basinW, basinH, state.waterLevelOutput);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '12px ui-monospace, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Compound Logic: Stage 1 (A or B) must flow, AND Valve C must be open.', w / 2, h - 24);
+      }
+
+      // Render Floating Water Bubbles/Particles
+      function renderParticles(dt) {
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt * 1.5;
+
+          if (p.life <= 0) {
+            state.particles.splice(i, 1);
+            continue;
+          }
+
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.life;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+      }
+
+      // --- HEADER CONTROLS ---
+      audioToggleBtn.addEventListener('click', () => {
+        initAudio();
+        state.audioEnabled = !state.audioEnabled;
+        audioLabel.textContent = state.audioEnabled ? 'Sound On' : 'Muted';
+        audioToggleBtn.classList.toggle('active', state.audioEnabled);
+        updateWaterSound(getCurrentResult());
+      });
+
+      speedToggleBtn.addEventListener('click', () => {
+        if (state.speed === 1.0) state.speed = 2.0;
+        else if (state.speed === 2.0) state.speed = 0.5;
+        else state.speed = 1.0;
+        speedLabel.textContent = `${state.speed}x`;
+      });
+
+      // --- HUB VIEW & ROUTING ENGINE ---
+      const hubView = document.getElementById('hubView');
+      const vizView = document.getElementById('vizView');
+      const backToHubBtn = document.getElementById('backToHubBtn');
+      const launchVizBtn = document.getElementById('launchVizBtn');
+      const launchPreviewCard1 = document.getElementById('launchPreviewCard1');
+      const hubFilters = document.getElementById('hubFilters');
+      const hubPwaInstallBtn = document.getElementById('hubPwaInstallBtn');
+
+      function navigateToView(viewName, gateMode) {
+        if (viewName === 'hub') {
+          state.currentView = 'hub';
+          hubView.classList.remove('hidden');
+          vizView.classList.add('hidden');
+          window.location.hash = '#hub';
+        } else if (viewName === 'viz') {
+          state.currentView = 'viz';
+          hubView.classList.add('hidden');
+          vizView.classList.remove('hidden');
+          window.location.hash = '#viz';
+          if (gateMode) {
+            switchGate(gateMode);
+          }
+          // Refresh canvas dimensions and simulation render
+          setTimeout(() => {
+            resizeCanvas();
+            refreshAll();
+          }, 30);
+        }
+      }
+
+      // Hub Direct Gate Launch Chips
+      if (hubFilters) {
+        hubFilters.addEventListener('click', (e) => {
+          const chip = e.target.closest('.filter-chip');
+          if (!chip) return;
+          const gate = chip.dataset.gate;
+          if (gate) {
+            navigateToView('viz', gate);
+          }
+        });
+      }
+
+      // Launch Visualizer actions
+      if (launchVizBtn) launchVizBtn.addEventListener('click', () => navigateToView('viz'));
+      if (launchPreviewCard1) launchPreviewCard1.addEventListener('click', () => navigateToView('viz'));
+      if (backToHubBtn) backToHubBtn.addEventListener('click', () => navigateToView('hub'));
+
+      // Keyboard Shortcut: Esc or H returns to Hub
+      window.addEventListener('keydown', (e) => {
+        if ((e.key === 'Escape' || e.key === 'h' || e.key === 'H') &&
+            state.currentView === 'viz' &&
+            !iosModal.classList.contains('open')) {
+          navigateToView('hub');
+        } else if (e.key === 'Escape') {
+          if (iosModal.classList.contains('open')) iosModal.classList.remove('open');
+        }
+      });
+
+      // --- PWA INSTALLATION LOGIC ---
+      function updateInstallButtonsDisplay(displayStyle) {
+        if (pwaInstallBtn) pwaInstallBtn.style.display = displayStyle;
+        if (hubPwaInstallBtn) hubPwaInstallBtn.style.display = displayStyle;
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        state.deferredPrompt = e;
+        updateInstallButtonsDisplay('inline-flex');
+      });
+
+      window.addEventListener('appinstalled', () => {
+        state.deferredPrompt = null;
+        updateInstallButtonsDisplay('none');
+        console.log('[PWA] Successfully installed suite.');
+      });
+
+      // Check iOS detection for guided install
+      const isIOS = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+      if (isIOS && !isStandalone) {
+        updateInstallButtonsDisplay('inline-flex');
+      }
+
+      async function triggerPwaInstall() {
+        if (state.deferredPrompt) {
+          state.deferredPrompt.prompt();
+          const { outcome } = await state.deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            updateInstallButtonsDisplay('none');
+          }
+          state.deferredPrompt = null;
+        } else if (isIOS) {
+          iosModal.classList.add('open');
+        }
+      }
+
+      pwaInstallBtn.addEventListener('click', triggerPwaInstall);
+      if (hubPwaInstallBtn) hubPwaInstallBtn.addEventListener('click', triggerPwaInstall);
+
+      closeIosModalBtn.addEventListener('click', () => {
+        iosModal.classList.remove('open');
+      });
+
+      // --- SERVICE WORKER REGISTRATION (OFFLINE-FIRST) ---
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          // If served via http/https, register sw.js
+          if (window.location.protocol.startsWith('http')) {
+            navigator.serviceWorker.register('./sw.js')
+              .then((reg) => {
+                console.log('[PWA] Service Worker active, scope:', reg.scope);
+                // Check for updates to flush out old caches
+                reg.update().catch(() => {});
+                const dots = document.querySelectorAll('.status-dot');
+                dots.forEach(dot => dot.style.backgroundColor = '#22c55e');
+              })
+              .catch((err) => {
+                console.warn('[PWA] Service Worker registration skipped or failed:', err);
+              });
+
+            // If a new service worker takes control, refresh to show new views
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+              }
+            });
+          } else {
+            console.log('[PWA] Running locally via file protocol.');
+          }
+        });
+      }
+
+      // Online/Offline event indicators
+      function updateOfflineBadges(isOnline) {
+        const badges = [document.getElementById('offlineStatus'), document.getElementById('hubOfflineStatus')];
+        badges.forEach(b => {
+          if (!b) return;
+          if (isOnline) {
+            b.innerHTML = '<span class="status-dot"></span><span>Online</span>';
+          } else {
+            b.innerHTML = '<span class="status-dot" style="background:#facc15;box-shadow:0 0 6px #facc15;"></span><span>Offline (Cached)</span>';
+          }
+        });
+      }
+
+      window.addEventListener('online', () => updateOfflineBadges(true));
+      window.addEventListener('offline', () => updateOfflineBadges(false));
+
+      // --- ROUTE RESOLUTION ON LOAD ---
+      function handleRoute() {
+        const hash = window.location.hash;
+        if (hash === '#viz' || hash.startsWith('#viz-')) {
+          navigateToView('viz');
+        } else {
+          navigateToView('hub');
+        }
+      }
+
+      window.addEventListener('hashchange', handleRoute);
+
+      // --- BOOTSTRAP INITIALIZATION ---
+      window.addEventListener('DOMContentLoaded', () => {
+        handleRoute();
+        resizeCanvas();
+        refreshAll();
+        requestAnimationFrame(renderSimulation);
+      });
+    </script>
+  </body>
+</html>

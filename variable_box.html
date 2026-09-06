@@ -1,0 +1,4333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Python Variable Box Quiz | Types, Math, Casting &amp; Errors</title>
+  <meta name="description" content="Interactive Python quiz teaching variables, data types, type casting, ValueErrors, and arithmetic operators using a physical cardboard box analogy. Zero dependencies, 100% offline.">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    /* Reset & Fullscreen Non-Scrollable Layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --bg-base: #0a0d14;
+      --bg-panel: #111724;
+      --bg-card: rgba(22, 30, 46, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.15);
+
+      --color-int: #38bdf8;
+      --color-float: #2dd4bf;
+      --color-str: #4ade80;
+      --color-bool: #c084fc;
+      --color-error: #ef4444;
+
+      --cardboard-base: #c29b68;
+      --cardboard-dark: #a27a46;
+      --cardboard-shade: #7c5c32;
+      --tape-color: rgba(245, 222, 179, 0.7);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      color: #f1f5f9;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fixed Top App Header */
+    header {
+      height: 48px;
+      background: rgba(13, 17, 26, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back-hub {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-back-hub:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #d97706, #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+    }
+
+    .app-icon-badge svg {
+      width: 16px;
+      height: 16px;
+      color: #fff;
+    }
+
+    .app-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-pill strong {
+      color: #f8fafc;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tool-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .status-offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+
+    /* Main Fullscreen 3-Column Grid */
+    main {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 48px);
+      display: grid;
+      grid-template-columns: 380px 1fr 390px;
+      gap: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 50%, #111726 0%, #080b12 100%);
+    }
+
+    /* COLUMN 1: Dark-themed Python Code Editor */
+    .col-code {
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      border-right: 1px solid var(--border-subtle);
+      background: rgba(14, 19, 31, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      gap: 12px;
+      justify-content: space-between;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 2px 8px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    /* Code Window Frame */
+    .editor-window {
+      background: #080c14;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      max-height: calc(100vh - 200px);
+    }
+
+    .editor-titlebar {
+      height: 34px;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .win-btn {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .win-close { background: #ef4444; }
+    .win-min { background: #f59e0b; }
+    .win-max { background: #10b981; }
+
+    .editor-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 10px;
+      border-radius: 4px 4px 0 0;
+      border-top: 2px solid #38bdf8;
+    }
+
+    .editor-body {
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .code-line {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      white-space: pre;
+    }
+
+    .line-num {
+      color: #475569;
+      font-size: 11px;
+      width: 18px;
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-text {
+      flex: 1;
+    }
+
+    .py-comment { color: #64748b; font-style: italic; }
+    .py-keyword { color: #f472b6; font-weight: 700; }
+    .py-fn { color: #a78bfa; }
+    .py-str { color: #4ade80; }
+    .py-num { color: #facc15; }
+    .py-op { color: #38bdf8; }
+    .py-bool { color: #c084fc; font-weight: 700; }
+    .py-var { color: #f8fafc; font-weight: 700; }
+
+    .target-var-highlight {
+      background: rgba(217, 119, 6, 0.25);
+      border-bottom: 2px solid #f59e0b;
+      padding: 0 4px;
+      border-radius: 2px;
+      animation: varPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes varPulse {
+      0%, 100% { background: rgba(217, 119, 6, 0.25); }
+      50% { background: rgba(217, 119, 6, 0.5); }
+    }
+
+    .code-prompt-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .code-prompt-card h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .code-prompt-card p {
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    /* COLUMN 2: The Physical Cardboard Box & Inside Reveal */
+    .col-center {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      perspective: 1000px;
+      overflow: hidden;
+    }
+
+    .stage-title {
+      position: absolute;
+      top: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* 3D Cardboard Box Container */
+    .box-stage {
+      width: 320px;
+      height: 320px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      transition: transform 0.4s ease;
+    }
+
+    /* Cardboard Box Body */
+    .cardboard-box {
+      width: 240px;
+      height: 240px;
+      background: linear-gradient(145deg, var(--cardboard-base) 0%, var(--cardboard-dark) 100%);
+      border: 3px solid var(--cardboard-shade);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 2px 6px rgba(255, 255, 255, 0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transform-style: preserve-3d;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Cardboard Tape Stripes */
+    .cardboard-tape-h {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 24px;
+      transform: translateY(-50%);
+      background: var(--tape-color);
+      border-top: 1px dashed rgba(162, 122, 70, 0.5);
+      border-bottom: 1px dashed rgba(162, 122, 70, 0.5);
+      z-index: 2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .cardboard-tape-v {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 24px;
+      transform: translateX(-50%);
+      background: var(--tape-color);
+      border-left: 1px dashed rgba(162, 122, 70, 0.5);
+      border-right: 1px dashed rgba(162, 122, 70, 0.5);
+      z-index: 2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Shipping Label */
+    .shipping-label {
+      width: 170px;
+      background: #ffffff;
+      color: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 6px;
+      padding: 8px 10px;
+      z-index: 5;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: left;
+      transform: rotate(-2deg);
+    }
+
+    .label-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 3px;
+    }
+
+    .label-title {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+
+    .label-var-name {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .label-fragile {
+      font-size: 7.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #dc2626;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .label-barcode {
+      height: 12px;
+      background: repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 4px, #000 4px, #000 7px);
+      margin-top: 2px;
+    }
+
+    /* Box Flaps for 3D Opening Animation */
+    .box-flap-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, #d4a76a 0%, var(--cardboard-base) 100%);
+      border: 2px solid var(--cardboard-shade);
+      transform-origin: top center;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .box-flap-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to top, #b58c57 0%, var(--cardboard-base) 100%);
+      border: 2px solid var(--cardboard-shade);
+      transform-origin: bottom center;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Inside the Open Box */
+    .box-interior {
+      position: absolute;
+      inset: 6px;
+      background: radial-gradient(circle, #1a2234 0%, #090c14 100%);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      transform: scale(0.85);
+      transition: all 0.5s ease;
+    }
+
+    .interior-glow {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      filter: blur(24px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .revealed-value-display {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
+      word-break: break-all;
+      z-index: 3;
+      max-width: 90%;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .revealed-type-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-top: 8px;
+      z-index: 3;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Value Type Styling Inside Box */
+    .val-str { color: var(--color-str); text-shadow: 0 0 16px rgba(74, 222, 128, 0.4); }
+    .val-int { color: var(--color-int); text-shadow: 0 0 16px rgba(56, 189, 248, 0.4); }
+    .val-float { color: var(--color-float); text-shadow: 0 0 16px rgba(45, 212, 191, 0.4); }
+    .val-bool { color: var(--color-bool); text-shadow: 0 0 16px rgba(192, 132, 252, 0.4); }
+
+    /* State 1: Incorrect Shake */
+    .shake-animation {
+      animation: boxShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.6) !important;
+    }
+
+    @keyframes boxShake {
+      10%, 90% { transform: translate3d(-4px, 0, 0) rotate(-2deg); }
+      20%, 80% { transform: translate3d(6px, 0, 0) rotate(2deg); }
+      30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-3deg); }
+      40%, 60% { transform: translate3d(8px, 0, 0) rotate(3deg); }
+    }
+
+    /* State 2: Box Opened (Correct Valid Type) */
+    .box-opened .box-flap-top {
+      transform: rotateX(160deg);
+      opacity: 0.2;
+    }
+
+    .box-opened .box-flap-bottom {
+      transform: rotateX(-160deg);
+      opacity: 0.2;
+    }
+
+    .box-opened .cardboard-tape-h,
+    .box-opened .cardboard-tape-v,
+    .box-opened .shipping-label {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .box-opened .box-interior {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* State 3: Destructive Error Collapse (ValueError) */
+    .box-error-collapse {
+      animation: boxBreak 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      border-color: #ef4444 !important;
+    }
+
+    @keyframes boxBreak {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.08) rotate(3deg); filter: brightness(1.2); }
+      45% { transform: scale(0.92) rotate(-5deg); }
+      70% { transform: scale(0.85) skew(12deg, -8deg); }
+      100% {
+        transform: scale(0.8) translateY(20px) skew(15deg, -10deg);
+        background: #450a0a;
+        box-shadow: 0 0 40px rgba(239, 68, 68, 0.7);
+      }
+    }
+
+    /* Big Red ValueError Stamp */
+    .stamp-value-error {
+      position: absolute;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      color: #ef4444;
+      border: 5px solid #ef4444;
+      padding: 6px 14px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      transform: rotate(-18deg) scale(0);
+      opacity: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.75);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
+      pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+    }
+
+    .stamp-visible {
+      transform: rotate(-18deg) scale(1);
+      opacity: 1;
+    }
+
+    /* COLUMN 3: The Quiz Form & Controls */
+    .col-quiz {
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      border-left: 1px solid var(--border-subtle);
+      background: rgba(14, 19, 31, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      gap: 12px;
+      justify-content: space-between;
+    }
+
+    .quiz-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-label code {
+      font-size: 11px;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    /* Styled Select Dropdown */
+    .custom-select {
+      background: #080c14;
+      border: 1.5px solid var(--border-light);
+      border-radius: 8px;
+      color: #f8fafc;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 12px;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .custom-select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Text Input Wrapper with Quotes for String mode */
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: #080c14;
+      border: 1.5px solid var(--border-light);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .quote-badge {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 900;
+      color: #4ade80;
+      padding: 0 10px;
+      background: rgba(74, 222, 128, 0.1);
+      display: none; /* Shown when type is str */
+      height: 100%;
+      align-items: center;
+    }
+
+    .custom-text-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #f8fafc;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 12px;
+      outline: none;
+      width: 100%;
+    }
+
+    .custom-text-input:disabled {
+      background: rgba(255, 255, 255, 0.03);
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    /* Actions Button Group */
+    .btn-submit {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: all 0.15s ease;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      color: #ffffff;
+      border: 1px solid #22c55e;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      font-weight: 800;
+      display: none; /* Revealed when answered correctly */
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+      animation: pulseNext 1.5s infinite ease-in-out;
+      transition: all 0.15s ease;
+    }
+
+    @keyframes pulseNext {
+      0%, 100% { box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4); }
+      50% { box-shadow: 0 6px 22px rgba(34, 197, 94, 0.7); }
+    }
+
+    .btn-next:hover {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      transform: translateY(-1px);
+    }
+
+    /* Feedback Banner Area */
+    .feedback-banner {
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      line-height: 1.4;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .feedback-banner.success {
+      display: flex;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1.5px solid #22c55e;
+      color: #bbf7d0;
+    }
+
+    .feedback-banner.error {
+      display: flex;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1.5px solid #ef4444;
+      color: #fecaca;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Rule Explanations & Reference Footer in Quiz Column */
+    .reference-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .reference-box strong {
+      color: #e2e8f0;
+    }
+
+    .reference-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    .reference-pill {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 6px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Modal / Help Guide */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      width: 90%;
+      max-width: 540px;
+      background: #111827;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-body {
+      font-size: 12.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-body code {
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #38bdf8;
+    }
+
+    .modal-close-btn {
+      align-self: flex-end;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header>
+    <div class="header-left">
+      <a href="./index.html" class="btn-back-hub" id="backToHubBtn" title="Return to Visualizer Hub">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Hub</span>
+      </a>
+
+      <div class="app-title-group">
+        <div class="app-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">Python Variable Box</h1>
+          <div class="app-subtitle">Variables, Types, Math &amp; ValueErrors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Progress & Stats -->
+    <div class="header-center">
+      <div class="stat-pill">
+        <span>Question:</span>
+        <strong id="qNumDisplay">#1</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Score:</span>
+        <strong id="scoreDisplay" style="color: #4ade80;">0</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Streak:</span>
+        <strong id="streakDisplay">🔥 0</strong>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="header-right">
+      <button class="tool-btn" id="btnAudioToggle" title="Toggle audio feedback">
+        <span id="audioIcon">🔊</span>
+        <span id="audioLabel">Sound ON</span>
+      </button>
+
+      <button class="tool-btn" id="btnHelpModal" title="Python Data Types &amp; Casting Guide">
+        <span>❓ Concept Guide</span>
+      </button>
+
+      <div class="status-offline-badge">
+        <span class="pulse-dot"></span>
+        <span>Offline Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Fullscreen 3-Column Layout -->
+  <main>
+    <!-- COLUMN 1: Dark-themed Python Code Window -->
+    <section class="col-code">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="section-tag">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          Column 1: The Code
+        </span>
+      </div>
+
+      <!-- Code Editor Window -->
+      <div class="editor-window">
+        <div class="editor-titlebar">
+          <div class="window-controls">
+            <span class="win-btn win-close"></span>
+            <span class="win-btn win-min"></span>
+            <span class="win-btn win-max"></span>
+          </div>
+          <div class="editor-tab">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span>variable_lab.py</span>
+          </div>
+          <div style="width: 40px;"></div>
+        </div>
+
+        <div class="editor-body" id="codeEditorBody">
+          <!-- Populated dynamically per question -->
+        </div>
+      </div>
+
+      <!-- Target Variable Note -->
+      <div class="code-prompt-card">
+        <h4>Target Variable</h4>
+        <p>Analyze the Python snippet above. Determine the exact Python data type and evaluated runtime value assigned to <strong style="color: #f59e0b;" id="targetVarNameBadge">x</strong>.</p>
+      </div>
+    </section>
+
+    <!-- COLUMN 2: Physical Cardboard Box Representation -->
+    <section class="col-center">
+      <div class="stage-title">Memory Allocation: Variable Box</div>
+
+      <div class="box-stage" id="boxStage">
+        <!-- 3D Cardboard Box Container -->
+        <div class="cardboard-box" id="cardboardBox">
+          <!-- Top and Bottom Flaps for 3D Opening -->
+          <div class="box-flap-top"></div>
+          <div class="box-flap-bottom"></div>
+
+          <!-- Exterior Packing Tape -->
+          <div class="cardboard-tape-h"></div>
+          <div class="cardboard-tape-v"></div>
+
+          <!-- Shipping Label with Variable Name -->
+          <div class="shipping-label">
+            <div class="label-header">
+              <span class="label-title">PYTHON MEMORY CELL</span>
+              <span class="label-fragile">⚠️ FRAGILE</span>
+            </div>
+            <div class="label-var-name">
+              <span>name: </span>
+              <span id="boxLabelVar" style="color: #2563eb;">x</span>
+            </div>
+            <div style="font-size: 8px; color: #64748b; font-family: var(--font-mono);">
+              STATUS: <span id="boxStatusText" style="font-weight: 700;">CLOSED &amp; SEALED</span>
+            </div>
+            <div class="label-barcode"></div>
+          </div>
+
+          <!-- Interior Compartment Revealed on Open -->
+          <div class="box-interior" id="boxInterior">
+            <div class="interior-glow" id="interiorGlow"></div>
+            <div class="revealed-value-display" id="revealedValue">--</div>
+            <div class="revealed-type-badge" id="revealedTypeBadge">&lt;class 'int'&gt;</div>
+          </div>
+
+          <!-- Big Red ValueError Stamp (Overlaid on destructive casting error) -->
+          <div class="stamp-value-error" id="valueErrorStamp">
+            ⚠️ ValueError
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUMN 3: The Interactive Quiz Form -->
+    <section class="col-quiz">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span class="section-tag" style="color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.25);">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          Column 3: The Quiz
+        </span>
+      </div>
+
+      <div class="quiz-card">
+        <!-- Field 1: Data Type Selection -->
+        <div class="form-group">
+          <label class="form-label" for="selectDataType">
+            <span>What is the Data Type?</span>
+            <code>type(var)</code>
+          </label>
+          <select id="selectDataType" class="custom-select">
+            <option value="">-- Select Python Type --</option>
+            <option value="int">int (Integer)</option>
+            <option value="float">float (Floating Point)</option>
+            <option value="str">str (String)</option>
+            <option value="bool">bool (Boolean)</option>
+            <option value="Error">Error (ValueError / Exception)</option>
+          </select>
+        </div>
+
+        <!-- Field 2: Value Input -->
+        <div class="form-group">
+          <label class="form-label" for="inputValue">
+            <span>What is the Value?</span>
+            <span style="font-size: 10px; color: #94a3b8;" id="valueHint">(Exact Python representation)</span>
+          </label>
+          <div class="input-wrapper" id="inputWrapper">
+            <span class="quote-badge" id="leftQuote">&ldquo;</span>
+            <input 
+              type="text" 
+              id="inputValue" 
+              class="custom-text-input" 
+              placeholder="e.g. 42, 3.14, True" 
+              autocomplete="off" 
+              spellcheck="false"
+            />
+            <span class="quote-badge" id="rightQuote">&rdquo;</span>
+          </div>
+        </div>
+
+        <!-- Submit & Next Action Buttons -->
+        <button class="btn-submit" id="btnOpenBox">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h16" />
+          </svg>
+          <span>Open Box (Submit)</span>
+        </button>
+
+        <button class="btn-next" id="btnNextQuestion">
+          <span>Next Question</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+
+        <!-- Feedback Messages -->
+        <div class="feedback-banner" id="feedbackBanner">
+          <div id="feedbackTitle" style="font-weight: 800;"></div>
+          <div id="feedbackMsg" style="font-size: 11px;"></div>
+        </div>
+      </div>
+
+      <!-- Quick Python Reference Guide -->
+      <div class="reference-box">
+        <strong>Python Fast Cheatsheet:</strong>
+        <div class="reference-grid">
+          <div class="reference-pill"><span>4 / 2</span><span style="color: #2dd4bf;">2.0 (float)</span></div>
+          <div class="reference-pill"><span>5 // 2</span><span style="color: #38bdf8;">2 (int)</span></div>
+          <div class="reference-pill"><span>10 % 3</span><span style="color: #38bdf8;">1 (int)</span></div>
+          <div class="reference-pill"><span>2 ** 3</span><span style="color: #38bdf8;">8 (int)</span></div>
+          <div class="reference-pill"><span>bool(0)</span><span style="color: #c084fc;">False</span></div>
+          <div class="reference-pill"><span>int("apple")</span><span style="color: #ef4444;">ValueError</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Educational Concept Guide Modal -->
+  <div class="modal-backdrop" id="helpModal">
+    <div class="modal-dialog">
+      <h3 class="modal-title">Python Variables &amp; Types: Study Guide</h3>
+      <div class="modal-body">
+        <p>In Python, variables act like labeled cardboard boxes that store references to objects in computer memory.</p>
+        
+        <div>
+          <strong style="color: #38bdf8;">1. Division: <code>/</code> vs <code>//</code></strong>
+          <p>The single slash <code>/</code> is true division and <em>always</em> returns a <code>float</code> (e.g. <code>4 / 2 -> 2.0</code>). The double slash <code>//</code> is floor division and rounds down to the nearest integer (e.g. <code>5 // 2 -> 2</code>).</p>
+        </div>
+
+        <div>
+          <strong style="color: #2dd4bf;">2. Modulo (<code>%</code>) and Exponent (<code>**</code>)</strong>
+          <p><code>%</code> computes the remainder after division (<code>10 % 3 -> 1</code>). <code>**</code> raises a base to an exponent (<code>3 ** 2 -> 9</code>).</p>
+        </div>
+
+        <div>
+          <strong style="color: #4ade80;">3. Type Casting</strong>
+          <p>Functions like <code>int()</code>, <code>float()</code>, and <code>str()</code> convert values. <code>int(7.9) -> 7</code> truncates decimals. <code>float(5) -> 5.0</code> adds a decimal point.</p>
+        </div>
+
+        <div>
+          <strong style="color: #ef4444;">4. Casting Errors (ValueError)</strong>
+          <p>If you ask Python to convert a non-numeric string into an integer (e.g. <code>int("apple")</code> or <code>int("3.14")</code> directly), Python throws a <code>ValueError</code> because the conversion is invalid.</p>
+        </div>
+
+        <div>
+          <strong style="color: #c084fc;">5. Boolean Conversion</strong>
+          <p><code>0</code>, <code>0.0</code>, and empty strings <code>""</code> evaluate to <code>False</code>. Any non-zero number or non-empty string evaluates to <code>True</code>.</p>
+        </div>
+      </div>
+      <button class="modal-close-btn" id="btnCloseModal">Understood!</button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       Python Variable Box Master Dataset: Exactly 50 Items
+       Strict Python 3.12 accuracy, zero dynamic generator
+       ========================================================= */
+                            const MASTER_QUESTIONS = [
+      {
+        id: 1,
+        code: `x = 15 + 27
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "42",
+        explanation: "Standard integer addition: 15 + 27 = 42."
+      },
+      {
+        id: 2,
+        code: `y = 50 - 18
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "int",
+        value: "32",
+        explanation: "Standard integer subtraction: 50 - 18 = 32."
+      },
+      {
+        id: 3,
+        code: `z = 6 * 7
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "int",
+        value: "42",
+        explanation: "Standard integer multiplication: 6 * 7 = 42."
+      },
+      {
+        id: 4,
+        code: `a = 100 - 45 + 10
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "65",
+        explanation: "Left-to-right evaluation of equal precedence operators (+ and -): (100 - 45) + 10 = 65."
+      },
+      {
+        id: 5,
+        code: `b = 2 + 3 * 4
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "14",
+        explanation: "Operator precedence: multiplication happens before addition (3 * 4 = 12, then + 2 = 14)."
+      },
+      {
+        id: 6,
+        code: `c = (2 + 3) * 4
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "20",
+        explanation: "Parentheses override standard precedence: (2 + 3) = 5, then 5 * 4 = 20."
+      },
+      {
+        id: 7,
+        code: `d = 100 - (20 + 30)
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "int",
+        value: "50",
+        explanation: "Parentheses evaluated first: 20 + 30 = 50, then 100 - 50 = 50."
+      },
+      {
+        id: 8,
+        code: `n = 42 * 0
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "int",
+        value: "0",
+        explanation: "Multiplication by zero results in integer 0."
+      },
+      {
+        id: 9,
+        code: `m = -5 + 12
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "int",
+        value: "7",
+        explanation: "Negative number addition: -5 + 12 = 7."
+      },
+      {
+        id: 10,
+        code: `k = -4 * -3
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "int",
+        value: "12",
+        explanation: "Multiplying two negative numbers yields a positive integer: 12."
+      },
+      {
+        id: 11,
+        code: `p = -10 - 5
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "int",
+        value: "-15",
+        explanation: "-10 minus 5 equals -15."
+      },
+      {
+        id: 12,
+        code: `q = (10 - 2) * (3 + 1)
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "32",
+        explanation: "(8) * (4) = 32."
+      },
+      {
+        id: 13,
+        code: `r = 50 - 20 - 10
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "20",
+        explanation: "Subtraction associates left to right: (50 - 20) - 10 = 20."
+      },
+      {
+        id: 14,
+        code: `s = 10 - 2 * 3 + 4
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "int",
+        value: "8",
+        explanation: "Multiplication first: 10 - 6 + 4 = 8."
+      },
+      {
+        id: 15,
+        code: `t = 5 * (10 - 8) + 1
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "int",
+        value: "11",
+        explanation: "Parentheses first: 5 * 2 + 1 = 11."
+      },
+      {
+        id: 16,
+        code: `w = 10
+w = w + 5
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "int",
+        value: "15",
+        explanation: "Variable reassignment: w starts at 10. We evaluate 10 + 5 = 15 and store 15 back into w."
+      },
+      {
+        id: 17,
+        code: `v = 50
+v = v - 15
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "int",
+        value: "35",
+        explanation: "Reassignment: v starts at 50, then 50 - 15 = 35 is assigned back to v."
+      },
+      {
+        id: 18,
+        code: `h = 3
+h = h * 4
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "int",
+        value: "12",
+        explanation: "Reassignment: h starts at 3, multiplied by 4 to become 12."
+      },
+      {
+        id: 19,
+        code: `u = 2
+u = u ** 3
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "int",
+        value: "8",
+        explanation: "Reassignment with exponent: u starts at 2, then 2 ** 3 = 8 is stored into u."
+      },
+      {
+        id: 20,
+        code: `g = 1
+g = g + 2
+g = g + 3
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "int",
+        value: "6",
+        explanation: "Sequential reassignment: g starts at 1, becomes 3 (1+2), then becomes 6 (3+3)."
+      },
+      {
+        id: 21,
+        code: `x = 5
+y = 10
+x = y
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "10",
+        explanation: "Reassignment from another variable: x receives the current value of y, which is 10."
+      },
+      {
+        id: 22,
+        code: `a = 4
+b = 7
+a = a * 2 + b
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "15",
+        explanation: "Reassignment expression: a starts at 4. We evaluate 4 * 2 + 7 = 15 and store 15 in a."
+      },
+      {
+        id: 23,
+        code: `x = 7
+y = 3
+x = x + y
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "10",
+        explanation: "Accumulating another variable: x starts at 7, 7 + 3 = 10 is stored back in x."
+      },
+      {
+        id: 24,
+        code: `p = 4
+q = p
+p = 9
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "4",
+        explanation: "Value copy: q was assigned the value of p (4). Later reassigning p to 9 does NOT alter q! q remains 4."
+      },
+      {
+        id: 25,
+        code: `x = 10
+y = x
+y = y + 5
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "10",
+        explanation: "Independent variables: y received 10 and was incremented to 15, but x was never modified and stays 10."
+      },
+      {
+        id: 26,
+        code: `z = 5
+z = str(z)
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "str",
+        value: "5",
+        explanation: "Type-changing reassignment: z was integer 5, and str(5) transforms z into string '5'."
+      },
+      {
+        id: 27,
+        code: `a = '42'
+a = int(a)
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "42",
+        explanation: "Type-changing reassignment: a held string '42', int('42') parses it to integer 42."
+      },
+      {
+        id: 28,
+        code: `b = 10
+b = b / 2
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "float",
+        value: "5.0",
+        explanation: "Important Python rule: division '/' produces float 5.0, so b is now float 5.0!"
+      },
+      {
+        id: 29,
+        code: `c = 'ha'
+c = c * 3
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "hahaha",
+        explanation: "String repetition reassignment: c ('ha') repeated 3 times becomes 'hahaha'."
+      },
+      {
+        id: 30,
+        code: `d = True
+d = not d
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "bool",
+        value: "False",
+        explanation: "Boolean toggle: not True inverts d to False."
+      },
+      {
+        id: 31,
+        code: `n = 'hello'
+n = n + '!'
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "str",
+        value: "hello!",
+        explanation: "String accumulation: 'hello' concatenated with '!' becomes 'hello!'."
+      },
+      {
+        id: 32,
+        code: `m = 20
+m = float(m)
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "float",
+        value: "20.0",
+        explanation: "Float cast reassignment: float(20) stores 20.0 in m."
+      },
+      {
+        id: 33,
+        code: `k = 17
+k = k // 5
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "int",
+        value: "3",
+        explanation: "Floor division reassignment: 17 // 5 evaluates to 3, stored in k."
+      },
+      {
+        id: 34,
+        code: `p = 10
+p = p % 4
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "int",
+        value: "2",
+        explanation: "Modulo reassignment: 10 % 4 leaves remainder 2, stored in p."
+      },
+      {
+        id: 35,
+        code: `q = 8
+q = q / 4
+q = int(q)
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "2",
+        explanation: "Sequential transformations: 8 / 4 = 2.0 (float), then int(2.0) converts it to integer 2."
+      },
+      {
+        id: 36,
+        code: `r = 100
+r = r - 25
+r = r - 15
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "60",
+        explanation: "Sequential decrements: 100 - 25 = 75, then 75 - 15 = 60."
+      },
+      {
+        id: 37,
+        code: `s = 'code'
+s = s + s
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "str",
+        value: "codecode",
+        explanation: "Self-concatenation: 'code' + 'code' becomes 'codecode'."
+      },
+      {
+        id: 38,
+        code: `t = 4 / 2
+# In Python, what gets stored in t?`,
+        targetVar: "t",
+        type: "float",
+        value: "2.0",
+        explanation: "Crucial Python rule: Standard division '/' ALWAYS returns a float, so 4 / 2 produces 2.0 (not 2)."
+      },
+      {
+        id: 39,
+        code: `w = 10 / 4
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "float",
+        value: "2.5",
+        explanation: "10 / 4 evaluates to floating point 2.5."
+      },
+      {
+        id: 40,
+        code: `v = 1 / 2
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "float",
+        value: "0.5",
+        explanation: "1 / 2 produces float 0.5."
+      },
+      {
+        id: 41,
+        code: `h = 3 / 2
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "float",
+        value: "1.5",
+        explanation: "3 / 2 evaluates to float 1.5."
+      },
+      {
+        id: 42,
+        code: `u = 0 / 5
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "float",
+        value: "0.0",
+        explanation: "0 divided by 5 yields float 0.0."
+      },
+      {
+        id: 43,
+        code: `g = 10 / 5
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "float",
+        value: "2.0",
+        explanation: "10 / 5 yields float 2.0."
+      },
+      {
+        id: 44,
+        code: `e = 7 / 1
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "float",
+        value: "7.0",
+        explanation: "Dividing by 1 using '/' still yields float 7.0."
+      },
+      {
+        id: 45,
+        code: `f = 100 / 10
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "float",
+        value: "10.0",
+        explanation: "100 / 10 yields float 10.0."
+      },
+      {
+        id: 46,
+        code: `j = 6 / 3
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "float",
+        value: "2.0",
+        explanation: "6 / 3 yields float 2.0."
+      },
+      {
+        id: 47,
+        code: `x = 9 / 2
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "float",
+        value: "4.5",
+        explanation: "9 / 2 yields float 4.5."
+      },
+      {
+        id: 48,
+        code: `y = 20 / 4
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "float",
+        value: "5.0",
+        explanation: "20 / 4 yields float 5.0."
+      },
+      {
+        id: 49,
+        code: `z = 1 / 4
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "float",
+        value: "0.25",
+        explanation: "1 / 4 yields float 0.25."
+      },
+      {
+        id: 50,
+        code: `a = 5 // 2
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "2",
+        explanation: "Double slash '//' is floor division: 5 // 2 discards remainder and returns integer 2."
+      },
+      {
+        id: 51,
+        code: `b = 9 // 4
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "2",
+        explanation: "Floor division 9 // 4 = 2 (int)."
+      },
+      {
+        id: 52,
+        code: `c = 7 // 2
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "3",
+        explanation: "Floor division 7 // 2 = 3 (int)."
+      },
+      {
+        id: 53,
+        code: `d = 8 // 3
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "int",
+        value: "2",
+        explanation: "8 // 3 floors 2.666... to integer 2."
+      },
+      {
+        id: 54,
+        code: `n = 10 // 3
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "int",
+        value: "3",
+        explanation: "10 // 3 floors 3.333... to integer 3."
+      },
+      {
+        id: 55,
+        code: `m = 4 // 2
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "int",
+        value: "2",
+        explanation: "4 // 2 produces integer 2 (unlike 4 / 2 which produces 2.0)."
+      },
+      {
+        id: 56,
+        code: `k = 1 // 2
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "int",
+        value: "0",
+        explanation: "1 // 2 rounds down to integer 0."
+      },
+      {
+        id: 57,
+        code: `p = 0 // 4
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "int",
+        value: "0",
+        explanation: "0 // 4 = integer 0."
+      },
+      {
+        id: 58,
+        code: `q = 15 // 4
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "3",
+        explanation: "Floor division 15 // 4 = 3 (int)."
+      },
+      {
+        id: 59,
+        code: `r = -7 // 2
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "-4",
+        explanation: "Python floor division rounds DOWN towards -infinity. -7 / 2 = -3.5, which floors to -4 (not -3!)."
+      },
+      {
+        id: 60,
+        code: `s = 7 // -2
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "int",
+        value: "-4",
+        explanation: "7 / -2 = -3.5. Rounding down towards negative infinity gives integer -4."
+      },
+      {
+        id: 61,
+        code: `t = -7 // -2
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "int",
+        value: "3",
+        explanation: "Both negative: -7 / -2 = 3.5. Rounding down gives integer 3."
+      },
+      {
+        id: 62,
+        code: `w = -10 // 3
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "int",
+        value: "-4",
+        explanation: "-10 / 3 = -3.333... Rounding down towards negative infinity yields -4."
+      },
+      {
+        id: 63,
+        code: `v = 10 // -3
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "int",
+        value: "-4",
+        explanation: "10 / -3 = -3.333... Rounding down towards negative infinity yields -4."
+      },
+      {
+        id: 64,
+        code: `h = -1 // 2
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "int",
+        value: "-1",
+        explanation: "A classic gotcha! -1 / 2 = -0.5. Rounding down towards -infinity gives integer -1."
+      },
+      {
+        id: 65,
+        code: `u = 1 // -2
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "int",
+        value: "-1",
+        explanation: "1 / -2 = -0.5. Rounding down towards negative infinity gives integer -1."
+      },
+      {
+        id: 66,
+        code: `g = -5 // 2
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "int",
+        value: "-3",
+        explanation: "-5 / 2 = -2.5. Rounding down towards -infinity gives integer -3."
+      },
+      {
+        id: 67,
+        code: `e = 5 // -2
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "int",
+        value: "-3",
+        explanation: "5 / -2 = -2.5. Rounding down towards -infinity gives integer -3."
+      },
+      {
+        id: 68,
+        code: `f = -9 // 4
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "int",
+        value: "-3",
+        explanation: "-9 / 4 = -2.25. Rounding down towards -infinity yields -3."
+      },
+      {
+        id: 69,
+        code: `j = -8 // 3
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "int",
+        value: "-3",
+        explanation: "-8 / 3 = -2.666... Rounding down towards -infinity yields -3."
+      },
+      {
+        id: 70,
+        code: `x = -6 // 2
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "-3",
+        explanation: "Divides evenly: -6 / 2 = -3.0 exact, so the floored integer is -3."
+      },
+      {
+        id: 71,
+        code: `y = -12 // -4
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "int",
+        value: "3",
+        explanation: "Divides evenly: -12 / -4 = 3.0 exact, so the floored integer is 3."
+      },
+      {
+        id: 72,
+        code: `z = -15 // 4
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "int",
+        value: "-4",
+        explanation: "-15 / 4 = -3.75. Rounding down towards -infinity yields -4."
+      },
+      {
+        id: 73,
+        code: `a = -20 // 6
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "-4",
+        explanation: "-20 / 6 = -3.333... Rounding down towards -infinity yields -4."
+      },
+      {
+        id: 74,
+        code: `b = -7.0 // 2
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "float",
+        value: "-4.0",
+        explanation: "Operand -7.0 is a float, so result is floored towards -infinity as a float: -4.0."
+      },
+      {
+        id: 75,
+        code: `c = 10 % 3
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "1",
+        explanation: "Modulo '%' yields the remainder: 10 divided by 3 is 3 with remainder 1."
+      },
+      {
+        id: 76,
+        code: `d = 14 % 5
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "int",
+        value: "4",
+        explanation: "14 % 5 leaves remainder 4."
+      },
+      {
+        id: 77,
+        code: `n = 8 % 2
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "int",
+        value: "0",
+        explanation: "8 divides evenly by 2, leaving remainder 0."
+      },
+      {
+        id: 78,
+        code: `m = 7 % 4
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "int",
+        value: "3",
+        explanation: "7 % 4 leaves remainder 3."
+      },
+      {
+        id: 79,
+        code: `k = 15 % 4
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "int",
+        value: "3",
+        explanation: "15 % 4 leaves remainder 3."
+      },
+      {
+        id: 80,
+        code: `p = 20 % 6
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "int",
+        value: "2",
+        explanation: "20 % 6 leaves remainder 2."
+      },
+      {
+        id: 81,
+        code: `q = 5 % 10
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "5",
+        explanation: "When numerator is smaller than denominator (5 < 10), the remainder is 5."
+      },
+      {
+        id: 82,
+        code: `r = 3 % 8
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "3",
+        explanation: "3 % 8 = 3 because 8 goes into 3 zero times with 3 remaining."
+      },
+      {
+        id: 83,
+        code: `s = 12 % 12
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "int",
+        value: "0",
+        explanation: "12 divided by 12 divides evenly: remainder 0."
+      },
+      {
+        id: 84,
+        code: `t = 25 % 7
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "int",
+        value: "4",
+        explanation: "25 % 7 leaves remainder 4 (since 7 * 3 = 21, 25 - 21 = 4)."
+      },
+      {
+        id: 85,
+        code: `w = 9 % 5
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "int",
+        value: "4",
+        explanation: "9 % 5 = 4."
+      },
+      {
+        id: 86,
+        code: `v = -7 % 3
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "int",
+        value: "2",
+        explanation: "Python floor modulo rule: -7 // 3 = -3. Then -7 - (3 * -3) = -7 - (-9) = 2 (int)."
+      },
+      {
+        id: 87,
+        code: `h = 7 % -3
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "int",
+        value: "-2",
+        explanation: "Python modulo rule: 7 // -3 = -3. Then 7 - (-3 * -3) = 7 - 9 = -2 (int)."
+      },
+      {
+        id: 88,
+        code: `u = 11 % 2
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "int",
+        value: "1",
+        explanation: "Odd numbers modulo 2 always equal 1."
+      },
+      {
+        id: 89,
+        code: `g = 0 % 7
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "int",
+        value: "0",
+        explanation: "0 % 7 leaves remainder 0."
+      },
+      {
+        id: 90,
+        code: `e = 3 ** 2
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "int",
+        value: "9",
+        explanation: "'**' is the exponentiation operator: 3 squared is 9."
+      },
+      {
+        id: 91,
+        code: `f = 2 ** 3
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "int",
+        value: "8",
+        explanation: "2 raised to the 3rd power (2 * 2 * 2) is 8."
+      },
+      {
+        id: 92,
+        code: `j = 5 ** 2
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "int",
+        value: "25",
+        explanation: "5 ** 2 = 25."
+      },
+      {
+        id: 93,
+        code: `x = 4 ** 2
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "16",
+        explanation: "4 ** 2 = 16."
+      },
+      {
+        id: 94,
+        code: `y = 2 ** 4
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "int",
+        value: "16",
+        explanation: "2 ** 4 = 16."
+      },
+      {
+        id: 95,
+        code: `z = 10 ** 3
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "int",
+        value: "1000",
+        explanation: "10 ** 3 = 1000."
+      },
+      {
+        id: 96,
+        code: `a = 4 ** 0
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "1",
+        explanation: "Any non-zero number raised to the 0th power equals integer 1."
+      },
+      {
+        id: 97,
+        code: `b = 7 ** 1
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "7",
+        explanation: "7 ** 1 = 7."
+      },
+      {
+        id: 98,
+        code: `c = 0 ** 5
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "0",
+        explanation: "0 raised to positive power is 0."
+      },
+      {
+        id: 99,
+        code: `d = 4 ** 0.5
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "float",
+        value: "2.0",
+        explanation: "Exponent 0.5 computes square root of 4, producing float 2.0."
+      },
+      {
+        id: 100,
+        code: `n = 9 ** 0.5
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "float",
+        value: "3.0",
+        explanation: "Square root via ** 0.5 produces float 3.0."
+      },
+      {
+        id: 101,
+        code: `m = 16 ** 0.5
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "float",
+        value: "4.0",
+        explanation: "16 ** 0.5 produces float 4.0."
+      },
+      {
+        id: 102,
+        code: `k = 2 ** -1
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "float",
+        value: "0.5",
+        explanation: "2 ** -1 = 1 / 2 = 0.5 (float)."
+      },
+      {
+        id: 103,
+        code: `p = 4 ** -1
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "float",
+        value: "0.25",
+        explanation: "4 ** -1 = 1 / 4 = 0.25 (float)."
+      },
+      {
+        id: 104,
+        code: `q = 10 ** -2
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "float",
+        value: "0.01",
+        explanation: "10 ** -2 = 0.01 (float)."
+      },
+      {
+        id: 105,
+        code: `r = int('10')
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "10",
+        explanation: "int('10') successfully parses string '10' into integer 10."
+      },
+      {
+        id: 106,
+        code: `s = int('42')
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "int",
+        value: "42",
+        explanation: "int('42') converts string '42' into integer 42."
+      },
+      {
+        id: 107,
+        code: `t = int('0')
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "int",
+        value: "0",
+        explanation: "int('0') converts string '0' into integer 0."
+      },
+      {
+        id: 108,
+        code: `w = int('-15')
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "int",
+        value: "-15",
+        explanation: "int('-15') converts negative string into integer -15."
+      },
+      {
+        id: 109,
+        code: `v = int(7.99)
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "int",
+        value: "7",
+        explanation: "int() truncates floating-point numbers towards zero, dropping .99 to produce integer 7."
+      },
+      {
+        id: 110,
+        code: `h = int(-3.8)
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "int",
+        value: "-3",
+        explanation: "int(-3.8) truncates towards zero to produce integer -3."
+      },
+      {
+        id: 111,
+        code: `u = int(12.0)
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "int",
+        value: "12",
+        explanation: "int(12.0) converts float 12.0 to integer 12."
+      },
+      {
+        id: 112,
+        code: `g = int(0.999)
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "int",
+        value: "0",
+        explanation: "int(0.999) truncates to integer 0."
+      },
+      {
+        id: 113,
+        code: `e = int(True)
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "int",
+        value: "1",
+        explanation: "In Python, True converts to integer 1."
+      },
+      {
+        id: 114,
+        code: `f = int(False)
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "int",
+        value: "0",
+        explanation: "In Python, False converts to integer 0."
+      },
+      {
+        id: 115,
+        code: `j = float(5)
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "float",
+        value: "5.0",
+        explanation: "float(5) converts integer 5 to floating-point 5.0."
+      },
+      {
+        id: 116,
+        code: `x = float('19.99')
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "float",
+        value: "19.99",
+        explanation: "float('19.99') parses string into float 19.99."
+      },
+      {
+        id: 117,
+        code: `y = float('0')
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "float",
+        value: "0.0",
+        explanation: "float('0') converts string '0' into float 0.0."
+      },
+      {
+        id: 118,
+        code: `z = float('-4.5')
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "float",
+        value: "-4.5",
+        explanation: "float('-4.5') converts string into float -4.5."
+      },
+      {
+        id: 119,
+        code: `a = float('7')
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "float",
+        value: "7.0",
+        explanation: "float('7') converts string '7' into float 7.0."
+      },
+      {
+        id: 120,
+        code: `b = float(True)
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "float",
+        value: "1.0",
+        explanation: "float(True) converts to float 1.0."
+      },
+      {
+        id: 121,
+        code: `c = float(False)
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "float",
+        value: "0.0",
+        explanation: "float(False) converts to float 0.0."
+      },
+      {
+        id: 122,
+        code: `d = str(3.14)
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "str",
+        value: "3.14",
+        explanation: "str(3.14) converts float 3.14 into string '3.14'."
+      },
+      {
+        id: 123,
+        code: `n = str(100)
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "str",
+        value: "100",
+        explanation: "str(100) converts integer 100 into string '100'."
+      },
+      {
+        id: 124,
+        code: `m = str(True)
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "str",
+        value: "True",
+        explanation: "str(True) produces the exact string 'True'."
+      },
+      {
+        id: 125,
+        code: `k = str(False)
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "str",
+        value: "False",
+        explanation: "str(False) produces string 'False'."
+      },
+      {
+        id: 126,
+        code: `p = str(0)
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "str",
+        value: "0",
+        explanation: "str(0) produces string '0'."
+      },
+      {
+        id: 127,
+        code: `q = str(5.0)
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "str",
+        value: "5.0",
+        explanation: "str(5.0) produces string '5.0'."
+      },
+      {
+        id: 128,
+        code: `r = str(4 / 2)
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "str",
+        value: "2.0",
+        explanation: "4 / 2 evaluates to float 2.0, so str(2.0) produces string '2.0'."
+      },
+      {
+        id: 129,
+        code: `s = str(int('25'))
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "str",
+        value: "25",
+        explanation: "int('25') gives 25, then str(25) gives string '25'."
+      },
+      {
+        id: 130,
+        code: `t = 'Python' + '3'
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "str",
+        value: "Python3",
+        explanation: "String concatenation combines 'Python' and '3' into 'Python3'."
+      },
+      {
+        id: 131,
+        code: `w = 'ha' * 3
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "str",
+        value: "hahaha",
+        explanation: "String multiplication repeats 'ha' three times: 'hahaha'."
+      },
+      {
+        id: 132,
+        code: `v = '-' * 4
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "str",
+        value: "----",
+        explanation: "'-' * 4 repeats '-' 4 times: '----'."
+      },
+      {
+        id: 133,
+        code: `h = 'cat' + 'dog'
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "str",
+        value: "catdog",
+        explanation: "String concatenation: 'catdog'."
+      },
+      {
+        id: 134,
+        code: `u = 'A' * 5
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "str",
+        value: "AAAAA",
+        explanation: "String repetition: 'AAAAA'."
+      },
+      {
+        id: 135,
+        code: `g = str(5) + str(5)
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "str",
+        value: "55",
+        explanation: "Adding strings '5' + '5' concatenates to '55' (not arithmetic 10!)."
+      },
+      {
+        id: 136,
+        code: `e = '1' + '2' + '3'
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "str",
+        value: "123",
+        explanation: "Concatenates strings into '123'."
+      },
+      {
+        id: 137,
+        code: `f = 'Hi' * 2
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "str",
+        value: "HiHi",
+        explanation: "Repeats 'Hi' twice: 'HiHi'."
+      },
+      {
+        id: 138,
+        code: `j = "snow"
+j = j + "man"
+j = j + "!"
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "str",
+        value: "snowman!",
+        explanation: "Multi-step string accumulation: \"snow\" + \"man\" = \"snowman\", then \"snowman\" + \"!\" = \"snowman!\"."
+      },
+      {
+        id: 139,
+        code: `x = "=*" * 3
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "str",
+        value: "=*=*=*",
+        explanation: "String multiplication: \"=*\" repeated 3 times produces \"=*=*=*\"."
+      },
+      {
+        id: 140,
+        code: `y = 12
+y = y + 8
+y = y // 5
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "int",
+        value: "4",
+        explanation: "12 + 8 = 20, then 20 // 5 = 4."
+      },
+      {
+        id: 141,
+        code: `a = "v"
+b = a + str(1) + "." + str(0)
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "v1.0",
+        explanation: "Concatenating strings and string-converted numbers: \"v\" + \"1\" + \".\" + \"0\" = \"v1.0\"."
+      },
+      {
+        id: 142,
+        code: `a = 'a' + 'b' * 2
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "str",
+        value: "abb",
+        explanation: "Repetition '*' has higher precedence than '+': 'b'*2 = 'bb', then 'a' + 'bb' = 'abb'."
+      },
+      {
+        id: 143,
+        code: `b = ('a' + 'b') * 2
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "abab",
+        explanation: "Parentheses first: 'ab' * 2 = 'abab'."
+      },
+      {
+        id: 144,
+        code: `c = 'xyz' * 0
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "",
+        explanation: "Multiplying a string by 0 produces an empty string ''."
+      },
+      {
+        id: 145,
+        code: `d = bool(0)
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "bool",
+        value: "False",
+        explanation: "In Python, numeric 0 evaluates to boolean False."
+      },
+      {
+        id: 146,
+        code: `n = bool(1)
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "bool",
+        value: "True",
+        explanation: "Numeric 1 evaluates to boolean True."
+      },
+      {
+        id: 147,
+        code: `m = bool(-5)
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "bool",
+        value: "True",
+        explanation: "Any non-zero integer (even negative ones like -5) evaluates to True in Python."
+      },
+      {
+        id: 148,
+        code: `k = bool('')
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "bool",
+        value: "False",
+        explanation: "An empty string '' has zero length, which evaluates to boolean False."
+      },
+      {
+        id: 149,
+        code: `p = bool(' ')
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "bool",
+        value: "True",
+        explanation: "A string with a space ' ' is NOT empty (length 1), so it evaluates to True!"
+      },
+      {
+        id: 150,
+        code: `q = bool('False')
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "bool",
+        value: "True",
+        explanation: "Tricky Python gotcha! The string 'False' is non-empty, so bool('False') evaluates to True!"
+      },
+      {
+        id: 151,
+        code: `r = bool('0')
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "bool",
+        value: "True",
+        explanation: "The string '0' is non-empty, so bool('0') evaluates to True!"
+      },
+      {
+        id: 152,
+        code: `s = bool(0.0)
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "bool",
+        value: "False",
+        explanation: "Float 0.0 evaluates to boolean False."
+      },
+      {
+        id: 153,
+        code: `t = bool(0.001)
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "bool",
+        value: "True",
+        explanation: "Any non-zero float evaluates to boolean True."
+      },
+      {
+        id: 154,
+        code: `w = bool(100)
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "bool",
+        value: "True",
+        explanation: "Non-zero integer 100 evaluates to boolean True."
+      },
+      {
+        id: 155,
+        code: `v = bool(None)
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "bool",
+        value: "False",
+        explanation: "None evaluates to boolean False."
+      },
+      {
+        id: 156,
+        code: `h = not True
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "bool",
+        value: "False",
+        explanation: "Logical NOT inverts True to False."
+      },
+      {
+        id: 157,
+        code: `u = not False
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "bool",
+        value: "True",
+        explanation: "Logical NOT inverts False to True."
+      },
+      {
+        id: 158,
+        code: `g = not 0
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "bool",
+        value: "True",
+        explanation: "0 is falsy, so 'not 0' evaluates to boolean True."
+      },
+      {
+        id: 159,
+        code: `e = not 1
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "bool",
+        value: "False",
+        explanation: "1 is truthy, so 'not 1' evaluates to boolean False."
+      },
+      {
+        id: 160,
+        code: `f = 10 + 2.5
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "float",
+        value: "12.5",
+        explanation: "Adding an integer (10) and a float (2.5) promotes the result to float 12.5."
+      },
+      {
+        id: 161,
+        code: `j = 4 * 1.5
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "float",
+        value: "6.0",
+        explanation: "4 * 1.5 promotes to float 6.0."
+      },
+      {
+        id: 162,
+        code: `x = 15 - 5.0
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "float",
+        value: "10.0",
+        explanation: "15 - 5.0 promotes to float 10.0."
+      },
+      {
+        id: 163,
+        code: `y = 2.0 * 3
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "float",
+        value: "6.0",
+        explanation: "2.0 * 3 promotes to float 6.0."
+      },
+      {
+        id: 164,
+        code: `z = 10 // 3.0
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "float",
+        value: "3.0",
+        explanation: "Floor division with a float operand produces float 3.0."
+      },
+      {
+        id: 165,
+        code: `a = 5.0 + 5.0
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "float",
+        value: "10.0",
+        explanation: "5.0 + 5.0 evaluates to float 10.0."
+      },
+      {
+        id: 166,
+        code: `b = 0 * 3.14
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "float",
+        value: "0.0",
+        explanation: "0 * 3.14 promotes to float 0.0."
+      },
+      {
+        id: 167,
+        code: `c = int(14 / 3)
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "4",
+        explanation: "14 / 3 = 4.666..., then int() truncates to integer 4."
+      },
+      {
+        id: 168,
+        code: `d = float(10 // 4)
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "float",
+        value: "2.0",
+        explanation: "10 // 4 = 2, then float(2) gives float 2.0."
+      },
+      {
+        id: 169,
+        code: `n = int('10') + 5
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "int",
+        value: "15",
+        explanation: "int('10') gives 10, then 10 + 5 = 15 (int)."
+      },
+      {
+        id: 170,
+        code: `m = float('2.5') * 2
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "float",
+        value: "5.0",
+        explanation: "float('2.5') gives 2.5, then 2.5 * 2 = 5.0 (float)."
+      },
+      {
+        id: 171,
+        code: `k = len('Python')
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "int",
+        value: "6",
+        explanation: "len('Python') returns the character count as integer 6."
+      },
+      {
+        id: 172,
+        code: `p = len('')
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "int",
+        value: "0",
+        explanation: "len('') of an empty string is integer 0."
+      },
+      {
+        id: 173,
+        code: `q = len('a b c')
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "5",
+        explanation: "len('a b c') counts spaces too: 5 characters (int)."
+      },
+      {
+        id: 174,
+        code: `r = len('123')
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "3",
+        explanation: "len('123') returns integer 3."
+      },
+      {
+        id: 175,
+        code: `s = int('apple')
+# What happens here?`,
+        targetVar: "s",
+        type: "Error",
+        value: "",
+        explanation: "int('apple') throws a ValueError! Alphabetical strings cannot be converted into base-10 integers."
+      },
+      {
+        id: 176,
+        code: `t = float('pizza')
+# What happens here?`,
+        targetVar: "t",
+        type: "Error",
+        value: "",
+        explanation: "float('pizza') raises ValueError: could not convert string to float."
+      },
+      {
+        id: 177,
+        code: `w = int('3.14')
+# What happens here?`,
+        targetVar: "w",
+        type: "Error",
+        value: "",
+        explanation: "Famous Python gotcha! int() on a string containing a decimal raises ValueError! (You would need int(float('3.14')))."
+      },
+      {
+        id: 178,
+        code: `v = int('12a')
+# What happens here?`,
+        targetVar: "v",
+        type: "Error",
+        value: "",
+        explanation: "int('12a') raises ValueError because 'a' is not a valid base-10 digit."
+      },
+      {
+        id: 179,
+        code: `h = float('abc')
+# What happens here?`,
+        targetVar: "h",
+        type: "Error",
+        value: "",
+        explanation: "float('abc') raises ValueError because 'abc' cannot be parsed as a float."
+      },
+      {
+        id: 180,
+        code: `u = int('')
+# What happens here?`,
+        targetVar: "u",
+        type: "Error",
+        value: "",
+        explanation: "int('') raises ValueError: invalid literal for int() with base 10: ''."
+      },
+      {
+        id: 181,
+        code: `g = float('')
+# What happens here?`,
+        targetVar: "g",
+        type: "Error",
+        value: "",
+        explanation: "float('') raises ValueError: could not convert string to float: ''."
+      },
+      {
+        id: 182,
+        code: `e = int('10 20')
+# What happens here?`,
+        targetVar: "e",
+        type: "Error",
+        value: "",
+        explanation: "int('10 20') raises ValueError due to the embedded space separating two tokens."
+      },
+      {
+        id: 183,
+        code: `f = int('one')
+# What happens here?`,
+        targetVar: "f",
+        type: "Error",
+        value: "",
+        explanation: "int('one') raises ValueError: English word numbers are not valid numeric literals."
+      },
+      {
+        id: 184,
+        code: `j = float('1,000')
+# What happens here?`,
+        targetVar: "j",
+        type: "Error",
+        value: "",
+        explanation: "float('1,000') raises ValueError because comma grouping is not permitted in raw string float casts."
+      },
+      {
+        id: 185,
+        code: `x = int('hello')
+# What happens here?`,
+        targetVar: "x",
+        type: "Error",
+        value: "",
+        explanation: "int('hello') raises ValueError: invalid literal for int() with base 10: 'hello'."
+      },
+      {
+        id: 186,
+        code: `y = float('xyz')
+# What happens here?`,
+        targetVar: "y",
+        type: "Error",
+        value: "",
+        explanation: "float('xyz') raises ValueError: could not convert string to float: 'xyz'."
+      },
+      {
+        id: 187,
+        code: `z = 25 - 4 * 3
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "int",
+        value: "13",
+        explanation: "Operator precedence: multiplication 4 * 3 = 12 is calculated first, then 25 - 12 = 13."
+      },
+      {
+        id: 188,
+        code: `a = 2
+a = a + 3 * 4
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "14",
+        explanation: "Multiplication first: 3 * 4 = 12, then 2 + 12 = 14 assigned back to a."
+      },
+      {
+        id: 189,
+        code: `b = 5
+b = b * 2
+b = b - 3
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "7",
+        explanation: "Sequential variable mutation: b becomes 10 (5 * 2), then 7 (10 - 3)."
+      },
+      {
+        id: 190,
+        code: `c = 100 // (2 + 3)
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "20",
+        explanation: "Parentheses first: 2 + 3 = 5, then floor division 100 // 5 = 20."
+      },
+      {
+        id: 191,
+        code: `d = (18 - 6) // 4
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "int",
+        value: "3",
+        explanation: "Parentheses first: 18 - 6 = 12, then 12 // 4 = 3."
+      },
+      {
+        id: 192,
+        code: `n = 4
+n = n * n
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "int",
+        value: "16",
+        explanation: "Reassignment: n starts at 4, 4 * 4 = 16 is stored back in n."
+      },
+      {
+        id: 193,
+        code: `m = 'item_' + str(7)
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "str",
+        value: "item_7",
+        explanation: "Concatenation with string cast: str(7) gives '7', then 'item_' + '7' = 'item_7'."
+      },
+      {
+        id: 194,
+        code: `k = 'go! ' * 3
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "str",
+        value: "go! go! go! ",
+        explanation: "String repetition: 'go! ' repeated 3 times is 'go! go! go! '."
+      },
+      {
+        id: 195,
+        code: `a = 7
+b = 3
+a = a - b
+b = b + a
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "7",
+        explanation: "a becomes 7 - 3 = 4. Then b becomes 3 + 4 = 7."
+      },
+      {
+        id: 196,
+        code: `q = -13 // 3
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "-5",
+        explanation: "Negative floor division: -13 / 3 = -4.333..., rounding down towards negative infinity yields -5."
+      },
+      {
+        id: 197,
+        code: `r = bool(-1)
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "bool",
+        value: "True",
+        explanation: "In Python, any non-zero integer (including negative numbers like -1) is truthy (True)."
+      },
+      {
+        id: 198,
+        code: `s = bool(-0.5)
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "bool",
+        value: "True",
+        explanation: "Any non-zero float evaluates to boolean True."
+      },
+      {
+        id: 199,
+        code: `t = int(19 / 2)
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "int",
+        value: "9",
+        explanation: "19 / 2 = 9.5 (float), then int(9.5) truncates towards zero to integer 9."
+      },
+      {
+        id: 200,
+        code: `w = '=' * 6
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "str",
+        value: "======",
+        explanation: "String repetition: '=' repeated 6 times yields '======.'"
+      },
+      {
+        id: 201,
+        code: `v = str(int(3.7))
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "str",
+        value: "3",
+        explanation: "int(3.7) truncates to 3, then str(3) produces string '3'."
+      },
+      {
+        id: 202,
+        code: `a = 10
+b = 20
+c = a
+a = b
+b = c
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "20",
+        explanation: "Variable swapping: c saves 10, then a receives the value of b (20)."
+      },
+      {
+        id: 203,
+        code: `a = 10
+b = 20
+c = a
+a = b
+b = c
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "10",
+        explanation: "Variable swapping: b receives the value of c (which saved the original value of a, 10)."
+      },
+      {
+        id: 204,
+        code: `g = 100
+g = 50
+g = g + 25
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "int",
+        value: "75",
+        explanation: "Value replacement: g was 100, replaced by 50, then 50 + 25 = 75 is stored in g."
+      },
+      {
+        id: 205,
+        code: `e = 0
+e = e + 10
+e = e + 20
+e = e - 5
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "int",
+        value: "25",
+        explanation: "Multi-step accumulator: e goes 0 -> 10 -> 30 -> 25."
+      },
+      {
+        id: 206,
+        code: `f = 1
+f = f * 2
+f = f * 2
+f = f * 2
+# What gets stored in f?`,
+        targetVar: "f",
+        type: "int",
+        value: "8",
+        explanation: "Sequential doubling: 1 * 2 = 2, then 4, then 8."
+      },
+      {
+        id: 207,
+        code: `j = 20
+j = j // 2
+j = j // 2
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "int",
+        value: "5",
+        explanation: "Sequential floor division: 20 // 2 = 10, then 10 // 2 = 5."
+      },
+      {
+        id: 208,
+        code: `x = 4
+y = 3
+x = x * y
+y = x + y
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "int",
+        value: "15",
+        explanation: "Multi-step dependencies: x becomes 12 (4 * 3). Then y becomes 12 + 3 = 15."
+      },
+      {
+        id: 209,
+        code: `p = 5
+q = 2
+p = p + q
+q = p * q
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "int",
+        value: "14",
+        explanation: "Sequential update: p becomes 7 (5 + 2). Then q becomes 7 * 2 = 14."
+      },
+      {
+        id: 210,
+        code: `z = 50
+z = z - 10
+z = z // 4
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "int",
+        value: "10",
+        explanation: "Sequential operations: 50 - 10 = 40, then 40 // 4 = 10."
+      },
+      {
+        id: 211,
+        code: `a = 15
+a = a % 4
+a = a + 10
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "int",
+        value: "13",
+        explanation: "Modulo then addition: 15 % 4 = 3, then 3 + 10 = 13."
+      },
+      {
+        id: 212,
+        code: `a = 6
+b = a
+a = 20
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "int",
+        value: "6",
+        explanation: "Value copy vs replacement: b was assigned a value of 6. Reassigning a to 20 does not affect b! b remains 6."
+      },
+      {
+        id: 213,
+        code: `c = 3
+c = c ** 2
+c = c + 1
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "10",
+        explanation: "Exponent reassignment: 3 ** 2 = 9, then 9 + 1 = 10."
+      },
+      {
+        id: 214,
+        code: `d = 100
+d = d - 30
+d = d + 15
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "int",
+        value: "85",
+        explanation: "Running d: 100 - 30 = 70, then 70 + 15 = 85."
+      },
+      {
+        id: 215,
+        code: `n = 8
+n = n * 3
+n = n - 4
+n = n // 2
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "int",
+        value: "10",
+        explanation: "Multi-n math: 8 * 3 = 24 -> 24 - 4 = 20 -> 20 // 2 = 10."
+      },
+      {
+        id: 216,
+        code: `x = 2
+y = 5
+z = x + y
+x = z * 2
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "int",
+        value: "14",
+        explanation: "Multi-variable chain: z = 2 + 5 = 7, then x = 7 * 2 = 14."
+      },
+      {
+        id: 217,
+        code: `k = 64
+k = k // 2
+k = k // 2
+k = k // 2
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "int",
+        value: "8",
+        explanation: "Repeated halving: 64 -> 32 -> 16 -> 8."
+      },
+      {
+        id: 218,
+        code: `p = 2
+p = p + p
+p = p + p
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "int",
+        value: "8",
+        explanation: "Self-doubling: 2 + 2 = 4, then 4 + 4 = 8."
+      },
+      {
+        id: 219,
+        code: `c = 10
+d = 5
+c = c - d
+d = d * 2
+c = c + d
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "int",
+        value: "15",
+        explanation: "Multi-variable steps: c becomes 5 (10 - 5), d becomes 10 (5 * 2), then c becomes 5 + 10 = 15."
+      },
+      {
+        id: 220,
+        code: `r = 7
+r = r * 2
+r = r - 4
+r = r + 1
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "int",
+        value: "11",
+        explanation: "Sequential adjustments: 7 * 2 = 14 -> 14 - 4 = 10 -> 10 + 1 = 11."
+      },
+      {
+        id: 221,
+        code: `x = 5
+y = x
+x = x + 1
+y = y - 1
+# What gets stored in y?`,
+        targetVar: "y",
+        type: "int",
+        value: "4",
+        explanation: "Independent variables: y started at 5 and is decremented by 1 to 4."
+      },
+      {
+        id: 222,
+        code: `t = 10
+t = t + 5
+t = t * 2
+# What gets stored in t?`,
+        targetVar: "t",
+        type: "int",
+        value: "30",
+        explanation: "Sequential accumulation: 10 + 5 = 15, then 15 * 2 = 30."
+      },
+      {
+        id: 223,
+        code: `w = 30
+w = w // 4
+w = w % 3
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "int",
+        value: "1",
+        explanation: "Floor div then modulo: 30 // 4 = 7, then 7 % 3 = 1."
+      },
+      {
+        id: 224,
+        code: `v = 1
+v = v + 2
+v = v + 3
+v = v + 4
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "int",
+        value: "10",
+        explanation: "Sequential sum: 1 + 2 = 3 -> 3 + 3 = 6 -> 6 + 4 = 10."
+      },
+      {
+        id: 225,
+        code: `h = 16
+h = h // 3
+h = h * 2
+# What gets stored in h?`,
+        targetVar: "h",
+        type: "int",
+        value: "10",
+        explanation: "Floor division then multiplication: 16 // 3 = 5, then 5 * 2 = 10."
+      },
+      {
+        id: 226,
+        code: `u = 100
+u = u // 10
+u = u ** 2
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "int",
+        value: "100",
+        explanation: "Floor division then exponent: 100 // 10 = 10, then 10 ** 2 = 100."
+      },
+      {
+        id: 227,
+        code: `g = "cat"
+g = g + "s"
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "str",
+        value: "cats",
+        explanation: "String accumulation: \"cat\" + \"s\" becomes \"cats\"."
+      },
+      {
+        id: 228,
+        code: `a = "Ada"
+b = "Lovelace"
+c = a + " " + b
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "Ada Lovelace",
+        explanation: "String concatenation with space: \"Ada Lovelace\"."
+      },
+      {
+        id: 229,
+        code: `a = "super"
+b = "hero"
+c = a + b
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "superhero",
+        explanation: "String concatenation: \"super\" + \"hero\" becomes \"superhero\"."
+      },
+      {
+        id: 230,
+        code: `a = "cool"
+b = "(" + a + ")"
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "(cool)",
+        explanation: "Bracket concatenation: \"<\" + \"cool\" + \">\" becomes \"<cool>\"."
+      },
+      {
+        id: 231,
+        code: `x = "alert"
+x = x + "!" * 3
+# What gets stored in x?`,
+        targetVar: "x",
+        type: "str",
+        value: "alert!!!",
+        explanation: "Repetition before concatenation: \"!\" * 3 = \"!!!\", then \"alert\" + \"!!!\" = \"alert!!!\"."
+      },
+      {
+        id: 232,
+        code: `a = "box_"
+b = 5
+c = a + str(b)
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "box_5",
+        explanation: "Concatenating string with converted integer: \"box_\" + str(5) = \"box_5\"."
+      },
+      {
+        id: 233,
+        code: `z = "hip" + " " + "hip" + " hooray!"
+# What gets stored in z?`,
+        targetVar: "z",
+        type: "str",
+        value: "hip hip hooray!",
+        explanation: "Concatenation of strings with spaces creates \"hip hip hooray!\"."
+      },
+      {
+        id: 234,
+        code: `a = "hello"
+a = a + " world"
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "str",
+        value: "hello world",
+        explanation: "String accumulation: \"hello\" + \" world\" = \"hello world\"."
+      },
+      {
+        id: 235,
+        code: `b = "Hi"
+b = b + " " + b
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "Hi Hi",
+        explanation: "String building: \"Hi\" + \" \" + \"Hi\" = \"Hi Hi\"."
+      },
+      {
+        id: 236,
+        code: `a = "na "
+b = a * 4
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "na na na na ",
+        explanation: "String multiplication: \"na \" repeated 4 times is \"na na na na \"."
+      },
+      {
+        id: 237,
+        code: `a = "CS"
+b = "101"
+c = a + "_" + b
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "CS_101",
+        explanation: "String concatenation with separator: \"CS_101\"."
+      },
+      {
+        id: 238,
+        code: `n = "*" * 5
+n = n + "!"
+# What gets stored in n?`,
+        targetVar: "n",
+        type: "str",
+        value: "*****!",
+        explanation: "String repetition and append: \"*****\" + \"!\" = \"*****!\"."
+      },
+      {
+        id: 239,
+        code: `m = 100
+m = m // 2
+m = m - 15
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "int",
+        value: "35",
+        explanation: "100 // 2 = 50, then 50 - 15 = 35."
+      },
+      {
+        id: 240,
+        code: `k = "|" + "-" * 4 + "|"
+# What gets stored in k?`,
+        targetVar: "k",
+        type: "str",
+        value: "|----|",
+        explanation: "\"-\" * 4 gives \"----\", surrounded by \"|\" gives \"|----|\"."
+      },
+      {
+        id: 241,
+        code: `p = 10.0
+p = p + 2.5
+p = p * 2
+# What gets stored in p?`,
+        targetVar: "p",
+        type: "float",
+        value: "25.0",
+        explanation: "10.0 + 2.5 = 12.5, then 12.5 * 2 = 25.0."
+      },
+      {
+        id: 242,
+        code: `q = "id_" + str(42)
+# What gets stored in q?`,
+        targetVar: "q",
+        type: "str",
+        value: "id_42",
+        explanation: "String concatenation with cast integer: \"id_\" + \"42\" = \"id_42\"."
+      },
+      {
+        id: 243,
+        code: `r = "data"
+r = r + "base"
+# What gets stored in r?`,
+        targetVar: "r",
+        type: "str",
+        value: "database",
+        explanation: "String reassignment: \"data\" + \"base\" = \"database\"."
+      },
+      {
+        id: 244,
+        code: `s = "play"
+s = s + "ground"
+# What gets stored in s?`,
+        targetVar: "s",
+        type: "str",
+        value: "playground",
+        explanation: "String reassignment: \"play\" + \"ground\" = \"playground\"."
+      },
+      {
+        id: 245,
+        code: `a = "tic"
+b = "tac"
+c = "toe"
+d = a + "-" + b + "-" + c
+# What gets stored in d?`,
+        targetVar: "d",
+        type: "str",
+        value: "tic-tac-toe",
+        explanation: "Multi-variable concatenation: \"tic-tac-toe\"."
+      },
+      {
+        id: 246,
+        code: `w = "ab"
+w = w * 2
+w = w + "c"
+# What gets stored in w?`,
+        targetVar: "w",
+        type: "str",
+        value: "ababc",
+        explanation: "Multi-step string operations: \"ab\" * 2 = \"abab\", then + \"c\" = \"ababc\"."
+      },
+      {
+        id: 247,
+        code: `v = "moon"
+v = v + "light"
+# What gets stored in v?`,
+        targetVar: "v",
+        type: "str",
+        value: "moonlight",
+        explanation: "String accumulation: \"moon\" + \"light\" = \"moonlight\"."
+      },
+      {
+        id: 248,
+        code: `a = "sun"
+b = "shine"
+c = a + b
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "sunshine",
+        explanation: "String concatenation: \"sunshine\"."
+      },
+      {
+        id: 249,
+        code: `u = "X" + str(10 // 2) + "Y"
+# What gets stored in u?`,
+        targetVar: "u",
+        type: "str",
+        value: "X5Y",
+        explanation: "10 // 2 = 5, str(5) = \"5\", resulting in \"X5Y\"."
+      },
+      {
+        id: 250,
+        code: `g = "blue"
+g = g + "bird"
+# What gets stored in g?`,
+        targetVar: "g",
+        type: "str",
+        value: "bluebird",
+        explanation: "String accumulation: \"blue\" + \"bird\" = \"bluebird\"."
+      },
+      {
+        id: 251,
+        code: `e = "-" * 3 + "*"
+# What gets stored in e?`,
+        targetVar: "e",
+        type: "str",
+        value: "---*",
+        explanation: "String repetition and concatenation: \"---\" + \">\" = \"--->\"."
+      },
+      {
+        id: 252,
+        code: `a = "Alice"
+b = "Hello, " + a
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "Hello, Alice",
+        explanation: "String b concatenation: \"Hello, Alice\"."
+      },
+      {
+        id: 253,
+        code: `j = "pan"
+j = j + "cake"
+# What gets stored in j?`,
+        targetVar: "j",
+        type: "str",
+        value: "pancake",
+        explanation: "String mutation: \"pan\" + \"cake\" = \"pancake\"."
+      },
+      {
+        id: 254,
+        code: `a = "."
+b = a * 5
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: ".....",
+        explanation: "String repetition: \".\" * 5 = \".....\"."
+      },
+      {
+        id: 255,
+        code: `a = "$"
+b = 20
+c = a + str(b)
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "$20",
+        explanation: "String concatenation with int cast: \"$\" + \"20\" = \"$20\"."
+      },
+      {
+        id: 256,
+        code: `a = "image"
+b = ".png"
+c = a + b
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "image.png",
+        explanation: "File extension concatenation: \"image.png\"."
+      },
+      {
+        id: 257,
+        code: `a = "user_" + str(7 * 3)
+# What gets stored in a?`,
+        targetVar: "a",
+        type: "str",
+        value: "user_21",
+        explanation: "Expression evaluated inside cast: 7 * 3 = 21, then \"user_\" + \"21\" = \"user_21\"."
+      },
+      {
+        id: 258,
+        code: `b = "abc"
+b = b + b
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: "abcabc",
+        explanation: "Self-concatenation: \"abc\" + \"abc\" = \"abcabc\"."
+      },
+      {
+        id: 259,
+        code: `c = "loop"
+c = c + "!"
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "loop!",
+        explanation: "String concatenation: \"loop!\"."
+      },
+      {
+        id: 260,
+        code: `a = ":: "
+b = a + "start"
+# What gets stored in b?`,
+        targetVar: "b",
+        type: "str",
+        value: ":: start",
+        explanation: "String b concatenation: \">> start\"."
+      },
+      {
+        id: 261,
+        code: `a = "super"
+b = "star"
+c = a + b
+# What gets stored in c?`,
+        targetVar: "c",
+        type: "str",
+        value: "superstar",
+        explanation: "\"super\" + \"star\" becomes \"superstar\"."
+      },
+      {
+        id: 262,
+        code: `m = 3
+m = m * 4
+m = m - 2
+# What gets stored in m?`,
+        targetVar: "m",
+        type: "int",
+        value: "10",
+        explanation: "3 * 4 = 12, then 12 - 2 = 10."
+      }
+    ];
+
+    /* =========================================================
+       Quiz State & Shuffling
+       ========================================================= */
+    let quizDeck = [];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let sessionQuestionNum = 1;
+    let audioEnabled = true;
+    let isQuestionSolved = false;
+
+    // Fisher-Yates Array Shuffle
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Balanced Quiz Deck Generator: Interleaves Multi-step/Replacement, String, and Math/Type questions
+    // ensuring students encounter regular, frequent string operations and variable reassignments throughout
+    function generateBalancedQuizDeck(questions) {
+      const isMultiStep = q => (q.code.match(/=/g) || []).length >= 2;
+      const isString = q => q.type === 'str' || q.code.includes("'") || q.code.includes('"');
+
+      const bucketMulti = [];
+      const bucketString = [];
+      const bucketOther = [];
+
+      questions.forEach(q => {
+        if (isMultiStep(q)) {
+          bucketMulti.push(q);
+        } else if (isString(q)) {
+          bucketString.push(q);
+        } else {
+          bucketOther.push(q);
+        }
+      });
+
+      const shuffledMulti = shuffleArray(bucketMulti);
+      const shuffledString = shuffleArray(bucketString);
+      const shuffledOther = shuffleArray(bucketOther);
+
+      const deck = [];
+      let mIdx = 0, sIdx = 0, oIdx = 0;
+      const total = questions.length;
+
+      while (deck.length < total) {
+        if (mIdx < shuffledMulti.length) deck.push(shuffledMulti[mIdx++]);
+        if (sIdx < shuffledString.length) deck.push(shuffledString[sIdx++]);
+        if (oIdx < shuffledOther.length) deck.push(shuffledOther[oIdx++]);
+        if (mIdx >= shuffledMulti.length && sIdx >= shuffledString.length && oIdx >= shuffledOther.length) break;
+      }
+
+      return deck;
+    }
+
+    /* =========================================================
+       Synthesized Web Audio API Sound Effects
+       ========================================================= */
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) audioCtx = new AudioClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!audioEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        if (type === 'correct') {
+          // Cheerful high arpeggio chime
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+          osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.45);
+        } else if (type === 'error_type') {
+          // Deep crunchy distortion / crack for ValueError
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(40, now + 0.35);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else {
+          // Muted bonk for incorrect guess
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (err) {}
+    }
+
+    /* =========================================================
+       DOM Elements
+       ========================================================= */
+    const codeEditorBody = document.getElementById('codeEditorBody');
+    const targetVarNameBadge = document.getElementById('targetVarNameBadge');
+    const boxLabelVar = document.getElementById('boxLabelVar');
+    const boxStatusText = document.getElementById('boxStatusText');
+    const cardboardBox = document.getElementById('cardboardBox');
+    const boxInterior = document.getElementById('boxInterior');
+    const interiorGlow = document.getElementById('interiorGlow');
+    const revealedValue = document.getElementById('revealedValue');
+    const revealedTypeBadge = document.getElementById('revealedTypeBadge');
+    const valueErrorStamp = document.getElementById('valueErrorStamp');
+
+    const selectDataType = document.getElementById('selectDataType');
+    const inputValue = document.getElementById('inputValue');
+    const inputWrapper = document.getElementById('inputWrapper');
+    const leftQuote = document.getElementById('leftQuote');
+    const rightQuote = document.getElementById('rightQuote');
+    const valueHint = document.getElementById('valueHint');
+
+    const btnOpenBox = document.getElementById('btnOpenBox');
+    const btnNextQuestion = document.getElementById('btnNextQuestion');
+    const feedbackBanner = document.getElementById('feedbackBanner');
+    const feedbackTitle = document.getElementById('feedbackTitle');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+
+    const qNumDisplay = document.getElementById('qNumDisplay');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const streakDisplay = document.getElementById('streakDisplay');
+
+    /* =========================================================
+       Code Syntax Colorizer
+       ========================================================= */
+       function renderSyntaxColoredCode(codeStr, targetVar) {
+      const lines = codeStr.split('\n');
+      let html = '';
+
+      lines.forEach((line, index) => {
+        const lineNum = index + 1;
+        const lineContent = tokenizeAndColorLine(line, targetVar);
+
+        html += `
+          <div class="code-line">
+            <span class="line-num">${lineNum}</span>
+            <span class="code-text">${lineContent}</span>
+          </div>
+        `;
+      });
+
+      return html;
+    }
+
+    function tokenizeAndColorLine(line, targetVar) {
+      if (line.trim().startsWith('#')) {
+        return `<span class="py-comment">${escapeHtml(line)}</span>`;
+      }
+
+      // Regex matching Python lexical tokens in order of precedence:
+      // 1. Comments
+      // 2. Double-quoted string literals
+      // 3. Single-quoted string literals
+      // 4. Numbers (integers or floats)
+      // 5. Operators (** // + - * / % =)
+      // 6. Builtin types and functions (int float str bool len)
+      // 7. Boolean literals and None (True False None)
+      // 8. Python logical keywords (not and or in is)
+      // 9. Identifiers (variable and function names)
+      // 10. Whitespace
+      // 11. Any punctuation / remaining characters
+      const tokenRegex = /(#.*)|("[^"\\]*(?:\\.[^"\\]*)*")|('[^'\\]*(?:\\.[^'\\]*)*')|(\b\d+(?:\.\d+)?\b)|(\*\*|\/\/|[+\-*\/%=])|(\b(?:int|float|str|bool|len)\b)|(\b(?:True|False|None)\b)|(\b(?:not|and|or|in|is)\b)|([a-zA-Z_]\w*)|(\s+)|(.)/g;
+
+      let result = '';
+      let match;
+
+      while ((match = tokenRegex.exec(line)) !== null) {
+        const [
+          full,
+          comment,
+          strDbl,
+          strSgl,
+          num,
+          op,
+          builtin,
+          boolVal,
+          keyword,
+          ident,
+          space,
+          other
+        ] = match;
+
+        if (comment !== undefined) {
+          result += `<span class="py-comment">${escapeHtml(comment)}</span>`;
+        } else if (strDbl !== undefined || strSgl !== undefined) {
+          const strLiteral = strDbl !== undefined ? strDbl : strSgl;
+          result += `<span class="py-str">${escapeHtml(strLiteral)}</span>`;
+        } else if (num !== undefined) {
+          result += `<span class="py-num">${escapeHtml(num)}</span>`;
+        } else if (op !== undefined) {
+          result += `<span class="py-op">${escapeHtml(op)}</span>`;
+        } else if (builtin !== undefined) {
+          result += `<span class="py-fn">${escapeHtml(builtin)}</span>`;
+        } else if (boolVal !== undefined) {
+          result += `<span class="py-bool">${escapeHtml(boolVal)}</span>`;
+        } else if (keyword !== undefined) {
+          result += `<span class="py-fn" style="color: #c084fc;">${escapeHtml(keyword)}</span>`;
+        } else if (ident !== undefined) {
+          if (ident === targetVar) {
+            result += `<span class="py-var target-var-highlight">${escapeHtml(ident)}</span>`;
+          } else {
+            result += `<span class="py-var">${escapeHtml(ident)}</span>`;
+          }
+        } else if (space !== undefined) {
+          result += space;
+        } else if (other !== undefined) {
+          result += escapeHtml(other);
+        }
+      }
+
+      return result;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /* =========================================================
+       Question Loader
+       ========================================================= */
+    function loadQuestion(index) {
+      if (index >= quizDeck.length) {
+        // Reshuffle deck when complete
+        quizDeck = generateBalancedQuizDeck(MASTER_QUESTIONS);
+        currentIndex = 0;
+      }
+
+      const q = quizDeck[currentIndex];
+      isQuestionSolved = false;
+
+      // Update Header stats
+      qNumDisplay.textContent = `#${sessionQuestionNum}`;
+      scoreDisplay.textContent = score;
+      streakDisplay.textContent = `🔥 ${streak}`;
+
+      // Reset Box state
+      cardboardBox.className = 'cardboard-box';
+      valueErrorStamp.className = 'stamp-value-error';
+      boxLabelVar.textContent = q.targetVar;
+      targetVarNameBadge.textContent = q.targetVar;
+      boxStatusText.textContent = 'CLOSED & SEALED';
+      boxStatusText.style.color = '#64748b';
+
+      // Reset Form
+      selectDataType.value = '';
+      inputValue.value = '';
+      inputValue.disabled = false;
+      inputValue.placeholder = 'e.g. 42, 3.14, True';
+      leftQuote.style.display = 'none';
+      rightQuote.style.display = 'none';
+      valueHint.textContent = '(Exact Python representation)';
+
+      btnOpenBox.style.display = 'flex';
+      btnNextQuestion.style.display = 'none';
+      feedbackBanner.style.display = 'none';
+
+      // Render Code Window
+      codeEditorBody.innerHTML = renderSyntaxColoredCode(q.code, q.targetVar);
+    }
+
+    /* =========================================================
+       Input Field UI Transitions (str vs Error vs numeric)
+       ========================================================= */
+    selectDataType.addEventListener('change', () => {
+      const sel = selectDataType.value;
+
+      if (sel === 'Error') {
+        // Disable text input completely
+        inputValue.value = '';
+        inputValue.disabled = true;
+        inputValue.placeholder = 'No value (Exception raised)';
+        leftQuote.style.display = 'none';
+        rightQuote.style.display = 'none';
+        valueHint.textContent = '(ValueError raised by Python runtime)';
+      } else if (sel === 'str') {
+        // Show visual surrounding quotation marks
+        inputValue.disabled = false;
+        inputValue.placeholder = 'type string content only';
+        leftQuote.style.display = 'flex';
+        rightQuote.style.display = 'flex';
+        valueHint.textContent = '(Quotation marks already provided)';
+      } else {
+        // Normal numeric / boolean input
+        inputValue.disabled = false;
+        leftQuote.style.display = 'none';
+        rightQuote.style.display = 'none';
+
+        if (sel === 'int') {
+          inputValue.placeholder = 'e.g. 42, -5, 0';
+          valueHint.textContent = '(Whole integer)';
+        } else if (sel === 'float') {
+          inputValue.placeholder = 'e.g. 2.0, 3.14, 0.5';
+          valueHint.textContent = '(Must include decimal, e.g. 2.0)';
+        } else if (sel === 'bool') {
+          inputValue.placeholder = 'True or False';
+          valueHint.textContent = '(Capitalized boolean)';
+        } else {
+          inputValue.placeholder = 'e.g. 42, 3.14, True';
+          valueHint.textContent = '(Exact Python representation)';
+        }
+      }
+    });
+
+    /* =========================================================
+       Answer Validation Engine
+       ========================================================= */
+    function checkAnswer() {
+      if (isQuestionSolved) return;
+      initAudio();
+
+      const q = quizDeck[currentIndex];
+      const userType = selectDataType.value;
+      const rawUserVal = inputValue.value.trim();
+
+      if (!userType) {
+        showFeedback(false, 'Select Data Type', 'Please select what Python data type is stored in the box.');
+        shakeBox();
+        return;
+      }
+
+      // Check Type Correctness
+      const isTypeCorrect = (userType === q.type);
+
+      // Check Value Correctness
+      let isValueCorrect = false;
+
+      if (q.type === 'Error') {
+        // If question raises an Error, matching userType is sufficient!
+        isValueCorrect = true;
+      } else if (q.type === 'str') {
+        // For strings, check inner content without requiring quotes
+        let cleanInput = rawUserVal;
+        if ((cleanInput.startsWith('"') && cleanInput.endsWith('"')) ||
+            (cleanInput.startsWith("'") && cleanInput.endsWith("'"))) {
+          cleanInput = cleanInput.slice(1, -1);
+        }
+        isValueCorrect = (cleanInput === q.value);
+      } else if (q.type === 'bool') {
+        // Boolean check (accept True/False or true/false)
+        isValueCorrect = (rawUserVal.toLowerCase() === q.value.toLowerCase());
+      } else if (q.type === 'float') {
+        // For float, verify numeric equivalence AND check presence of decimal point
+        const userNum = parseFloat(rawUserVal);
+        const targetNum = parseFloat(q.value);
+        if (!isNaN(userNum) && Math.abs(userNum - targetNum) < 0.0001) {
+          // Ensure they included a decimal point to reinforce the float concept!
+          if (rawUserVal.includes('.') || rawUserVal.includes('e') || rawUserVal.includes('E')) {
+            isValueCorrect = true;
+          } else {
+            showFeedback(false, 'Missing Decimal Point', `Remember: In Python, floats display with a decimal (e.g. '${targetNum.toFixed(1)}' instead of '${targetNum}').`);
+            shakeBox();
+            return;
+          }
+        }
+      } else if (q.type === 'int') {
+        // Integer check
+        const userNum = parseInt(rawUserVal, 10);
+        const targetNum = parseInt(q.value, 10);
+        if (!isNaN(userNum) && userNum === targetNum && !rawUserVal.includes('.')) {
+          isValueCorrect = true;
+        }
+      }
+
+      // Final Evaluation
+      if (isTypeCorrect && isValueCorrect) {
+        // CORRECT ANSWER!
+        handleCorrect(q);
+      } else {
+        // INCORRECT ANSWER
+        handleIncorrect(q, isTypeCorrect);
+      }
+    }
+
+    function handleCorrect(q) {
+      isQuestionSolved = true;
+      score += 1;
+      streak += 1;
+      scoreDisplay.textContent = score;
+      streakDisplay.textContent = `🔥 ${streak}`;
+
+      btnOpenBox.style.display = 'none';
+      btnNextQuestion.style.display = 'flex';
+
+      if (q.type === 'Error') {
+        // Destructive ValueError box collapse
+        playSound('error_type');
+        cardboardBox.className = 'cardboard-box box-error-collapse';
+        valueErrorStamp.className = 'stamp-value-error stamp-visible';
+        boxStatusText.textContent = 'CRASHED: ValueError';
+        boxStatusText.style.color = '#ef4444';
+
+        showFeedback(true, 'Correct! Exception Raised', q.explanation);
+      } else {
+        // Animate box open & reveal value inside
+        playSound('correct');
+        cardboardBox.className = 'cardboard-box box-opened';
+        boxStatusText.textContent = 'OPENED & INSPECTED';
+        boxStatusText.style.color = '#22c55e';
+
+        // Format and style inside value
+        revealedTypeBadge.textContent = `<class '${q.type}'>`;
+        revealedTypeBadge.style.color = `var(--color-${q.type})`;
+        revealedTypeBadge.style.borderColor = `var(--color-${q.type})`;
+        interiorGlow.style.background = `var(--color-${q.type})`;
+
+        if (q.type === 'str') {
+          revealedValue.textContent = `"${q.value}"`;
+          revealedValue.className = 'revealed-value-display val-str';
+        } else if (q.type === 'int') {
+          revealedValue.textContent = q.value;
+          revealedValue.className = 'revealed-value-display val-int';
+        } else if (q.type === 'float') {
+          revealedValue.textContent = q.value;
+          revealedValue.className = 'revealed-value-display val-float';
+        } else if (q.type === 'bool') {
+          revealedValue.textContent = q.value;
+          revealedValue.className = 'revealed-value-display val-bool';
+        }
+
+        showFeedback(true, 'Correct! Box Opened', q.explanation);
+      }
+    }
+
+    function handleIncorrect(q, isTypeCorrect) {
+      streak = 0;
+      streakDisplay.textContent = `🔥 ${streak}`;
+      playSound('wrong');
+      shakeBox();
+
+      if (!isTypeCorrect) {
+        showFeedback(false, 'Try Again! Type Mismatch', `The data type is not ${selectDataType.value || 'specified'}. Check the operation carefully.`);
+      } else {
+        showFeedback(false, 'Try Again! Value Mismatch', `The data type '${q.type}' is correct, but the evaluated value inside the box does not match.`);
+      }
+    }
+
+    function shakeBox() {
+      cardboardBox.classList.remove('shake-animation');
+      void cardboardBox.offsetWidth; // Trigger reflow
+      cardboardBox.classList.add('shake-animation');
+      setTimeout(() => {
+        cardboardBox.classList.remove('shake-animation');
+      }, 500);
+    }
+
+    function showFeedback(isSuccess, title, message) {
+      feedbackBanner.className = isSuccess ? 'feedback-banner success' : 'feedback-banner error';
+      feedbackTitle.textContent = title;
+      feedbackMsg.textContent = message;
+      feedbackBanner.style.display = 'flex';
+    }
+
+    /* =========================================================
+       Event Listeners
+       ========================================================= */
+    btnOpenBox.addEventListener('click', checkAnswer);
+
+    btnNextQuestion.addEventListener('click', () => {
+      currentIndex++;
+      sessionQuestionNum++;
+      loadQuestion(currentIndex);
+    });
+
+    inputValue.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (isQuestionSolved) {
+          btnNextQuestion.click();
+        } else {
+          checkAnswer();
+        }
+      }
+    });
+
+    // Audio Toggle
+    const btnAudioToggle = document.getElementById('btnAudioToggle');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioLabel = document.getElementById('audioLabel');
+
+    btnAudioToggle.addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) {
+        initAudio();
+        audioIcon.textContent = '🔊';
+        audioLabel.textContent = 'Sound ON';
+        playSound('correct');
+      } else {
+        audioIcon.textContent = '🔇';
+        audioLabel.textContent = 'Sound OFF';
+      }
+    });
+
+    // Modal Concept Guide
+    const helpModal = document.getElementById('helpModal');
+    const btnHelpModal = document.getElementById('btnHelpModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+
+    btnHelpModal.addEventListener('click', () => helpModal.classList.add('open'));
+    btnCloseModal.addEventListener('click', () => helpModal.classList.remove('open'));
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) helpModal.classList.remove('open');
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (helpModal.classList.contains('open')) {
+          helpModal.classList.remove('open');
+        } else {
+          window.location.href = './index.html';
+        }
+      } else if (e.key.toLowerCase() === 'h' && document.activeElement !== inputValue) {
+        window.location.href = './index.html';
+      }
+    });
+
+    /* =========================================================
+       Initialization
+       ========================================================= */
+    quizDeck = generateBalancedQuizDeck(MASTER_QUESTIONS);
+    loadQuestion(0);
+  </script>
+</body>
+</html>

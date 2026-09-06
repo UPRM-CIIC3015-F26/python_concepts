@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Python Slicing Visualizer | Interactive Indices &amp; Strides Lab</title>
+  <meta name="description" content="Interactive Python string slicing visualizer demonstrating positive and negative indices, default bounds, and stride steps. Offline-first, zero dependencies.">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --bg-base: #0a0e17;
+      --bg-panel: #111827;
+      --bg-panel-elevated: #1a2333;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.16);
+      
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.4);
+      --accent-emerald-bg: rgba(16, 185, 129, 0.15);
+
+      --accent-cyan: #38bdf8;
+      --accent-cyan-bg: rgba(56, 189, 248, 0.12);
+      
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.12);
+
+      --accent-rose: #f43f5e;
+      --accent-rose-bg: rgba(244, 63, 94, 0.15);
+
+      --accent-purple: #a855f7;
+      --accent-purple-bg: rgba(168, 85, 247, 0.15);
+
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0a0e17 85%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fixed App Header */
+    header {
+      height: 48px;
+      min-height: 48px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-back-hub {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-back-hub:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      min-width: 0;
+      flex-shrink: 0;
+    }
+
+    .app-icon-badge {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      flex-shrink: 0;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #10b981, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+      color: #ffffff;
+      white-space: nowrap;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .app-icon-badge svg {
+      width: 17px;
+      height: 17px;
+      color: #ffffff;
+      flex-shrink: 0;
+      display: block;
+    }
+
+    .app-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .app-title > span:first-child {
+      white-space: nowrap;
+    }
+
+    .app-subtitle-pill {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      .app-subtitle-pill {
+        display: none;
+      }
+      .header-pill {
+        display: none;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 9px;
+      border-radius: 5px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #e2e8f0;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    /* Main App Layout (Full-height, strictly no scrollbars) */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 16px;
+      gap: 10px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* TOP SECTION: String Selection & Presets */
+    .top-section {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .string-select-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 420px;
+      min-width: 0;
+    }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dropdown-select {
+      background: #0d131f;
+      border: 1px solid var(--border-light);
+      color: #38bdf8;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+      min-width: 150px;
+    }
+    .dropdown-select:hover, .dropdown-select:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .string-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #090d16;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 5px 12px;
+      flex: 1 1 340px;
+      min-width: 220px;
+      max-width: 560px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .string-input-wrap:focus-within {
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 0 1px var(--accent-emerald);
+    }
+
+    .string-input-prefix {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #34d399;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .custom-string-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      width: 100%;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .len-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .presets-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: nowrap;
+    }
+
+    .preset-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .preset-chip:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      transform: translateY(-1px);
+    }
+    .preset-chip.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    /* MIDDLE SECTION: The Index Grid */
+    .grid-stage-card {
+      flex: 1;
+      background: rgba(17, 24, 39, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-stage-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .grid-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Grid Wrap */
+    .index-grid-scroll-wrap {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 14px 8px;
+    }
+
+    .index-grid {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    /* Single Column containing: Positive Index, Char Box, Negative Index */
+    .index-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .pos-index {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+      padding: 2px 5px;
+      min-width: 24px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .char-box {
+      width: 48px;
+      height: 52px;
+      background: #1e293b;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+    }
+
+    .neg-index {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: #fb923c;
+      background: rgba(251, 146, 60, 0.12);
+      border: 1px solid rgba(251, 146, 60, 0.3);
+      border-radius: 4px;
+      padding: 2px 5px;
+      min-width: 24px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    /* STATES FOR CHAR BOX */
+    /* 1. Included in slice */
+    .char-box.included {
+      background: #059669;
+      background-image: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-color: #34d399;
+      color: #ffffff;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px -2px rgba(16, 185, 129, 0.45), 0 0 0 1.5px #34d399;
+      z-index: 5;
+    }
+    .index-col.included .pos-index {
+      color: #ffffff;
+      background: #0284c7;
+      border-color: #38bdf8;
+    }
+    .index-col.included .neg-index {
+      color: #ffffff;
+      background: #ea580c;
+      border-color: #fb923c;
+    }
+
+    /* 2. Skipped by stride step (within range but jumped over) */
+    .char-box.skipped {
+      opacity: 1;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1.5px dashed rgba(148, 163, 184, 0.5);
+      color: #cbd5e1;
+    }
+    .index-col.skipped {
+      opacity: 1;
+    }
+
+    /* 3. Outside of start:stop range */
+    .char-box.outside {
+      opacity: 1;
+      background: #1e293b;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+    }
+    .index-col.outside {
+      opacity: 1;
+    }
+
+    /* Traversal animation active box */
+    .char-box.stepping-active {
+      animation: pulseActive 0.3s ease-out;
+      outline: 3px solid #fbbf24;
+      outline-offset: 2px;
+    }
+
+    @keyframes pulseActive {
+      0% { transform: translateY(-3px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(-3px); }
+    }
+
+    /* Special space glyph */
+    .char-space-glyph {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.4);
+      font-family: var(--font-sans);
+    }
+
+    /* Direction & Range HUD below grid */
+    .slice-dynamics-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .dynamics-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* BOTTOM CONTROLS: The Slice Syntax Input */
+    .bottom-controls-card {
+      background: rgba(17, 24, 39, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .code-syntax-editor {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #070a11;
+      border: 1.5px solid var(--border-light);
+      border-radius: 9px;
+      padding: 6px 14px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .code-text-keyword {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    .code-bracket {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    .code-colon {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 800;
+      color: #e2e8f0;
+      padding: 0 1px;
+    }
+
+    /* Slice param input box */
+    .slice-input-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .slice-param-field {
+      width: 54px;
+      height: 32px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      transition: all 0.15s ease;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .slice-param-field:focus {
+      border-color: #38bdf8;
+      background: #0f172a;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+    }
+    .slice-param-field::placeholder {
+      color: #64748b;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .slice-param-tag {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+    }
+
+    .slice-defaults-explanation {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+
+    .defaults-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .defaults-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .def-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      padding: 2px 7px;
+      color: #cbd5e1;
+    }
+    .def-chip span {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    /* Interactive Traversal Player */
+    .traversal-player {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-step-play {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: 1px solid #38bdf8;
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-step-play:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
+      transform: translateY(-1px);
+    }
+
+    /* OUTPUT ZONE: Resulting Substring */
+    .output-zone-card {
+      background: rgba(17, 24, 39, 0.85);
+      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .output-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .output-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .output-stats {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Main Result Display */
+    .output-content-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .output-string-visual {
+      flex: 1;
+      background: #070a11;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 8px 14px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .output-code-repr {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: #94a3b8;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .output-quote {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    .output-char-chain {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .output-char-mini {
+      min-width: 26px;
+      height: 28px;
+      padding: 0 4px;
+      background: rgba(16, 185, 129, 0.25);
+      border: 1px solid #10b981;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: #ecfdf5;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .output-empty-state {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* Error Banner */
+    .error-banner {
+      display: none;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: #fca5a5;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-banner.active {
+      display: flex;
+    }
+
+    /* Keyboard Nav Floating Prompt */
+    .kbd-tag {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      padding: 1px 4px;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIXED APP HEADER -->
+  <header>
+    <div class="header-left">
+      <a href="./index.html" class="btn-back-hub" id="backToHubBtn" title="Return to Visualizer Hub (Shortcut: [H] or [Esc])">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Hub</span>
+        <span class="kbd-tag">H</span>
+      </a>
+
+      <div class="app-title-group">
+        <div class="app-icon-badge" title="Python Slicing: s[start:stop:step]">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 5H5v14h3" />
+            <circle cx="12" cy="9" r="1.3" fill="currentColor" />
+            <circle cx="12" cy="15" r="1.3" fill="currentColor" />
+            <path d="M16 5h3v14h-3" />
+          </svg>
+        </div>
+        <div class="app-title">
+          <span>Python Slicing Visualizer</span>
+          <span class="app-subtitle-pill">Indices &bull; Defaults &bull; Strides</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <span class="header-pill">Python 3.12 Rules</span>
+      <button class="btn-action" id="resetBtn" title="Reset to default string and full slice">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Reset</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN SIMULATION VIEWPORT (Strictly single-screen, non-scrollable) -->
+  <main>
+    
+    <!-- TOP: STRING SELECTION & PRESETS -->
+    <section class="top-section">
+      <div class="string-select-group">
+        <div class="field-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+          <span>String:</span>
+        </div>
+
+        <select class="dropdown-select" id="presetSelect" title="Select a preset string">
+          <option value="CodePath_UPRM">CodePath_UPRM</option>
+          <option value="Mayaguez">Mayaguez</option>
+          <option value="Python_2026">Python_2026</option>
+          <option value="Hello_World">Hello_World</option>
+          <option value="COMPUTER_SCIENCE">COMPUTER_SCIENCE</option>
+          <option value="ALGORITHM">ALGORITHM</option>
+          <option value="__custom__">&plus; Custom String...</option>
+        </select>
+
+        <div class="string-input-wrap">
+          <span class="string-input-prefix">s =</span>
+          <input type="text" id="stringInput" class="custom-string-input" value="CodePath_UPRM" maxlength="60" placeholder="Type or paste custom string..." title="Edit active string (type any text)" />
+        </div>
+
+        <div class="len-badge" id="lenBadge">len = 13</div>
+      </div>
+
+      <!-- Quick Preset Slices -->
+      <div class="presets-group">
+        <span class="field-label" style="font-size: 10px; margin-right: 2px;">Slice Presets:</span>
+        <button class="preset-chip" data-start="" data-stop="" data-step="" title="Full string copy">[:]</button>
+        <button class="preset-chip" data-start="" data-stop="" data-step="-1" title="Reverse string">[::-1]</button>
+        <button class="preset-chip" data-start="" data-stop="" data-step="2" title="Every other character">[::2]</button>
+        <button class="preset-chip" data-start="1" data-stop="" data-step="2" title="Odd index characters">[1::2]</button>
+        <button class="preset-chip" data-start="2" data-stop="7" data-step="" title="Subslice index 2 to 6">[2:7]</button>
+        <button class="preset-chip" data-start="-4" data-stop="" data-step="" title="Last 4 characters">[-4:]</button>
+        <button class="preset-chip" data-start="" data-stop="-2" data-step="" title="All except last 2">[:-2]</button>
+        <button class="preset-chip" data-start="10" data-stop="2" data-step="-2" title="Reverse stride by 2">[10:2:-2]</button>
+      </div>
+    </section>
+
+    <!-- MIDDLE: THE INDEX GRID -->
+    <section class="grid-stage-card">
+      <div class="grid-stage-header">
+        <div class="grid-legend">
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #38bdf8;"></span>
+            <span>Positive Index: <strong style="color: #38bdf8;">0 to len-1</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #fb923c;"></span>
+            <span>Negative Index: <strong style="color: #fb923c;">-len to -1</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #10b981;"></span>
+            <span>Included in Slice</span>
+          </div>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);" id="sliceCountNote">
+          0 characters selected
+        </div>
+      </div>
+
+      <!-- Character Columns (Generated dynamically) -->
+      <div class="index-grid-scroll-wrap">
+        <div class="index-grid" id="indexGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Dynamic Slice Traversal Bar -->
+      <div class="slice-dynamics-bar" id="dynamicsBar">
+        <div class="dynamics-left">
+          <span id="directionIndicator">➡️ Direction: Forward (Left-to-Right)</span>
+          <span style="color: rgba(255,255,255,0.15);">&bull;</span>
+          <span id="strideIndicator">Step: +1</span>
+          <span style="color: rgba(255,255,255,0.15);">&bull;</span>
+          <span id="rangeIndicator">Range: [0 &rarr; 13)</span>
+        </div>
+        <div id="pyRangeRepr" style="color: #38bdf8;">range(0, 13, 1)</div>
+      </div>
+    </section>
+
+    <!-- ERROR BANNER (When step == 0) -->
+    <div class="error-banner" id="errorBanner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <span id="errorMessage">ValueError: slice step cannot be zero</span>
+    </div>
+
+    <!-- BOTTOM CONTROLS: THE SLICE SYNTAX -->
+    <section class="bottom-controls-card">
+      
+      <!-- Python Code Slice Block -->
+      <div class="code-syntax-editor">
+        <span class="code-text-keyword">my_string</span>
+        <span class="code-bracket">[</span>
+
+        <!-- Start Input -->
+        <div class="slice-input-box">
+          <input type="text" id="startInput" class="slice-param-field" placeholder="0" maxlength="4" autocomplete="off" title="Start index (leave blank for default)" />
+          <span class="slice-param-tag">start</span>
+        </div>
+
+        <span class="code-colon">:</span>
+
+        <!-- Stop Input -->
+        <div class="slice-input-box">
+          <input type="text" id="stopInput" class="slice-param-field" placeholder="13" maxlength="4" autocomplete="off" title="Stop index (leave blank for default)" />
+          <span class="slice-param-tag">stop</span>
+        </div>
+
+        <span class="code-colon">:</span>
+
+        <!-- Step Input -->
+        <div class="slice-input-box">
+          <input type="text" id="stepInput" class="slice-param-field" placeholder="1" maxlength="4" autocomplete="off" title="Step stride (leave blank for default 1)" />
+          <span class="slice-param-tag">step</span>
+        </div>
+
+        <span class="code-bracket">]</span>
+      </div>
+
+      <!-- Resolved Defaults Details -->
+      <div class="slice-defaults-explanation">
+        <div class="defaults-title">Python Resolved Defaults</div>
+        <div class="defaults-chips">
+          <div class="def-chip" id="defStartChip">start: <span id="resStartVal">0</span></div>
+          <div class="def-chip" id="defStopChip">stop: <span id="resStopVal">13</span></div>
+          <div class="def-chip" id="defStepChip">step: <span id="resStepVal">+1</span></div>
+        </div>
+      </div>
+
+      <!-- Traversal Player -->
+      <div class="traversal-player">
+        <button class="btn-step-play" id="playAnimationBtn" title="Animate Python index traversal step-by-step">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 3l14 9-14 9V3z" />
+          </svg>
+          <span>Step Traverse</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- OUTPUT ZONE: SLICE RESULT -->
+    <section class="output-zone-card">
+      <div class="output-header">
+        <div class="output-title-group">
+          <div class="output-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>Resulting Substring</span>
+          </div>
+        </div>
+
+        <div class="output-stats">
+          <span>len(<strong style="color:#34d399;" id="resLen">13</strong>)</span>
+          <span style="color: rgba(255,255,255,0.15);">&bull;</span>
+          <span>type: <strong style="color:#93c5fd;">&lt;class 'str'&gt;</strong></span>
+        </div>
+      </div>
+
+      <!-- Output Visual Display -->
+      <div class="output-content-row">
+        <div class="output-string-visual" id="outputStringVisual">
+          <div class="output-code-repr">
+            <span style="color:#60a5fa;">result</span> = <span class="output-quote">"</span>
+          </div>
+          <div class="output-char-chain" id="outputCharChain">
+            <!-- Populated by JS -->
+          </div>
+          <div class="output-code-repr">
+            <span class="output-quote">"</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT LOGIC ENGINE (Zero dependencies, vanilla JS) -->
+  <script>
+    // State
+    let activeString = "CodePath_UPRM";
+    let isAnimating = false;
+    let animTimer = null;
+
+    // DOM Elements
+    const presetSelect = document.getElementById("presetSelect");
+    const stringInput = document.getElementById("stringInput");
+    const lenBadge = document.getElementById("lenBadge");
+    const indexGrid = document.getElementById("indexGrid");
+    const startInput = document.getElementById("startInput");
+    const stopInput = document.getElementById("stopInput");
+    const stepInput = document.getElementById("stepInput");
+    const defStartChip = document.getElementById("defStartChip");
+    const defStopChip = document.getElementById("defStopChip");
+    const defStepChip = document.getElementById("defStepChip");
+    const resStartVal = document.getElementById("resStartVal");
+    const resStopVal = document.getElementById("resStopVal");
+    const resStepVal = document.getElementById("resStepVal");
+    const errorBanner = document.getElementById("errorBanner");
+    const errorMessage = document.getElementById("errorMessage");
+    const outputCharChain = document.getElementById("outputCharChain");
+    const resLen = document.getElementById("resLen");
+    const directionIndicator = document.getElementById("directionIndicator");
+    const strideIndicator = document.getElementById("strideIndicator");
+    const rangeIndicator = document.getElementById("rangeIndicator");
+    const pyRangeRepr = document.getElementById("pyRangeRepr");
+    const sliceCountNote = document.getElementById("sliceCountNote");
+    const playAnimationBtn = document.getElementById("playAnimationBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const presetChips = document.querySelectorAll(".preset-chip");
+
+    /**
+     * Exact Python 3.12 Slice Evaluator (matches CPython PySlice_Unpack / slice.indices)
+     */
+    function computePythonSlice(length, startRaw, stopRaw, stepRaw) {
+      // 1. Step resolution
+      let step = 1;
+      if (stepRaw !== undefined && stepRaw.trim() !== "") {
+        let parsedStep = parseInt(stepRaw.trim(), 10);
+        if (isNaN(parsedStep)) {
+          return { error: "ValueError: slice step must be an integer" };
+        }
+        if (parsedStep === 0) {
+          return { error: "ValueError: slice step cannot be zero" };
+        }
+        step = parsedStep;
+      }
+
+      // 2. Default boundaries based on step direction
+      const defaultStart = step > 0 ? 0 : length - 1;
+      const defaultStop = step > 0 ? length : -1;
+
+      let start = defaultStart;
+      let startProvided = false;
+      if (startRaw !== undefined && startRaw.trim() !== "") {
+        let parsedStart = parseInt(startRaw.trim(), 10);
+        if (isNaN(parsedStart)) {
+          return { error: "ValueError: slice start must be an integer" };
+        }
+        start = parsedStart;
+        startProvided = true;
+      }
+
+      let stop = defaultStop;
+      let stopProvided = false;
+      if (stopRaw !== undefined && stopRaw.trim() !== "") {
+        let parsedStop = parseInt(stopRaw.trim(), 10);
+        if (isNaN(parsedStop)) {
+          return { error: "ValueError: slice stop must be an integer" };
+        }
+        stop = parsedStop;
+        stopProvided = true;
+      }
+
+      // 3. Normalization of start & stop (Python bounds clipping)
+      let normStart = start;
+      if (startProvided) {
+        if (normStart < 0) {
+          normStart += length;
+          if (normStart < 0) {
+            normStart = step < 0 ? -1 : 0;
+          }
+        } else if (normStart >= length) {
+          normStart = step < 0 ? length - 1 : length;
+        }
+      }
+
+      let normStop = stop;
+      if (stopProvided) {
+        if (normStop < 0) {
+          normStop += length;
+          if (normStop < 0) {
+            normStop = step < 0 ? -1 : 0;
+          }
+        } else if (normStop >= length) {
+          normStop = step < 0 ? length - 1 : length;
+        }
+      }
+
+      // 4. Generate included indices sequence
+      const indices = [];
+      if (step > 0) {
+        for (let i = normStart; i < normStop; i += step) {
+          indices.push(i);
+        }
+      } else {
+        for (let i = normStart; i > normStop; i += step) {
+          indices.push(i);
+        }
+      }
+
+      return {
+        step,
+        start,
+        stop,
+        normStart,
+        normStop,
+        defaultStart,
+        defaultStop,
+        startProvided,
+        stopProvided,
+        indices
+      };
+    }
+
+    /**
+     * Render the visual index grid
+     */
+    function renderIndexGrid() {
+      indexGrid.innerHTML = "";
+      const len = activeString.length;
+
+      for (let i = 0; i < len; i++) {
+        const posIdx = i;
+        const negIdx = i - len;
+        const char = activeString[i];
+
+        const col = document.createElement("div");
+        col.className = "index-col";
+        col.id = `col-${i}`;
+
+        // Positive Index Label
+        const posDiv = document.createElement("div");
+        posDiv.className = "pos-index";
+        posDiv.textContent = posIdx;
+        posDiv.title = `Positive index: ${posIdx}`;
+
+        // Char Box
+        const charBox = document.createElement("div");
+        charBox.className = "char-box";
+        charBox.id = `char-box-${i}`;
+
+        // Display char or space glyph
+        if (char === " ") {
+          const sp = document.createElement("span");
+          sp.className = "char-space-glyph";
+          sp.textContent = "␣";
+          charBox.appendChild(sp);
+        } else {
+          const charSpan = document.createElement("span");
+          charSpan.textContent = char;
+          charBox.appendChild(charSpan);
+        }
+
+        // Negative Index Label
+        const negDiv = document.createElement("div");
+        negDiv.className = "neg-index";
+        negDiv.textContent = negIdx;
+        negDiv.title = `Negative index: ${negIdx}`;
+
+        col.appendChild(posDiv);
+        col.appendChild(charBox);
+        col.appendChild(negDiv);
+        indexGrid.appendChild(col);
+      }
+    }
+
+    /**
+     * Main update function: evaluate slice and update visuals
+     */
+    function updateSliceVisualizer() {
+      const len = activeString.length;
+      lenBadge.textContent = `len = ${len}`;
+
+      const startVal = startInput.value;
+      const stopVal = stopInput.value;
+      const stepVal = stepInput.value;
+
+      // Update placeholders to show contextual defaults
+      const provisionalStep = parseInt(stepVal.trim(), 10);
+      const isReverse = !isNaN(provisionalStep) && provisionalStep < 0;
+
+      startInput.placeholder = isReverse ? (len > 0 ? len - 1 : 0) : "0";
+      stopInput.placeholder = isReverse ? "-1" : len;
+      stepInput.placeholder = "1";
+
+      // Compute exact slice
+      const result = computePythonSlice(len, startVal, stopVal, stepVal);
+
+      if (result.error) {
+        // Show error
+        errorBanner.classList.add("active");
+        errorMessage.textContent = result.error;
+        outputCharChain.innerHTML = `<span class="output-empty-state" style="color: #ef4444;">${result.error}</span>`;
+        resLen.textContent = "0";
+        sliceCountNote.textContent = "Invalid slice step";
+        
+        // Reset all grid boxes
+        for (let i = 0; i < len; i++) {
+          const col = document.getElementById(`col-${i}`);
+          const box = document.getElementById(`char-box-${i}`);
+          if (col && box) {
+            col.className = "index-col outside";
+            box.className = "char-box outside";
+          }
+        }
+        return;
+      }
+
+      // Clear error
+      errorBanner.classList.remove("active");
+
+      // Update resolved defaults chips
+      resStartVal.textContent = result.startProvided ? result.start : `${result.defaultStart} (default)`;
+      resStopVal.textContent = result.stopProvided ? result.stop : `${result.defaultStop} (default)`;
+      resStepVal.textContent = (result.step > 0 ? `+${result.step}` : `${result.step}`) + (stepVal.trim() === "" ? " (default)" : "");
+
+      // Dynamics Bar
+      const isNegativeStep = result.step < 0;
+      directionIndicator.textContent = isNegativeStep ? "⬅️ Direction: Backward (Right-to-Left)" : "➡️ Direction: Forward (Left-to-Right)";
+      strideIndicator.textContent = `Step: ${result.step > 0 ? "+" + result.step : result.step}`;
+      rangeIndicator.textContent = `Range: [${result.normStart} → ${result.normStop})`;
+      pyRangeRepr.textContent = `range(${result.startProvided ? result.start : result.defaultStart}, ${result.stopProvided ? result.stop : result.defaultStop}, ${result.step})`;
+
+      const includedSet = new Set(result.indices);
+
+      // Character range span between normStart and normStop
+      const inRangeSpan = (idx) => {
+        if (result.step > 0) {
+          return idx >= result.normStart && idx < result.normStop;
+        } else {
+          return idx <= result.normStart && idx > result.normStop;
+        }
+      };
+
+      // Update grid columns
+      for (let i = 0; i < len; i++) {
+        const col = document.getElementById(`col-${i}`);
+        const box = document.getElementById(`char-box-${i}`);
+
+        if (!col || !box) continue;
+
+        if (includedSet.has(i)) {
+          col.className = "index-col included";
+          box.className = "char-box included";
+        } else if (inRangeSpan(i)) {
+          // Inside start/stop range, but skipped due to step > 1 or < -1
+          col.className = "index-col skipped";
+          box.className = "char-box skipped";
+        } else {
+          // Completely outside start/stop range
+          col.className = "index-col outside";
+          box.className = "char-box outside";
+        }
+      }
+
+      // Output string builder
+      outputCharChain.innerHTML = "";
+      let slicedStr = "";
+
+      if (result.indices.length === 0) {
+        outputCharChain.innerHTML = '<span class="output-empty-state">"" (empty string)</span>';
+      } else {
+        result.indices.forEach(idx => {
+          const ch = activeString[idx];
+          slicedStr += ch;
+
+          const mini = document.createElement("div");
+          mini.className = "output-char-mini";
+          mini.textContent = ch === " " ? "␣" : ch;
+          mini.title = `Index ${idx}`;
+          outputCharChain.appendChild(mini);
+        });
+      }
+
+      resLen.textContent = result.indices.length;
+      sliceCountNote.textContent = `${result.indices.length} of ${len} characters selected`;
+
+      // Highlight matching preset chip if applicable
+      presetChips.forEach(chip => {
+        const cStart = chip.dataset.start;
+        const cStop = chip.dataset.stop;
+        const cStep = chip.dataset.step;
+        if (startVal.trim() === cStart && stopVal.trim() === cStop && stepVal.trim() === cStep) {
+          chip.classList.add("active");
+        } else {
+          chip.classList.remove("active");
+        }
+      });
+    }
+
+    /**
+     * Interactive Step-by-Step Traversal Animation
+     */
+    function playStepAnimation() {
+      if (isAnimating) {
+        clearInterval(animTimer);
+        isAnimating = false;
+        playAnimationBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 3l14 9-14 9V3z" />
+          </svg>
+          <span>Step Traverse</span>
+        `;
+        updateSliceVisualizer();
+        return;
+      }
+
+      const len = activeString.length;
+      const result = computePythonSlice(len, startInput.value, stopInput.value, stepInput.value);
+      if (result.error || result.indices.length === 0) return;
+
+      isAnimating = true;
+      playAnimationBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="6" y="4" width="4" height="16"/>
+          <rect x="14" y="4" width="4" height="16"/>
+        </svg>
+        <span>Pause</span>
+      `;
+
+      // Clear output temporarily to build step-by-step
+      outputCharChain.innerHTML = "";
+      let stepIndex = 0;
+
+      // Clear all highlights
+      for (let i = 0; i < len; i++) {
+        const box = document.getElementById(`char-box-${i}`);
+        if (box) box.classList.remove("stepping-active");
+      }
+
+      animTimer = setInterval(() => {
+        if (stepIndex >= result.indices.length) {
+          clearInterval(animTimer);
+          isAnimating = false;
+          playAnimationBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 3l14 9-14 9V3z" />
+            </svg>
+            <span>Step Traverse</span>
+          `;
+          updateSliceVisualizer();
+          return;
+        }
+
+        const targetIdx = result.indices[stepIndex];
+        const box = document.getElementById(`char-box-${targetIdx}`);
+
+        // Remove previous active outline
+        document.querySelectorAll(".char-box.stepping-active").forEach(b => b.classList.remove("stepping-active"));
+
+        if (box) {
+          box.classList.add("stepping-active");
+        }
+
+        // Add to output chain
+        const ch = activeString[targetIdx];
+        const mini = document.createElement("div");
+        mini.className = "output-char-mini";
+        mini.style.animation = "pulseActive 0.25s ease-out";
+        mini.textContent = ch === " " ? "␣" : ch;
+        outputCharChain.appendChild(mini);
+
+        stepIndex++;
+      }, 350);
+    }
+
+    // EVENT LISTENERS
+
+    // Real-time input listeners for slice inputs
+    [startInput, stopInput, stepInput].forEach(input => {
+      input.addEventListener("input", () => {
+        if (isAnimating) {
+          clearInterval(animTimer);
+          isAnimating = false;
+          playAnimationBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 3l14 9-14 9V3z" />
+            </svg>
+            <span>Step Traverse</span>
+          `;
+        }
+        updateSliceVisualizer();
+      });
+    });
+
+    // Preset dropdown selection
+    presetSelect.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (val === "__custom__") {
+        stringInput.focus();
+        stringInput.select();
+      } else {
+        activeString = val;
+        stringInput.value = val;
+        renderIndexGrid();
+        updateSliceVisualizer();
+      }
+    });
+
+    // Custom string text input
+    stringInput.addEventListener("input", (e) => {
+      const val = e.target.value;
+      activeString = val.length > 0 ? val : " ";
+      
+      // Update dropdown state
+      const matchingOpt = Array.from(presetSelect.options).find(opt => opt.value === val);
+      if (matchingOpt) {
+        presetSelect.value = val;
+      } else {
+        presetSelect.value = "__custom__";
+      }
+
+      renderIndexGrid();
+      updateSliceVisualizer();
+    });
+
+    // Preset slice chips
+    presetChips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        startInput.value = chip.dataset.start;
+        stopInput.value = chip.dataset.stop;
+        stepInput.value = chip.dataset.step;
+        updateSliceVisualizer();
+      });
+    });
+
+    // Play Traversal Button
+    playAnimationBtn.addEventListener("click", playStepAnimation);
+
+    // Reset Button
+    resetBtn.addEventListener("click", () => {
+      activeString = "CodePath_UPRM";
+      stringInput.value = "CodePath_UPRM";
+      presetSelect.value = "CodePath_UPRM";
+      startInput.value = "";
+      stopInput.value = "";
+      stepInput.value = "";
+      renderIndexGrid();
+      updateSliceVisualizer();
+    });
+
+    // Keyboard Shortcuts: H or Esc to return to Hub
+    window.addEventListener("keydown", (e) => {
+      // Don't trigger if user is actively typing in custom string or slice input
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA");
+
+      if (!isTyping) {
+        if (e.key === "h" || e.key === "H" || e.key === "Escape") {
+          window.location.href = "./index.html";
+        } else if (e.key === " ") {
+          e.preventDefault();
+          playStepAnimation();
+        } else if (e.key === "r" || e.key === "R") {
+          resetBtn.click();
+        }
+      } else if (e.key === "Escape") {
+        activeEl.blur();
+      }
+    });
+
+    // Initialize on page load
+    renderIndexGrid();
+    updateSliceVisualizer();
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Python Logic Visualizer",
+  "description": "Interactive CS visualizer and simulation suite for Python classes, featuring the Python Variable Box quiz, hydraulic Boolean logic gates, automated water diverter if/elif/else control flow, Detroit Pizzeria function scope, Loop Prediction Quiz (for/while loops, continue, break), Python Slicing Visualizer (indices, strides, defaults), and 100% offline PWA capability.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
