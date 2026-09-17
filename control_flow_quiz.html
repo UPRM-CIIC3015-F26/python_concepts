@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Control Flow & Variable Debugger | Python Quiz Lab</title>
+  <meta name="description" content="Interactive Python control flow quiz and debugger. Trace if, if/else, if/elif/else, and nested conditional statements and predict variable outcomes.">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    :root {
+      --bg-base: #0a0e17;
+      --bg-panel: #111827;
+      --bg-panel-elevated: #1f2937;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.18);
+      --accent-cyan: #38bdf8;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-blue: #3b82f6;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0a0e17 85%);
+      color: #f1f5f9;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      height: 52px;
+      min-height: 52px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-back-hub {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-back-hub:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .app-icon-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+      color: #fff;
+    }
+    .app-icon-badge svg {
+      width: 18px;
+      height: 18px;
+    }
+    .app-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-subtitle-pill {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.18);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #cbd5e1;
+    }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-light);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    /* Main Debugger Layout */
+    main {
+      flex: 1;
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+      max-width: 1300px;
+      margin: 0 auto;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* Left Debugger Panel */
+    .debugger-sidebar {
+      width: 320px;
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+    .debugger-header {
+      background: rgba(30, 41, 59, 0.9);
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #93c5fd;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .debugger-content {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .variable-card {
+      background: rgba(10, 14, 23, 0.7);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .var-name {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+    .var-type {
+      color: #64748b;
+      font-size: 10px;
+      margin-left: 4px;
+    }
+    .var-val {
+      color: #facc15;
+      margin-top: 4px;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .var-val.updated {
+      color: #34d399;
+      animation: pulseVar 0.5s ease;
+    }
+    @keyframes pulseVar {
+      0% { transform: scale(1.05); color: #34d399; }
+      100% { transform: scale(1); color: #34d399; }
+    }
+
+    /* Right Main Panel */
+    .quiz-main-panel {
+      flex: 1;
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .quiz-progress {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-blue);
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .struct-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      text-transform: uppercase;
+    }
+
+    .code-editor-box {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      background: #0d1322;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 12px 0 16px 0;
+      color: #e2e8f0;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+      white-space: pre;
+    }
+    .code-line {
+      display: flex;
+      white-space: pre;
+    }
+    .line-num {
+      width: 24px;
+      color: #475569;
+      text-align: right;
+      padding-right: 12px;
+      user-select: none;
+    }
+    .kw { color: #f472b6; font-weight: 700; }
+    .op { color: #38bdf8; }
+    .str { color: #34d399; }
+    .num { color: #fbbf24; }
+    .var { color: #93c5fd; }
+
+    .question-prompt {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 12px;
+    }
+
+    .answer-input-area {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .answer-input {
+      background: #0d1322;
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: #fff;
+      outline: none;
+      width: 240px;
+      transition: all 0.2s ease;
+    }
+    .answer-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.6);
+    }
+
+    /* Options grid for choice questions */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+      max-width: 600px;
+    }
+    .option-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #cbd5e1;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .option-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .option-btn.selected {
+      background: rgba(59, 130, 246, 0.35);
+      border-color: #3b82f6;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* Feedback Banner */
+    .feedback-banner {
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: none;
+      margin-top: 8px;
+      animation: fadeIn 0.3s ease;
+    }
+    .feedback-banner.success {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #34d399;
+    }
+    .feedback-banner.error {
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid #f43f5e;
+      color: #fb7185;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .next-btn-container {
+      margin-top: 14px;
+      display: none;
+    }
+    .btn-next {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <a href="./index.html" class="btn-back-hub" title="Return to Visualizer Hub (Shortcut: [H] or [Esc])">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Hub</span>
+      </a>
+
+      <div class="app-title-group">
+        <div class="app-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        </div>
+        <div class="app-title">
+          <span>Control Flow &amp; Variable Debugger</span>
+          <span class="app-subtitle-pill">[Quiz Lab]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="stat-pill" id="scoreDisplay">Score: 0 | Streak: 0</div>
+      <button class="btn-action" id="soundToggleBtn">🔊 Sound On</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Debugger Sidebar -->
+    <aside class="debugger-sidebar">
+      <div class="debugger-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Live Debugger State</span>
+      </div>
+      <div class="debugger-content" id="debuggerVariables">
+        <!-- Dynamically populated variables -->
+      </div>
+    </aside>
+
+    <!-- Right Main Quiz Panel -->
+    <section class="quiz-main-panel">
+      <div class="quiz-progress">
+        <span id="progressText">Question 1 of 24</span>
+        <span class="struct-badge" id="structureBadge">Individual if</span>
+      </div>
+
+      <div class="code-editor-box" id="codeEditorBox">
+        <!-- Rendered code lines -->
+      </div>
+
+      <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+        <button class="btn-action" onclick="runDebuggerWalkthrough()" style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #93c5fd; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);">
+          🔍 Step-by-Step Debugger Walkthrough
+        </button>
+        <span style="font-size: 12px; color: #94a3b8;" id="debuggerStatus">Debugger Ready</span>
+      </div>
+
+      <div class="question-prompt" id="questionPrompt">
+        What is the final value of <span id="targetVarName" style="color: #38bdf8;">price</span> after execution?
+      </div>
+
+      <!-- Input or Options -->
+      <div id="answerInputContainer">
+        <div class="options-grid" id="optionsGrid" style="display: none; margin-bottom: 12px;">
+          <!-- Dynamically populated options -->
+        </div>
+        <div class="answer-input-area" id="textInputArea" style="margin-bottom: 12px;">
+          <input type="text" class="answer-input" id="userAnswerInput" placeholder="Enter value (e.g. 50, True)..." autocomplete="off" />
+        </div>
+        <div>
+          <button class="btn-submit" onclick="submitAnswer()">Evaluate &amp; Step</button>
+        </div>
+      </div>
+
+      <div class="feedback-banner" id="feedbackBanner"></div>
+
+      <div class="next-btn-container" id="nextContainer">
+        <button class="btn-next" onclick="nextQuestion()">Next Question ➔</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Master Question Bank covering individual if, if/else, if/elif/else, and nested if/else statements
+    const MASTER_QUESTIONS = [
+      // --- TYPE 1: Individual if statement ---
+      {
+        type: 'Individual if',
+        initialVars: { age: 18, price: 100 },
+        code: [
+          'price = 100',
+          'age = 18',
+          'if age >= 18:',
+          '    price = price - 20'
+        ],
+        targetVar: 'price',
+        answer: '80',
+        options: ['100', '80', '120', '0'],
+        explanation: 'age is 18, so age >= 18 is True. The statement price = price - 20 executes: 100 - 20 = 80.'
+      },
+      {
+        type: 'Individual if',
+        initialVars: { score: 92, grade: '"C"' },
+        code: [
+          'score = 92',
+          'grade = "C"',
+          'if score >= 90:',
+          '    grade = "A"'
+        ],
+        targetVar: 'grade',
+        answer: '"A"',
+        options: ['"C"', '"A"', '"B"', '"F"'],
+        explanation: 'score is 92, which is >= 90 (True). grade is reassigned from "C" to "A".'
+      },
+      {
+        type: 'Individual if',
+        initialVars: { temp: 15, status: '"Normal"' },
+        code: [
+          'temp = 15',
+          'status = "Normal"',
+          'if temp > 30:',
+          '    status = "Overheat"'
+        ],
+        targetVar: 'status',
+        answer: '"Normal"',
+        options: ['"Normal"', '"Overheat"', '"Warning"', '"Cold"'],
+        explanation: 'temp is 15, so temp > 30 is False. The individual if block is skipped, leaving status as "Normal".'
+      },
+      {
+        type: 'Individual if',
+        initialVars: { balance: 50, vip: true },
+        code: [
+          'balance = 50',
+          'vip = True',
+          'if vip:',
+          '    balance = balance + 50'
+        ],
+        targetVar: 'balance',
+        answer: '100',
+        options: ['50', '100', '0', '150'],
+        explanation: 'vip is True, so the if block runs: balance = 50 + 50 = 100.'
+      },
+      {
+        type: 'Individual if',
+        initialVars: { hours: 45, pay: 400 },
+        code: [
+          'hours = 45',
+          'pay = 400',
+          'if hours > 40:',
+          '    pay = pay + 50'
+        ],
+        targetVar: 'pay',
+        answer: '450',
+        options: ['400', '450', '500', '350'],
+        explanation: 'hours (45) > 40 is True. pay increases by 50 to 450.'
+      },
+      {
+        type: 'Individual if',
+        initialVars: { items: 6, discount: 0 },
+        code: [
+          'items = 6',
+          'discount = 0',
+          'if items >= 5:',
+          '    discount = 10'
+        ],
+        targetVar: 'discount',
+        answer: '10',
+        options: ['0', '5', '10', '15'],
+        explanation: 'items is 6 (>= 5 is True), so discount is set to 10.'
+      },
+
+      // --- TYPE 2: if / else statements ---
+      {
+        type: 'if / else',
+        initialVars: { age: 16, access: '""' },
+        code: [
+          'age = 16',
+          'if age >= 18:',
+          '    access = "Granted"',
+          'else:',
+          '    access = "Denied"'
+        ],
+        targetVar: 'access',
+        answer: '"Denied"',
+        options: ['"Granted"', '"Denied"', '"Pending"', '"Error"'],
+        explanation: 'age is 16, so age >= 18 is False. The execution falls into the else block, setting access to "Denied".'
+      },
+      {
+        type: 'if / else',
+        initialVars: { score: 75, result: '""' },
+        code: [
+          'score = 75',
+          'if score >= 60:',
+          '    result = "Pass"',
+          'else:',
+          '    result = "Fail"'
+        ],
+        targetVar: 'result',
+        answer: '"Pass"',
+        options: ['"Pass"', '"Fail"', '"Retake"', '"Honors"'],
+        explanation: 'score 75 >= 60 is True. The if branch runs, setting result to "Pass".'
+      },
+      {
+        type: 'if / else',
+        initialVars: { number: 7, parity: '""' },
+        code: [
+          'number = 7',
+          'if number % 2 == 0:',
+          '    parity = "Even"',
+          'else:',
+          '    parity = "Odd"'
+        ],
+        targetVar: 'parity',
+        answer: '"Odd"',
+        options: ['"Even"', '"Odd"', '"Zero"', '"Prime"'],
+        explanation: '7 % 2 == 1 (not 0), so the condition is False. The else branch runs, setting parity to "Odd".'
+      },
+      {
+        type: 'if / else',
+        initialVars: { loggedIn: false, nav: '""' },
+        code: [
+          'loggedIn = False',
+          'if loggedIn:',
+          '    nav = "Dashboard"',
+          'else:',
+          '    nav = "Login"'
+        ],
+        targetVar: 'nav',
+        answer: '"Login"',
+        options: ['"Dashboard"', '"Login"', '"Home"', '"Settings"'],
+        explanation: 'loggedIn is False, so execution jumps to else: nav = "Login".'
+      },
+      {
+        type: 'if / else',
+        initialVars: { speed: 85, ticket: false },
+        code: [
+          'speed = 85',
+          'if speed > 75:',
+          '    ticket = True',
+          'else:',
+          '    ticket = False'
+        ],
+        targetVar: 'ticket',
+        answer: 'True',
+        options: ['True', 'False', 'None', '0'],
+        explanation: '85 > 75 is True, so ticket is set to True.'
+      },
+      {
+        type: 'if / else',
+        initialVars: { stock: 0, status: '""' },
+        code: [
+          'stock = 0',
+          'if stock > 0:',
+          '    status = "Available"',
+          'else:',
+          '    status = "Sold Out"'
+        ],
+        targetVar: 'status',
+        answer: '"Sold Out"',
+        options: ['"Available"', '"Sold Out"', '"Pending"', '"Low Stock"'],
+        explanation: 'stock is 0, so stock > 0 is False. Else branch sets status to "Sold Out".'
+      },
+
+      // --- TYPE 3: if / elif / else ladders ---
+      {
+        type: 'if / elif / else',
+        initialVars: { score: 82, letter: '""' },
+        code: [
+          'score = 82',
+          'if score >= 90:',
+          '    letter = "A"',
+          'elif score >= 80:',
+          '    letter = "B"',
+          'elif score >= 70:',
+          '    letter = "C"',
+          'else:',
+          '    letter = "F"'
+        ],
+        targetVar: 'letter',
+        answer: '"B"',
+        options: ['"A"', '"B"', '"C"', '"F"'],
+        explanation: 'score 82 < 90 (skips if), but 82 >= 80 is True! The elif score >= 80 branch runs, setting letter to "B".'
+      },
+      {
+        type: 'if / elif / else',
+        initialVars: { temp: 22, mode: '""' },
+        code: [
+          'temp = 22',
+          'if temp > 30:',
+          '    mode = "AC"',
+          'elif temp < 18:',
+          '    mode = "Heat"',
+          'else:',
+          '    mode = "Eco"'
+        ],
+        targetVar: 'mode',
+        answer: '"Eco"',
+        options: ['"AC"', '"Heat"', '"Eco"', '"Off"'],
+        explanation: 'temp 22 is not > 30, and not < 18. It falls through to else, setting mode to "Eco".'
+      },
+      {
+        type: 'if / elif / else',
+        initialVars: { age: 65, ticketPrice: 0 },
+        code: [
+          'age = 65',
+          'if age < 12:',
+          '    ticketPrice = 10',
+          'elif age >= 60:',
+          '    ticketPrice = 15',
+          'else:',
+          '    ticketPrice = 20'
+        ],
+        targetVar: 'ticketPrice',
+        answer: '15',
+        options: ['10', '15', '20', '0'],
+        explanation: 'age 65 is not < 12, but age >= 60 is True. ticketPrice is set to 15.'
+      },
+      {
+        type: 'if / elif / else',
+        initialVars: { code: 404, msg: '""' },
+        code: [
+          'code = 404',
+          'if code == 200:',
+          '    msg = "OK"',
+          'elif code == 404:',
+          '    msg = "Not Found"',
+          'else:',
+          '    msg = "Error"'
+        ],
+        targetVar: 'msg',
+        answer: '"Not Found"',
+        options: ['"OK"', '"Not Found"', '"Error"', '"Redirect"'],
+        explanation: 'code is 404, matching the elif code == 404 branch: msg = "Not Found".'
+      },
+      {
+        type: 'if / elif / else',
+        initialVars: { level: 3, bonus: 0 },
+        code: [
+          'level = 3',
+          'if level == 1:',
+          '    bonus = 50',
+          'elif level == 2:',
+          '    bonus = 100',
+          'else:',
+          '    bonus = 200'
+        ],
+        targetVar: 'bonus',
+        answer: '200',
+        options: ['50', '100', '200', '0'],
+        explanation: 'level 3 does not match 1 or 2. Else branch runs: bonus = 200.'
+      },
+      {
+        type: 'if / elif / else',
+        initialVars: { speed: 45, fine: 0 },
+        code: [
+          'speed = 45',
+          'if speed > 80:',
+          '    fine = 300',
+          'elif speed > 60:',
+          '    fine = 150',
+          'else:',
+          '    fine = 0'
+        ],
+        targetVar: 'fine',
+        answer: '0',
+        options: ['300', '150', '0', '50'],
+        explanation: 'speed 45 is neither > 80 nor > 60. Else branch sets fine to 0.'
+      },
+
+      // --- TYPE 4: Nested (single) if / else statements ---
+      {
+        type: 'Nested if/else',
+        initialVars: { member: true, age: 20, fee: 50 },
+        code: [
+          'member = True',
+          'age = 20',
+          'fee = 50',
+          'if member:',
+          '    if age < 25:',
+          '        fee = 30',
+          '    else:',
+          '        fee = 40',
+          'else:',
+          '    fee = 50'
+        ],
+        targetVar: 'fee',
+        answer: '30',
+        options: ['50', '40', '30', '20'],
+        explanation: 'member is True (enters outer if). Inside, age (20) < 25 is True (enters inner if), setting fee to 30.'
+      },
+      {
+        type: 'Nested if/else',
+        initialVars: { member: false, age: 30, fee: 50 },
+        code: [
+          'member = False',
+          'age = 30',
+          'fee = 50',
+          'if member:',
+          '    if age < 25:',
+          '        fee = 30',
+          '    else:',
+          '        fee = 40',
+          'else:',
+          '    fee = 50'
+        ],
+        targetVar: 'fee',
+        answer: '50',
+        options: ['50', '40', '30', '0'],
+        explanation: 'member is False, so the outer if fails immediately and the outer else runs, keeping fee at 50.'
+      },
+      {
+        type: 'Nested if/else',
+        initialVars: { loggedIn: true, role: '"Admin"', access: '""' },
+        code: [
+          'loggedIn = True',
+          'role = "Admin"',
+          'if loggedIn:',
+          '    if role == "Admin":',
+          '        access = "Full"',
+          '    else:',
+          '        access = "Limited"',
+          'else:',
+          '    access = "None"'
+        ],
+        targetVar: 'access',
+        answer: '"Full"',
+        options: ['"Full"', '"Limited"', '"None"', '"Denied"'],
+        explanation: 'loggedIn is True, and role == "Admin" is True. access is set to "Full".'
+      },
+      {
+        type: 'Nested if/else',
+        initialVars: { loggedIn: true, role: '"Guest"', access: '""' },
+        code: [
+          'loggedIn = True',
+          'role = "Guest"',
+          'if loggedIn:',
+          '    if role == "Admin":',
+          '        access = "Full"',
+          '    else:',
+          '        access = "Limited"',
+          'else:',
+          '    access = "None"'
+        ],
+        targetVar: 'access',
+        answer: '"Limited"',
+        options: ['"Full"', '"Limited"', '"None"', '"Guest"'],
+        explanation: 'loggedIn is True, but role == "Admin" is False. Inner else runs: access = "Limited".'
+      },
+      {
+        type: 'Nested if/else',
+        initialVars: { isWeekend: false, sunny: true, plan: '""' },
+        code: [
+          'isWeekend = False',
+          'sunny = True',
+          'if isWeekend:',
+          '    plan = "Relax"',
+          'else:',
+          '    if sunny:',
+          '        plan = "Work Outside"',
+          '    else:',
+          '        plan = "Office Work"'
+        ],
+        targetVar: 'plan',
+        answer: '"Work Outside"',
+        options: ['"Relax"', '"Work Outside"', '"Office Work"', '"Sleep"'],
+        explanation: 'isWeekend is False (goes to outer else). Inside, sunny is True (goes to inner if), setting plan to "Work Outside".'
+      },
+      {
+        type: 'Nested if/else',
+        initialVars: { isWeekend: false, sunny: false, plan: '""' },
+        code: [
+          'isWeekend = False',
+          'sunny = False',
+          'if isWeekend:',
+          '    plan = "Relax"',
+          'else:',
+          '    if sunny:',
+          '        plan = "Work Outside"',
+          '    else:',
+          '        plan = "Office Work"'
+        ],
+        targetVar: 'plan',
+        answer: '"Office Work"',
+        options: ['"Relax"', '"Work Outside"', '"Office Work"', '"Stay Home"'],
+        explanation: 'isWeekend is False -> outer else. sunny is False -> inner else. plan = "Office Work".'
+      },
+      // --- TYPE 1.5: Multiple Sequential Individual Ifs (Values replaced/updated successively) ---
+      {
+        type: 'Multiple Sequential Ifs',
+        initialVars: { score: 70, bonus: 0 },
+        code: [
+          'score = 70',
+          'bonus = 0',
+          'if score >= 60:',
+          '    bonus = 5',
+          'if score >= 80:',
+          '    bonus = 20'
+        ],
+        targetVar: 'bonus',
+        answer: '5',
+        options: ['0', '5', '20', '25'],
+        explanation: 'First if (score >= 60) runs: bonus becomes 5. Second if (score >= 80) is False (70 < 80), so bonus remains 5.'
+      },
+      {
+        type: 'Multiple Sequential Ifs',
+        initialVars: { temp: 35, alert: '"None"' },
+        code: [
+          'temp = 35',
+          'alert = "None"',
+          'if temp > 30:',
+          '    alert = "Warning"',
+          'if temp > 40:',
+          '    alert = "Critical"'
+        ],
+        targetVar: 'alert',
+        answer: '"Warning"',
+        options: ['"None"', '"Warning"', '"Critical"', '"Off"'],
+        explanation: 'First if (35 > 30) runs: alert becomes "Warning". Second if (35 > 40) is False, so alert stays "Warning".'
+      },
+      {
+        type: 'Multiple Sequential Ifs',
+        initialVars: { points: 150, rank: '"Novice"' },
+        code: [
+          'points = 150',
+          'rank = "Novice"',
+          'if points >= 100:',
+          '    rank = "Pro"',
+          'if points >= 200:',
+          '    rank = "Master"'
+        ],
+        targetVar: 'rank',
+        answer: '"Pro"',
+        options: ['"Novice"', '"Pro"', '"Master"', '"Expert"'],
+        explanation: 'First if (150 >= 100) runs: rank becomes "Pro". Second if (150 >= 200) is False, so rank stays "Pro".'
+      },
+      {
+        type: 'Multiple Sequential Ifs',
+        initialVars: { count: 3, total: 10 },
+        code: [
+          'count = 3',
+          'total = 10',
+          'if count > 2:',
+          '    total = total + 5',
+          'if count > 5:',
+          '    total = total + 10'
+        ],
+        targetVar: 'total',
+        answer: '15',
+        options: ['10', '15', '25', '20'],
+        explanation: 'First if (3 > 2) is True: total = 10 + 5 = 15. Second if (3 > 5) is False, so total remains 15.'
+      }
+    ];
+
+    let QUESTIONS = [];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let soundEnabled = true;
+    let answered = false;
+    let currentVars = {};
+
+    // Fisher-Yates Shuffle Algorithm
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function initGame() {
+      QUESTIONS = shuffleArray(MASTER_QUESTIONS);
+      currentIndex = 0;
+      score = 0;
+      streak = 0;
+      scoreDisplay.textContent = `Score: ${score} | Streak: ${streak}`;
+      loadQuestion();
+    }
+
+    // DOM Elements
+    const progressText = document.getElementById('progressText');
+    const structureBadge = document.getElementById('structureBadge');
+    const codeEditorBox = document.getElementById('codeEditorBox');
+    const targetVarName = document.getElementById('targetVarName');
+    const userAnswerInput = document.getElementById('userAnswerInput');
+    const textInputArea = document.getElementById('textInputArea');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const feedbackBanner = document.getElementById('feedbackBanner');
+    const nextContainer = document.getElementById('nextContainer');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const debuggerVariables = document.getElementById('debuggerVariables');
+
+    function loadQuestion() {
+      answered = false;
+      feedbackBanner.style.display = 'none';
+      nextContainer.style.display = 'none';
+      userAnswerInput.value = '';
+      userAnswerInput.disabled = false;
+      const debuggerStatus = document.getElementById('debuggerStatus');
+      if (debuggerStatus) debuggerStatus.textContent = 'Debugger Ready';
+
+      const q = QUESTIONS[currentIndex];
+      currentVars = { ...q.initialVars };
+
+      progressText.textContent = `Question ${currentIndex + 1} of ${QUESTIONS.length}`;
+      structureBadge.textContent = q.type;
+      targetVarName.textContent = q.targetVar;
+
+      renderDebugger();
+      renderCode(q.code);
+
+      // Setup options or text input
+      if (q.options) {
+        textInputArea.style.display = 'none';
+        optionsGrid.style.display = 'grid';
+        renderOptions(q.options, q.targetVar);
+      } else {
+        textInputArea.style.display = 'flex';
+        optionsGrid.style.display = 'none';
+      }
+    }
+
+    function getExecutionSteps(codeLines, initialVars) {
+      let vars = { ...initialVars };
+      let steps = [];
+      let chainStates = [];
+      
+      codeLines.forEach((line, idx) => {
+        const trimmed = line.trim();
+        const indent = line.search(/\S/);
+        
+        if (!trimmed || trimmed.startsWith('#')) return;
+        
+        if (trimmed.startsWith('if ')) {
+          const cond = trimmed.substring(3, trimmed.endsWith(':') ? trimmed.length - 1 : trimmed.length).trim();
+          let res = false;
+          try {
+            let evalExpr = cond;
+            for (const [k, v] of Object.entries(vars)) {
+              evalExpr = evalExpr.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(v));
+            }
+            res = Boolean(eval(evalExpr));
+          } catch(e) {}
+          
+          chainStates.push({ indent: indent, matched: res, active: res });
+          steps.push({ lineIdx: idx, type: 'cond' });
+        } else if (trimmed.startsWith('elif ')) {
+          const cond = trimmed.substring(5, trimmed.endsWith(':') ? trimmed.length - 1 : trimmed.length).trim();
+          let parentChain = chainStates.filter(c => c.indent === indent).pop();
+          let res = false;
+          let isActive = false;
+          if (parentChain) {
+            if (!parentChain.matched) {
+              try {
+                let evalExpr = cond;
+                for (const [k, v] of Object.entries(vars)) {
+                  evalExpr = evalExpr.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(v));
+                }
+                res = Boolean(eval(evalExpr));
+                if (res) parentChain.matched = true;
+                isActive = res;
+              } catch(e) {}
+            }
+          }
+          chainStates.push({ indent: indent, matched: parentChain ? parentChain.matched : false, active: isActive });
+          steps.push({ lineIdx: idx, type: 'cond' });
+        } else if (trimmed === 'else:') {
+          let parentChain = chainStates.filter(c => c.indent === indent).pop();
+          let isActive = false;
+          if (parentChain) {
+            if (!parentChain.matched) {
+              parentChain.matched = true;
+              isActive = true;
+            }
+          }
+          chainStates.push({ indent: indent, matched: true, active: isActive });
+          steps.push({ lineIdx: idx, type: 'cond' });
+        } else if (indent > 0) {
+          let enclosing = chainStates.filter(c => c.indent < indent).pop();
+          let isActive = enclosing ? enclosing.active : true;
+          
+          if (isActive) {
+            if (trimmed.includes('=')) {
+              const parts = trimmed.split('=').map(s => s.trim());
+              const varName = parts[0];
+              const expr = parts[1];
+              try {
+                let evaluated = expr;
+                for (const [k, v] of Object.entries(vars)) {
+                  evaluated = evaluated.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(v));
+                }
+                vars[varName] = eval(evaluated);
+              } catch(e) {}
+            }
+            steps.push({ lineIdx: idx, type: 'assign' });
+          }
+        } else {
+          if (trimmed.includes('=')) {
+            const parts = trimmed.split('=').map(s => s.trim());
+            const varName = parts[0];
+            const expr = parts[1];
+            try {
+              let evaluated = expr;
+              for (const [k, v] of Object.entries(vars)) {
+                evaluated = evaluated.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(v));
+              }
+              vars[varName] = eval(evaluated);
+            } catch(e) {}
+          }
+          steps.push({ lineIdx: idx, type: 'assign' });
+        }
+      });
+      return steps;
+    }
+
+    let isWalkingThrough = false;
+    function runDebuggerWalkthrough() {
+      if (isWalkingThrough) return;
+      isWalkingThrough = true;
+      const q = QUESTIONS[currentIndex];
+      currentVars = { ...q.initialVars };
+      renderDebugger();
+      
+      const lines = codeEditorBox.querySelectorAll('.code-line');
+      const steps = getExecutionSteps(q.code, q.initialVars);
+      let stepIdx = 0;
+      
+      const debuggerStatus = document.getElementById('debuggerStatus');
+      if (debuggerStatus) debuggerStatus.textContent = 'Stepping active path...';
+      
+      function stepNext() {
+        if (stepIdx < steps.length) {
+          lines.forEach(l => {
+            l.style.background = 'transparent';
+            l.style.borderLeft = 'none';
+          });
+          
+          const step = steps[stepIdx];
+          const activeLine = lines[step.lineIdx];
+          if (activeLine) {
+            activeLine.style.background = 'rgba(59, 130, 246, 0.25)';
+            activeLine.style.borderLeft = '3px solid #3b82f6';
+          }
+          
+          const codeText = q.code[step.lineIdx].trim();
+          if (codeText.includes('=')) {
+            const parts = codeText.split('=').map(s => s.trim());
+            const varName = parts[0];
+            const expr = parts[1];
+            if (currentVars.hasOwnProperty(varName)) {
+              if (expr === 'True' || expr === 'true') currentVars[varName] = true;
+              else if (expr === 'False' || expr === 'false') currentVars[varName] = false;
+              else if (!isNaN(expr)) currentVars[varName] = Number(expr);
+              else if (expr.startsWith('"') || expr.startsWith("'")) currentVars[varName] = expr;
+              else {
+                try {
+                  let evaluated = expr;
+                  for (const [k, v] of Object.entries(currentVars)) {
+                    evaluated = evaluated.replace(new RegExp('\\b' + k + '\\b', 'g'), JSON.stringify(v));
+                  }
+                  currentVars[varName] = eval(evaluated);
+                } catch(e) {}
+              }
+              renderDebugger(varName);
+            }
+          }
+          
+          stepIdx++;
+          setTimeout(stepNext, 600);
+        } else {
+          lines.forEach(l => {
+            l.style.background = 'transparent';
+            l.style.borderLeft = 'none';
+          });
+          if (debuggerStatus) debuggerStatus.textContent = 'Execution finished! Predict answer.';
+          isWalkingThrough = false;
+        }
+      }
+      
+      stepNext();
+    }
+
+    function renderDebugger(updatedVar = null) {
+      debuggerVariables.innerHTML = '';
+      for (const [k, v] of Object.entries(currentVars)) {
+        const card = document.createElement('div');
+        card.className = 'variable-card';
+        const isUpdated = (k === updatedVar);
+        card.innerHTML = `
+          <div><span class="var-name">${k}</span></div>
+          <div class="var-val ${isUpdated ? 'updated' : ''}">${v}</div>
+        `;
+        debuggerVariables.appendChild(card);
+      }
+    }
+
+    function renderCode(codeLines) {
+      codeEditorBox.innerHTML = '';
+      codeLines.forEach((line, idx) => {
+        const div = document.createElement('div');
+        div.className = 'code-line';
+        
+        // Highlight keywords
+        let formatted = line
+            .replace(/\bif\b/g, '<span class="kw">if</span>')
+            .replace(/\belif\b/g, '<span class="kw">elif</span>')
+            .replace(/\belse\b/g, '<span class="kw">else</span>')
+            .replace(/\bTrue\b/g, '<span class="num">True</span>')
+            .replace(/\bFalse\b/g, '<span class="num">False</span>');
+
+        div.innerHTML = `<span class="line-num">${idx + 1}</span><span style="white-space: pre;">${formatted}</span>`;
+        codeEditorBox.appendChild(div);
+      });
+    }
+
+    function renderOptions(options, targetVar) {
+      optionsGrid.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (answered) return;
+          document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          userAnswerInput.value = opt;
+          submitAnswer();
+        };
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    // Web Audio
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        if (type === 'win') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.1);
+          osc.frequency.setValueAtTime(659.25, now + 0.2);
+          osc.frequency.setValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(120, now + 0.3);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        }
+      } catch (e) {}
+    }
+
+    soundToggleBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundToggleBtn.textContent = soundEnabled ? '🔊 Sound On' : '🔇 Muted';
+    });
+
+    function submitAnswer() {
+      if (answered) return;
+      const userVal = userAnswerInput.value.trim();
+      if (!userVal) return;
+
+      answered = true;
+      userAnswerInput.disabled = true;
+
+      const q = QUESTIONS[currentIndex];
+      // Normalize user answer comparison
+      const cleanUser = userVal.replace(/['"]/g, '');
+      const cleanAns = q.answer.replace(/['"]/g, '');
+      const isCorrect = (cleanUser === cleanAns || userVal === q.answer);
+
+      // Update debugger with correct final value
+      currentVars[q.targetVar] = q.answer;
+      renderDebugger(q.targetVar);
+
+      if (isCorrect) {
+        score += 10;
+        streak += 1;
+        playSound('win');
+        feedbackBanner.className = 'feedback-banner success';
+        feedbackBanner.innerHTML = `<strong>🎉 [CORRECT] Debugger trace passed!</strong><br>${q.explanation}`;
+      } else {
+        streak = 0;
+        playSound('error');
+        feedbackBanner.className = 'feedback-banner error';
+        feedbackBanner.innerHTML = `<strong>❌ [INCORRECT] Debugger trace failed.</strong> Expected <code>${q.targetVar} = ${q.answer}</code>.<br>${q.explanation}`;
+      }
+
+      scoreDisplay.textContent = `Score: ${score} | Streak: ${streak}`;
+      feedbackBanner.style.display = 'block';
+      nextContainer.style.display = 'block';
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= QUESTIONS.length) {
+        QUESTIONS = shuffleArray(MASTER_QUESTIONS);
+        currentIndex = 0;
+      }
+      loadQuestion();
+    }
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !answered) {
+        submitAnswer();
+      } else if (e.key === 'Escape' || e.key === 'h' || e.key === 'H') {
+        window.location.href = './index.html';
+      }
+    });
+
+    initGame();
+  </script>
+</body>
+</html>

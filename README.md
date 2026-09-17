@@ -4,29 +4,33 @@ An interactive computer science visualizer and educational simulation suite desi
 
 ---
 
-## 🚀 Core Interactive Modules
+## 🚀 Core Interactive Modules & Labs
 
-1. **Python Variable Box Quiz (`variable_box.html`)**
+1. **Python Variable Box Lab (`variable_box.html`)**
    - **Concepts**: Variables, data types (`int`, `float`, `str`, `bool`), type casting, arithmetic operators (`+`, `-`, `*`, `/`, `//`, `%`, `**`), and `ValueError` handling.
    - **Mechanic**: Closed 3D cardboard memory box with interactive Python code prediction, dynamic variable assignment, and physics-based opening or box collapse on evaluation.
 
-2. **Hydraulic Boolean Logic Gates (`index.html`)**
+2. **Hydraulic Boolean Logic Gates (`boolean_quiz.html`)**
    - **Concepts**: Boolean operators (`and`, `or`, `not`, `nand`, `nor`, compound logic), short-circuit evaluation, truth tables, and strict Python boolean types (`True`, `False`).
-   - **Mechanic**: Industrial fluid dynamics simulation featuring supply tanks, interactive valves, water flow particles, animated turbines, automated truth tables, and a progressive 10-question challenge curriculum.
+   - **Mechanic**: Industrial fluid dynamics simulation featuring supply tanks, interactive valves, water flow particles, animated turbines, automated truth tables, and a progressive challenge curriculum.
 
 3. **Automated Water Diverter (`diverter.html`)**
    - **Concepts**: Conditional branching (`if / elif / else`), mutual exclusivity, and default fallbacks.
    - **Mechanic**: An industrial temperature-regulated water routing system. Adjust the temperature slider (-50°C to 150°C) to direct water into the Steam Turbine (`if`), Ice Crusher (`elif`), or Municipal Tank (`else`).
 
-4. **Detroit Pizzeria Function Scope (`pizzeria.html`)**
+4. **Control Flow & Variable Debugger Quiz (`control_flow_quiz.html`)**
+   - **Concepts**: Conditional statements (`if`, `if/else`, `if/elif/else`, nested branches) and step-by-step state tracking.
+   - **Mechanic**: Interactive debugging simulator with real-time variable state inspection and question challenges.
+
+5. **Detroit Pizzeria Function Scope (`pizzeria.html`)**
    - **Concepts**: Function parameters, local scope vs. global scope, variable shadowing, captured return values, and garbage collection.
    - **Mechanic**: A Detroit-style pizzeria kitchen analogy where ingredients move between the Dining Room (global) and Kitchen (local) with live variable inspection.
 
-5. **Loop Prediction Quiz (`loop_deck.html`)**
+6. **Loop Prediction Quiz (`loop_deck.html`)**
    - **Concepts**: `for` loops, `while` loops, `range()` arguments, `continue` skips, and `break` terminations.
    - **Mechanic**: A card-deck challenge interface where students predict loop outcomes into a predicted hand, step through iterations, and observe real-time list appending.
 
-6. **Python String Slicing Visualizer (`slicing.html`)**
+7. **Python String Slicing Visualizer (`slicing.html`)**
    - **Concepts**: String indexing, positive indices (`0` to `len-1`), negative indices (`-len` to `-1`), default bounds, and stride steps (`s[start:stop:step]`).
    - **Mechanic**: Interactive index grid with real-time character highlighting and step-by-step traversal.
 
@@ -68,3 +72,4 @@ An interactive computer science visualizer and educational simulation suite desi
 ## 📜 License
 
 This project is open-source software licensed under the **[BSD 3-Clause License](LICENSE)**.
+

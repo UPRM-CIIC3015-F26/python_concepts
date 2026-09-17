@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Boolean Logic Showdown | Python Quiz Game Show</title>
+  <meta name="description" content="Test your Python boolean logic skills in an interactive game show quiz featuring True/False doors, prizes, and goats!">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    :root {
+      --bg-base: #0a0e17;
+      --bg-panel: #111827;
+      --bg-panel-elevated: #1f2937;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.18);
+      --accent-cyan: #38bdf8;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0a0e17 85%);
+      color: #f1f5f9;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      height: 52px;
+      min-height: 52px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-back-hub {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-light);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-back-hub:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .app-icon-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+      color: #fff;
+    }
+    .app-icon-badge svg {
+      width: 18px;
+      height: 18px;
+    }
+    .app-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-subtitle-pill {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fcd34d;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #cbd5e1;
+    }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-light);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    /* Main Game Show Arena */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+    }
+
+    .quiz-card {
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 16px;
+      padding: 24px 32px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .quiz-progress {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-gold);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .expression-box {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: #f8fafc;
+      background: rgba(10, 14, 23, 0.9);
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      padding: 18px 28px;
+      margin: 12px 0 16px 0;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+      word-break: break-all;
+    }
+
+    .quiz-instructions {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* Doors Arena */
+    .doors-arena {
+      display: flex;
+      gap: 32px;
+      width: 100%;
+      max-width: 650px;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .game-door {
+      flex: 1;
+      height: 220px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 4px solid #475569;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      perspective: 1000px;
+      overflow: hidden;
+    }
+
+    .game-door.door-true {
+      border-color: #34d399;
+      background: linear-gradient(135deg, #064e3b, #022c22);
+    }
+    .game-door.door-false {
+      border-color: #fb7185;
+      background: linear-gradient(135deg, #881337, #4c0519);
+    }
+
+    .game-door:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .door-label {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .door-true .door-label { color: #34d399; text-shadow: 0 0 12px rgba(52, 211, 153, 0.5); }
+    .door-false .door-label { color: #fb7185; text-shadow: 0 0 12px rgba(251, 113, 133, 0.5); }
+
+    .door-knob {
+      width: 16px;
+      height: 16px;
+      background: #fbbf24;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .door-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: inherit;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.4s ease;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .game-door.opened .door-content {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .game-door.opened .door-front {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .door-front {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .prize-icon {
+      font-size: 48px;
+      margin-bottom: 6px;
+      animation: bounce 1s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+
+    .prize-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .prize-desc {
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+
+    /* Feedback Box */
+    .feedback-banner {
+      margin-top: 14px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      max-width: 650px;
+      width: 100%;
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .feedback-banner.success {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #34d399;
+    }
+    .feedback-banner.error {
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid #f43f5e;
+      color: #fb7185;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .next-btn-container {
+      margin-top: 14px;
+      display: none;
+    }
+    .btn-next {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.6);
+    }
+
+    /* Hint / Rule Box */
+    .rule-box {
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 16px;
+      max-width: 650px;
+      width: 100%;
+      text-align: left;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+    .rule-box strong { color: #f8fafc; }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <header>
+    <div class="header-left">
+      <a href="./index.html" class="btn-back-hub" title="Return to Visualizer Hub (Shortcut: [H] or [Esc])">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Hub</span>
+      </a>
+
+      <div class="app-title-group">
+        <div class="app-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="app-title">
+          <span>Boolean Logic Showdown</span>
+          <span class="app-subtitle-pill">[Quiz Game Show &bull; 32 Randomized Questions]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="stat-pill" id="scoreDisplay">Score: 0 | Streak: 0</div>
+      <button class="btn-action" id="soundToggleBtn">🔊 Sound On</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="progressText">Question 1 of 32</div>
+      <div class="expression-box" id="expressionText">5 > 3 and "py" in "python"</div>
+      <div class="quiz-instructions">
+        🧠 Evaluate the Python boolean expression above. Choose the correct door: <strong>TRUE</strong> or <strong>FALSE</strong>! Pick right to win a fabulous prize &amp; confetti; pick wrong and meet the goat! 🐐
+      </div>
+
+      <div class="doors-arena">
+        <!-- Door True -->
+        <div class="game-door door-true" id="doorTrue" onclick="handleDoorClick(true)">
+          <div class="door-front">
+            <div class="door-label">TRUE</div>
+            <div style="font-size: 11px; color: #a7f3d0; font-weight: 600;">[ Select True ]</div>
+            <div class="door-knob"></div>
+          </div>
+          <div class="door-content" id="contentTrue">
+            <div class="prize-icon" id="prizeTrueIcon">🏆</div>
+            <div class="prize-title" id="prizeTrueTitle">Gold Trophy</div>
+            <div class="prize-desc" id="prizeTrueDesc">Correct! Expression evaluates to True.</div>
+          </div>
+        </div>
+
+        <!-- Door False -->
+        <div class="game-door door-false" id="doorFalse" onclick="handleDoorClick(false)">
+          <div class="door-front">
+            <div class="door-label">FALSE</div>
+            <div style="font-size: 11px; color: #fecdd3; font-weight: 600;">[ Select False ]</div>
+            <div class="door-knob"></div>
+          </div>
+          <div class="door-content" id="contentFalse">
+            <div class="prize-icon" id="prizeFalseIcon">🐐</div>
+            <div class="prize-title" id="prizeFalseTitle">The Booby Prize Goat</div>
+            <div class="prize-desc" id="prizeFalseDesc">Baaah! Expression actually evaluates to True!</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback-banner" id="feedbackBanner"></div>
+
+      <div class="next-btn-container" id="nextContainer">
+        <button class="btn-next" onclick="nextQuestion()">Next Question ➔</button>
+      </div>
+
+      <div class="rule-box" id="ruleBox">
+        <strong>💡 Python Logic Rules:</strong> Precedence: Parentheses <code>()</code> ➔ Comparisons (`&lt;`, `&gt;`, `==`, `!=`, `in`) ➔ <code>not</code> ➔ <code>and</code> ➔ <code>or</code>. String <code>in</code> checks substring presence (e.g., <code>"py" in "python"</code> is <code>True</code>).
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Master Question Bank: 32 Randomized Questions covering and, or, not, (), comparisons, and string 'in'
+    const MASTER_QUESTIONS = [
+      { expr: '5 > 3 and "py" in "python"', answer: true, explanation: '5 > 3 is True and "py" is in "python" (True). True and True is True.' },
+      { expr: 'not (10 == 10) or "cat" in "dog"', answer: false, explanation: '10 == 10 is True -> not True is False. "cat" in "dog" is False. False or False is False.' },
+      { expr: '(2 + 3 == 5) and not ("a" in "bcd")', answer: true, explanation: '2 + 3 == 5 is True. "a" in "bcd" is False -> not False is True. True and True is True.' },
+      { expr: '"code" in "codepath" or 7 < 4', answer: true, explanation: '"code" in "codepath" is True. In OR logic, left side True short-circuits to True.' },
+      { expr: 'not ("python" in "java" or 5 != 5)', answer: true, explanation: '"python" in "java" is False, 5 != 5 is False. False or False is False. not False is True.' },
+      { expr: '(10 > 20) and ("apple" in "pineapple")', answer: false, explanation: '10 > 20 is False. In AND logic, left side False short-circuits to False.' },
+      { expr: 'not not (3 <= 3)', answer: true, explanation: '3 <= 3 is True. not True is False. not False is True.' },
+      { expr: '("x" in "xyz") and (100 == 10 * 10)', answer: true, explanation: '"x" in "xyz" is True, 100 == 100 is True. True and True is True.' },
+      { expr: '(15 > 20) or not ("z" in "abc")', answer: true, explanation: '15 > 20 is False. "z" in "abc" is False -> not False is True. False or True is True.' },
+      { expr: 'not (5 == 5 and "test" in "contest")', answer: false, explanation: '5 == 5 is True, "test" in "contest" is True -> True and True is True. not True is False.' },
+      { expr: '("a" in "apple") and ("b" in "banana") and (2 + 2 == 4)', answer: true, explanation: 'All conditions ("a" in "apple", "b" in "banana", 4 == 4) are True. True and True and True is True.' },
+      { expr: 'not ("hello" in "world") and (4 > 9)', answer: false, explanation: '"hello" in "world" is False -> not False is True. But 4 > 9 is False. True and False is False.' },
+      { expr: '"ai" in "openai" and 10 >= 10', answer: true, explanation: '"ai" in "openai" is True, 10 >= 10 is True. True and True is True.' },
+      { expr: 'not (7 != 7) or ("b" in "a")', answer: true, explanation: '7 != 7 is False -> not False is True. True or False is True.' },
+      { expr: '(5 == 5) and not ("py" in "java")', answer: true, explanation: '5 == 5 is True. "py" in "java" is False -> not False is True. True and True is True.' },
+      { expr: '"data" in "database" and not (3 > 5)', answer: true, explanation: '"data" in "database" is True. 3 > 5 is False -> not False is True. True and True is True.' },
+      { expr: 'not ("x" in "abc" or "y" in "abc")', answer: true, explanation: '"x" in "abc" is False, "y" in "abc" is False. False or False is False. not False is True.' },
+      { expr: '(1 + 1 == 3) or ("z" in "zero")', answer: true, explanation: '1 + 1 == 3 is False, but "z" in "zero" is True. False or True is True.' },
+      { expr: 'not not not (2 == 2)', answer: false, explanation: '2 == 2 is True -> not True is False -> not False is True -> not True is False.' },
+      { expr: '("python" in "ipython") and (5 < 2)', answer: false, explanation: '"python" in "ipython" is True, but 5 < 2 is False. True and False is False.' },
+      { expr: 'not (10 < 5) and ("cat" in "concatenate")', answer: true, explanation: '10 < 5 is False -> not False is True. "cat" in "concatenate" is True. True and True is True.' },
+      { expr: '(8 == 8) or ("dog" in "cat") and (9 > 12)', answer: true, explanation: 'Precedence: (8 == 8) is True. In OR expression, True || ... short-circuits to True.' },
+      { expr: 'not ("a" in "bcd" and 4 == 4)', answer: true, explanation: '"a" in "bcd" is False and 4 == 4 is True -> False and True is False. not False is True.' },
+      { expr: '("io" in "audio") and not ("x" in "abc")', answer: true, explanation: '"io" in "audio" is True, "x" in "abc" is False -> not False is True. True and True is True.' },
+      { expr: 'not (20 == 20) and ("run" in "runner")', answer: false, explanation: '20 == 20 is True -> not False is False. False and True short-circuits to False.' },
+      { expr: '(3 * 3 == 9) and ("fast" in "faster")', answer: true, explanation: '3 * 3 == 9 is True, "fast" in "faster" is True. True and True is True.' },
+      { expr: 'not ("test" in "exam") or not (1 != 1)', answer: true, explanation: '"test" in "exam" is False -> not False is True. True or ... is True.' },
+      { expr: '("net" in "internet") and (15 % 3 == 0)', answer: true, explanation: '"net" in "internet" is True, 15 % 3 == 0 is True. True and True is True.' },
+      { expr: 'not (8 > 3 or "a" in "bcd")', answer: false, explanation: '8 > 3 is True. True or False is True. not True is False.' },
+      { expr: '(12 / 4 == 3) and ("script" in "javascript")', answer: true, explanation: '12 / 4 == 3 is True, "script" in "javascript" is True. True and True is True.' },
+      { expr: 'not not ("a" in "array")', answer: true, explanation: '"a" in "array" is True. not True is False. not False is True.' },
+      { expr: '("python" in "snake") or (5 == 6)', answer: false, explanation: '"python" in "snake" is False and 5 == 6 is False. False or False is False.' }
+    ];
+
+    let QUESTIONS = [];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let soundEnabled = true;
+    let answered = false;
+
+    // Fisher-Yates Shuffle Algorithm for true randomness
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Initialize game with randomized questions
+    function initGame() {
+      QUESTIONS = shuffleArray(MASTER_QUESTIONS);
+      currentIndex = 0;
+      score = 0;
+      streak = 0;
+      scoreDisplay.textContent = `Score: ${score} | Streak: ${streak}`;
+      loadQuestion();
+    }
+
+    const PRIZES = [
+      { icon: '🏆', title: 'Gold Python Trophy', desc: 'Fabulous! You picked the correct door!' },
+      { icon: '🏎️', title: 'Turbo Sports Car', desc: 'Vroom! You won the prize car!' },
+      { icon: '🍕', title: 'Giant Deep Dish Pizza', desc: 'Delicious! You picked the winning door!' },
+      { icon: '💎', title: 'Diamond Syntax Gem', desc: 'Brilliant! You found the hidden treasure!' }
+    ];
+
+    const GOATS = [
+      { icon: '🐐', title: 'The Booby Prize Goat', desc: 'Baaah! That door had the goat!' },
+      { icon: '🐐', title: 'Hungry Lecture Goat', desc: 'Munch munch! The goat was hiding behind that door!' },
+      { icon: '🐐', title: 'Confused Syntax Goat', desc: 'Baaah! Wrong door! Meet the goat!' }
+    ];
+
+    // DOM Elements
+    const progressText = document.getElementById('progressText');
+    const expressionText = document.getElementById('expressionText');
+    const feedbackBanner = document.getElementById('feedbackBanner');
+    const nextContainer = document.getElementById('nextContainer');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const doorTrue = document.getElementById('doorTrue');
+    const doorFalse = document.getElementById('doorFalse');
+
+    function loadQuestion() {
+      answered = false;
+      feedbackBanner.style.display = 'none';
+      nextContainer.style.display = 'none';
+      doorTrue.classList.remove('opened');
+      doorFalse.classList.remove('opened');
+
+      setupDoorContent();
+
+      const q = QUESTIONS[currentIndex];
+      progressText.textContent = `Question ${currentIndex + 1} of ${QUESTIONS.length}`;
+      expressionText.textContent = q.expr;
+    }
+
+    // Configure doors based on correct answer
+    function setupDoorContent() {
+      const q = QUESTIONS[currentIndex];
+      const correctBool = q.answer; // true or false
+
+      const prize = PRIZES[Math.floor(Math.random() * PRIZES.length)];
+      const goat = GOATS[Math.floor(Math.random() * GOATS.length)];
+
+      const trueDoorContent = document.getElementById('contentTrue');
+      const falseDoorContent = document.getElementById('contentFalse');
+
+      if (correctBool === true) {
+        // True door has prize, False door has goat
+        trueDoorContent.innerHTML = `
+          <div class="prize-icon">${prize.icon}</div>
+          <div class="prize-title">${prize.title}</div>
+          <div class="prize-desc">Correct! ${prize.desc}</div>
+        `;
+        falseDoorContent.innerHTML = `
+          <div class="prize-icon">${goat.icon}</div>
+          <div class="prize-title">${goat.title}</div>
+          <div class="prize-desc">Baaah! Expression is True, so this door has the goat!</div>
+        `;
+      } else {
+        // False door has prize, True door has goat
+        falseDoorContent.innerHTML = `
+          <div class="prize-icon">${prize.icon}</div>
+          <div class="prize-title">${prize.title}</div>
+          <div class="prize-desc">Correct! ${prize.desc}</div>
+        `;
+        trueDoorContent.innerHTML = `
+          <div class="prize-icon">${goat.icon}</div>
+          <div class="prize-title">${goat.title}</div>
+          <div class="prize-desc">Baaah! Expression is False, so this door has the goat!</div>
+        `;
+      }
+    }
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        if (type === 'win') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.1);
+          osc.frequency.setValueAtTime(659.25, now + 0.2);
+          osc.frequency.setValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } else if (type === 'goat') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(120, now + 0.3);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        }
+      } catch (e) {}
+    }
+
+    soundToggleBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundToggleBtn.textContent = soundEnabled ? '🔊 Sound On' : '🔇 Muted';
+    });
+
+    function handleDoorClick(guessedBool) {
+      if (answered) return;
+      answered = true;
+
+      const q = QUESTIONS[currentIndex];
+      const correctBool = q.answer;
+      const isCorrect = (guessedBool === correctBool);
+
+      // Open ONLY the chosen door!
+      if (guessedBool === true) {
+        doorTrue.classList.add('opened');
+      } else {
+        doorFalse.classList.add('opened');
+      }
+
+      if (isCorrect) {
+        score += 10;
+        streak += 1;
+        playSound('win');
+        triggerConfetti();
+        feedbackBanner.className = 'feedback-banner success';
+        feedbackBanner.innerHTML = `<strong>🎉 [CORRECT] You opened the winning door!</strong><br>${q.explanation}`;
+      } else {
+        streak = 0;
+        playSound('goat');
+        feedbackBanner.className = 'feedback-banner error';
+        feedbackBanner.innerHTML = `<strong>🐐 [INCORRECT] Oof! You opened the door with the goat!</strong><br>${q.explanation}`;
+      }
+
+      scoreDisplay.textContent = `Score: ${score} | Streak: ${streak}`;
+      feedbackBanner.style.display = 'block';
+      nextContainer.style.display = 'block';
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= QUESTIONS.length) {
+        // Re-shuffle for endless replayability
+        QUESTIONS = shuffleArray(MASTER_QUESTIONS);
+        currentIndex = 0;
+      }
+      loadQuestion();
+    }
+
+    // Confetti System
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const ctx = confettiCanvas.getContext('2d');
+    let confettis = [];
+
+    function resizeConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConfetti);
+    resizeConfetti();
+
+    function triggerConfetti() {
+      confettis = [];
+      const colors = ['#f59e0b', '#38bdf8', '#10b981', '#f43f5e', '#a855f7', '#34d399'];
+      for (let i = 0; i < 120; i++) {
+        confettis.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2,
+          vx: (Math.random() - 0.5) * 16,
+          vy: (Math.random() - 0.7) * 16 - 4,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 15,
+          gravity: 0.35,
+          opacity: 1.0
+        });
+      }
+    }
+
+    function updateConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      for (let i = confettis.length - 1; i >= 0; i--) {
+        const c = confettis[i];
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vy += c.gravity;
+        c.rotation += c.rotSpeed;
+        c.opacity -= 0.012;
+
+        if (c.opacity <= 0 || c.y > window.innerHeight) {
+          confettis.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate((c.rotation * Math.PI) / 180);
+        ctx.globalAlpha = c.opacity;
+        ctx.fillStyle = c.color;
+        ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
+        ctx.restore();
+      }
+      requestAnimationFrame(updateConfetti);
+    }
+    updateConfetti();
+
+    // Keyboard shortcut: Esc or H returns to hub
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'h' || e.key === 'H') {
+        window.location.href = './index.html';
+      }
+    });
+
+    initGame();
+  </script>
+</body>
+</html>
